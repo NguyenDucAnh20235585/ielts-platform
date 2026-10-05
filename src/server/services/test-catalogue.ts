@@ -14,6 +14,7 @@ import {
   TEST_TYPES,
 } from "@/features/test/api-enums";
 import type { CurrentUser } from "@/server/auth/current-user";
+import { likePattern } from "@/server/db/like";
 import type { Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
 import { offsetOf, paginated } from "@/server/http/pagination";
@@ -52,11 +53,6 @@ export type CatalogueQuery = {
   page: number;
   limit: number;
 };
-
-/** Escapes LIKE wildcards so a search for "50%" matches literally. */
-function likePattern(text: string): string {
-  return `%${text.replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
-}
 
 /** api-contract §2.6 TestSummary */
 function toSummary(row: CatalogueRow) {

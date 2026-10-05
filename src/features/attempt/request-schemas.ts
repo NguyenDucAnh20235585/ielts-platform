@@ -3,6 +3,7 @@ import { z } from "zod";
 import { paginationQuery } from "@/server/http/pagination";
 
 import { ATTEMPT_STATUSES, TEST_MODES, TEST_TYPES } from "@/features/test/api-enums";
+import { apiEnum } from "@/features/test/api-enum-schema";
 
 /** One answer in PATCH …/answers and POST …/submit (api-contract §2.4). Shape per format is checked later. */
 const answerItem = z.strictObject({
@@ -19,20 +20,6 @@ export const submitBody = z.strictObject({
 });
 
 export const flagBody = z.strictObject({ flagged: z.boolean() });
-
-/** Accepts the API value ("READING") and returns the DB value ("reading"). */
-function apiEnum<Map extends Record<string, string>>(map: Map) {
-  const entries = Object.entries(map);
-  const apiValues = entries.map(([, api]) => api);
-  return z
-    .string()
-    .refine((value) => apiValues.includes(value), { message: `Expected one of: ${apiValues.join(", ")}` })
-    .transform((value) => {
-      const entry = entries.find(([, api]) => api === value);
-      if (!entry) throw new Error("unreachable");
-      return entry[0] as keyof Map & string;
-    });
-}
 
 // Unknown query parameters are ignored (e.g. cache-busting "?_=123"); bodies are strict.
 export const catalogueQuery = z.object({
