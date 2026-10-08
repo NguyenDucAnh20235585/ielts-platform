@@ -3,8 +3,9 @@ import postgres from "postgres";
 
 import { serverEnv } from "@/config/env";
 
-export type Sql = postgres.Sql;
-export type TransactionSql = postgres.TransactionSql;
+import type { Sql } from "./types";
+
+export type { Queryable, Sql, TransactionSql } from "./types";
 
 // One pool per server process. Kept on globalThis so that `next dev` hot
 // reloads do not open a new pool on every change.
