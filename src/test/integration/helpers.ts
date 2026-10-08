@@ -51,21 +51,31 @@ export async function perfectAnswers(sql: Sql, versionId: string): Promise<Answe
   });
 }
 
-/** A one-question published Reading test with chosen settings. */
+/** A one-question published Reading test. Only the given mode is enabled. */
 export async function createPublishedTest(
   sql: Sql,
-  settings: { mode: "mock" | "practice"; timeLimit: number | null; maxAttempts: number | null; visibility: "never" | "after_submit" },
+  settings: {
+    mode: "mock" | "practice";
+    timeLimit: number | null;
+    maxAttempts: number | null;
+    visibility: "never" | "after_submit" | "immediately_in_practice";
+  },
 ): Promise<{ testId: string; versionId: string; questionId: string }> {
   const testId = randomUUID();
   const versionId = randomUUID();
   const sectionId = randomUUID();
   const groupId = randomUUID();
   const questionId = randomUUID();
+  const other = settings.mode === "mock" ? "practice" : "mock";
   await sql.begin(async (tx) => {
     await tx`insert into public.tests (id, title, type) values (${testId}, ${`IT test ${testId}`}, 'reading')`;
+    await tx`insert into public.test_versions (id, test_id, version_number) values (${versionId}, ${testId}, 1)`;
     await tx`
-      insert into public.test_versions (id, test_id, version_number, mode, time_limit_seconds, max_attempts, answer_visibility)
-      values (${versionId}, ${testId}, 1, ${settings.mode}, ${settings.timeLimit}, ${settings.maxAttempts}, ${settings.visibility})
+      insert into public.test_version_modes
+        (test_version_id, mode, enabled, time_limit_seconds, max_attempts, answer_visibility, allow_pause, allow_replay, allow_seek)
+      values
+        (${versionId}, ${settings.mode}, true, ${settings.timeLimit}, ${settings.maxAttempts}, ${settings.visibility}, false, false, false),
+        (${versionId}, ${other}, false, 600, null, 'after_submit', false, false, false)
     `;
     await tx`insert into public.sections (id, test_version_id, section_type, position, content) values (${sectionId}, ${versionId}, 'reading', 1, 'Passage')`;
     await tx`insert into public.question_groups (id, section_id, position, instructions) values (${groupId}, ${sectionId}, 1, 'TFNG')`;
@@ -75,7 +85,6 @@ export async function createPublishedTest(
     `;
     await tx`insert into public.answer_keys (question_id, correct_answer, explanation) values (${questionId}, '{"choice":"TRUE"}', 'Because.')`;
     await tx`update public.test_versions set status = 'published', published_at = now() where id = ${versionId}`;
-    await tx`update public.tests set status = 'published', current_version_id = ${versionId} where id = ${testId}`;
   });
   return { testId, versionId, questionId };
 }

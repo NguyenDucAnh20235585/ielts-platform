@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { AnswerFormat } from "@/features/grading/schemas";
+import type { DbTestMode } from "@/features/test/api-enums";
 import {
   buildStudentContent,
   type GroupRow,
@@ -21,16 +22,27 @@ export type VersionStructure = {
 
 /**
  * Loads a test version's content WITHOUT answer keys (they are only loaded by
- * the grading path in attempt-finalize.ts). Returns null if the version does
- * not exist.
+ * the grading path in attempt-core.ts). Returns null if the version does not
+ * exist.
+ *
+ * `mode` picks the settings shown in `version` (an attempt's mode, D-015).
+ * Without it: the first enabled mode, MOCK before PRACTICE ('mock' < 'practice').
  */
-export async function loadVersionStructure(sql: Queryable, versionId: string): Promise<VersionStructure | null> {
+export async function loadVersionStructure(
+  sql: Queryable,
+  versionId: string,
+  mode?: DbTestMode,
+): Promise<VersionStructure | null> {
   const versions = await sql<VersionRow[]>`
-    select tv.id, tv.test_id, tv.version_number, t.title, t.type, tv.mode, tv.time_limit_seconds,
-           tv.answer_visibility, tv.allow_pause, tv.allow_replay, tv.allow_seek, tv.max_plays
+    select tv.id, tv.test_id, tv.version_number, t.title, t.type, m.mode, m.time_limit_seconds,
+           m.answer_visibility, m.allow_pause, m.allow_replay, m.allow_seek, m.max_plays
     from public.test_versions tv
     join public.tests t on t.id = tv.test_id
+    join public.test_version_modes m on m.test_version_id = tv.id
     where tv.id = ${versionId}
+      ${mode ? sql`and m.mode = ${mode}` : sql``}
+    order by m.enabled desc, m.mode
+    limit 1
   `;
   const version = versions[0];
   if (!version) {
@@ -62,9 +74,13 @@ export async function loadVersionStructure(sql: Queryable, versionId: string): P
   return { version, sections: [...sections], groups: [...groups], questions: [...questions] };
 }
 
-/** Student view of a version (api-contract §2.6 StudentContent). */
-export async function loadStudentContent(sql: Queryable, versionId: string): Promise<StudentContent | null> {
-  const structure = await loadVersionStructure(sql, versionId);
+/** Student view of a version in one mode (api-contract §2.6 StudentContent). */
+export async function loadStudentContent(
+  sql: Queryable,
+  versionId: string,
+  mode?: DbTestMode,
+): Promise<StudentContent | null> {
+  const structure = await loadVersionStructure(sql, versionId, mode);
   if (!structure) {
     return null;
   }

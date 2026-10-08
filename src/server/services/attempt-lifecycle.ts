@@ -6,7 +6,7 @@ import {
   toAttemptView,
 } from "@/features/attempt/attempt-view";
 import { remainingSeconds } from "@/features/attempt/timer";
-import { ATTEMPT_STATUSES, type DbTestMode, type DbTestStatus } from "@/features/test/api-enums";
+import { ATTEMPT_STATUSES, type DbTestMode, type DbTestVisibility, TEST_MODES } from "@/features/test/api-enums";
 import type { CurrentUser } from "@/server/auth/current-user";
 import { isUniqueViolation } from "@/server/db/errors";
 import type { Sql } from "@/server/db/types";
@@ -31,11 +31,11 @@ function activeAttemptExists(attemptId: string | null): ApiError {
 }
 
 /**
- * POST /api/tests/:testId/attempts (api-contract §5, D-013).
- * Creates the attempt in status CREATED, bound to the test's current version;
- * the timer starts only at `begin`.
+ * POST /api/tests/:testId/attempts (api-contract §5, D-013, D-015).
+ * Creates the attempt in status CREATED, bound to the test's published
+ * version and to the mode the student picked; the timer starts only at `begin`.
  */
-export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, now: Date) {
+export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, mode: DbTestMode, now: Date) {
   // An expired attempt must not block a new one.
   await finalizeExpiredForUser(sql, user.id, now, testId);
 
@@ -43,24 +43,30 @@ export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, 
   try {
     attempt = await sql.begin(async (tx) => {
       const tests = await tx<{
-        status: DbTestStatus;
-        current_version_id: string | null;
-        mode: DbTestMode | null;
+        visibility: DbTestVisibility;
+        version_id: string | null;
+        enabled: boolean | null;
         time_limit_seconds: number | null;
         max_attempts: number | null;
       }[]>`
-        select t.status, t.current_version_id, tv.mode, tv.time_limit_seconds, tv.max_attempts
+        select t.visibility, tv.id as version_id, m.enabled, m.time_limit_seconds, m.max_attempts
         from public.tests t
-        left join public.test_versions tv on tv.id = t.current_version_id
+        left join public.test_versions tv on tv.test_id = t.id and tv.status = 'published'
+        left join public.test_version_modes m on m.test_version_id = tv.id and m.mode = ${mode}
         where t.id = ${testId}
         for share of t
       `;
       const test = tests[0];
-      if (!test || test.status === "archived") {
+      if (!test || test.visibility === "archived") {
         throw new ApiError("TEST_NOT_FOUND", "Test not found.");
       }
-      if (test.status !== "published" || test.current_version_id === null || test.mode === null) {
+      if (test.visibility !== "visible" || test.version_id === null) {
         throw new ApiError("TEST_NOT_PUBLISHED", "This test is not published.");
+      }
+      if (!test.enabled) {
+        throw new ApiError("MODE_NOT_AVAILABLE", `This test cannot be taken in ${TEST_MODES[mode]} mode.`, {
+          mode: TEST_MODES[mode],
+        });
       }
       // Prototype 1: every published test is PUBLIC (D-004), so no access check yet.
 
@@ -73,12 +79,15 @@ export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, 
         throw activeAttemptExists(active[0].id);
       }
 
+      // max_attempts is per mode (D-015).
       if (test.max_attempts !== null) {
         const used = await tx<{ count: number }[]>`
-          select count(*)::int as count from public.attempts where user_id = ${user.id} and test_id = ${testId}
+          select count(*)::int as count from public.attempts
+          where user_id = ${user.id} and test_id = ${testId} and mode = ${mode}
         `;
         if ((used[0]?.count ?? 0) >= test.max_attempts) {
-          throw new ApiError("MAX_ATTEMPT_REACHED", "You have used all attempts for this test.", {
+          throw new ApiError("MAX_ATTEMPT_REACHED", "You have used all attempts for this test in this mode.", {
+            mode: TEST_MODES[mode],
             max_attempts: test.max_attempts,
           });
         }
@@ -86,7 +95,7 @@ export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, 
 
       const created = await tx<AttemptRow[]>`
         insert into public.attempts (user_id, test_id, test_version_id, mode, time_limit_seconds, status, created_at)
-        values (${user.id}, ${testId}, ${test.current_version_id}, ${test.mode}, ${test.time_limit_seconds}, 'created', ${now})
+        values (${user.id}, ${testId}, ${test.version_id}, ${mode}, ${test.time_limit_seconds}, 'created', ${now})
         returning id, user_id, test_id, test_version_id, status, mode, time_limit_seconds,
                   created_at, started_at, expires_at, submitted_at
       `;
@@ -162,7 +171,7 @@ export async function getAttemptStatus(sql: Sql, user: CurrentUser, attemptId: s
 
 /** api-contract §2.6 AttemptPayload. Content is withheld until the attempt has begun. */
 async function buildAttemptPayload(sql: Sql, attempt: AttemptRow, now: Date) {
-  const content = await loadStudentContent(sql, attempt.test_version_id);
+  const content = await loadStudentContent(sql, attempt.test_version_id, attempt.mode);
   if (!content) {
     throw new Error("Test version of the attempt is missing.");
   }

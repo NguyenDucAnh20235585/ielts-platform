@@ -47,7 +47,7 @@ export async function finalizeAttempt(tx: Queryable, attempt: AttemptRow, now: D
     throw new Error(`Cannot finalize an attempt in status ${attempt.status}.`);
   }
 
-  const structure = await loadVersionStructure(tx, attempt.test_version_id);
+  const structure = await loadVersionStructure(tx, attempt.test_version_id, attempt.mode);
   if (!structure) {
     throw new Error("Test version of the attempt is missing.");
   }

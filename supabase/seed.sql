@@ -6,8 +6,12 @@
 -- this project (INSTRUCTIONS §3: never copy Cambridge IELTS material).
 --
 -- Contents (database-schema.md §5.2):
---   Reading Mock 1      3 passages, 39 question rows = 40 marks, MOCK, 60 min, published
---   Reading Practice 1  1 passage, 13 marks, PRACTICE, no time limit, published
+--   Reading Mock 1      3 passages, 39 question rows = 40 marks, published.
+--                       PRACTICE (no time limit, answers shown) and
+--                       MOCK (60 min, 3 attempts, answers after submit).
+--   Reading Practice 1  1 passage, 13 marks, published. PRACTICE only
+--                       (13 marks give no band, so MOCK is disabled).
+-- The student picks the mode when starting an attempt (D-015).
 -- Default band tables come from the migration, not from this file.
 --
 -- Users are not seeded. Sign up through the app / Supabase Auth, then promote:
@@ -15,6 +19,20 @@
 -- =============================================================================
 
 -- Helpers (temporary: they disappear when the seed session ends) -------------
+
+-- Settings of one mode of a version (test_version_modes).
+create function pg_temp.add_mode(
+    p_version uuid, p_mode text, p_enabled boolean, p_time_limit int, p_max_attempts int,
+    p_visibility text, p_audio_free boolean, p_max_plays int default null)
+returns void
+language sql
+as $$
+    insert into public.test_version_modes
+        (test_version_id, mode, enabled, time_limit_seconds, max_attempts, answer_visibility,
+         allow_pause, allow_replay, allow_seek, max_plays)
+    values (p_version, p_mode, p_enabled, p_time_limit, p_max_attempts, p_visibility,
+            p_audio_free, p_audio_free, p_audio_free, p_max_plays)
+$$;
 
 create function pg_temp.add_section(
     p_version uuid, p_position int, p_title text, p_instructions text, p_content text,
@@ -83,8 +101,10 @@ begin
     values (v_test, 'Academic Reading Mock 1',
             'Full computer-delivered style Reading test: 3 passages, 40 questions, 60 minutes.', 'reading');
 
-    insert into public.test_versions (id, test_id, version_number, mode, time_limit_seconds, answer_visibility)
-    values (v_version, v_test, 1, 'mock', 3600, 'after_submit');
+    insert into public.test_versions (id, test_id, version_number)
+    values (v_version, v_test, 1);
+    perform pg_temp.add_mode(v_version, 'practice', true, null, null, 'immediately_in_practice', true);
+    perform pg_temp.add_mode(v_version, 'mock', true, 3600, 3, 'after_submit', false, 1);
 
     -- -------------------------------------------------------------------------
     -- Passage 1 — Questions 1–13
@@ -387,7 +407,6 @@ Research suggests that our sense of time is not controlled by a single {{gap:36}
 
     -- Publish -----------------------------------------------------------------
     update public.test_versions set status = 'published', published_at = now() where id = v_version;
-    update public.tests set status = 'published', current_version_id = v_version where id = v_test;
 end
 $seed$;
 
@@ -406,10 +425,10 @@ begin
     values (v_test, 'Reading Practice 1 — The Story of the Pencil',
             'Short practice passage: 13 questions, no time limit, answers shown after submitting.', 'reading');
 
-    insert into public.test_versions
-        (id, test_id, version_number, mode, time_limit_seconds, answer_visibility,
-         allow_pause, allow_replay, allow_seek)
-    values (v_version, v_test, 1, 'practice', null, 'immediately_in_practice', true, true, true);
+    insert into public.test_versions (id, test_id, version_number)
+    values (v_version, v_test, 1);
+    perform pg_temp.add_mode(v_version, 'practice', true, null, null, 'immediately_in_practice', true);
+    perform pg_temp.add_mode(v_version, 'mock', false, 1200, null, 'after_submit', false, 1);
 
     v_section := pg_temp.add_section(v_version, 1, 'Reading Passage',
         'Read the passage and answer **Questions 1–13**. There is no time limit.',
@@ -502,6 +521,5 @@ Choose **NO MORE THAN TWO WORDS** from the passage for each answer.$i$,
         '{"accepted":["writing"]}', 'Paragraph D: "The common ''HB'' pencil … is used for everyday writing."');
 
     update public.test_versions set status = 'published', published_at = now() where id = v_version;
-    update public.tests set status = 'published', current_version_id = v_version where id = v_test;
 end
 $seed$;
