@@ -34,3 +34,8 @@ export const historyQuery = z.object({
   test_id: z.uuid().optional(),
   ...paginationQuery,
 });
+
+/** POST /api/tests/:testId/attempts — the student picks the mode (D-015). */
+export const startAttemptBody = z.strictObject({
+  mode: apiEnum(TEST_MODES),
+});

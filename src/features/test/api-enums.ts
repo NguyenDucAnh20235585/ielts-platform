@@ -11,8 +11,13 @@ export const TEST_MODES = { practice: "PRACTICE", mock: "MOCK" } as const;
 export type DbTestMode = keyof typeof TEST_MODES;
 export type ApiTestMode = (typeof TEST_MODES)[DbTestMode];
 
+/** Status of a test VERSION (draft → published → archived). Tests have no publish status (D-015). */
 export const TEST_STATUSES = { draft: "DRAFT", published: "PUBLISHED", archived: "ARCHIVED" } as const;
 export type DbTestStatus = keyof typeof TEST_STATUSES;
+
+/** Admin switch on a test (D-015): students see it only when VISIBLE and a version is published. */
+export const TEST_VISIBILITIES = { visible: "VISIBLE", hidden: "HIDDEN", archived: "ARCHIVED" } as const;
+export type DbTestVisibility = keyof typeof TEST_VISIBILITIES;
 
 export const ACCESS_TYPES = { public: "PUBLIC", private: "PRIVATE", assigned: "ASSIGNED" } as const;
 export type DbAccessType = keyof typeof ACCESS_TYPES;

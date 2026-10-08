@@ -43,6 +43,7 @@ export type AttemptView = {
 export type ActiveAttemptView = {
   attempt_id: string;
   status: ApiAttemptStatus;
+  mode: (typeof TEST_MODES)[DbTestMode];
   started_at: string | null;
   expires_at: string | null;
   remaining_seconds: number | null;
@@ -78,6 +79,7 @@ export function toActiveAttemptView(row: AttemptRow, now: Date): ActiveAttemptVi
   return {
     attempt_id: row.id,
     status: ATTEMPT_STATUSES[row.status],
+    mode: TEST_MODES[row.mode],
     started_at: iso(row.started_at),
     expires_at: iso(row.expires_at),
     remaining_seconds: remainingSeconds({ status: row.status, expiresAt: row.expires_at }, now),

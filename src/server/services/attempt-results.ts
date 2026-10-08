@@ -30,11 +30,13 @@ export async function readResult(sql: Queryable, attempt: AttemptRow) {
   })[]>`
     select r.correct_count, r.incorrect_count, r.unanswered_count, r.raw_score, r.max_score, r.band_score,
            r.time_taken_seconds, r.grading_snapshot,
-           t.title as test_title, t.type as test_type, tv.version_number, tv.answer_visibility
+           t.title as test_title, t.type as test_type, tv.version_number, m.answer_visibility
     from public.results r
     join public.attempts a on a.id = r.attempt_id
     join public.tests t on t.id = a.test_id
     join public.test_versions tv on tv.id = a.test_version_id
+    -- visibility of the mode the student picked (D-015)
+    join public.test_version_modes m on m.test_version_id = a.test_version_id and m.mode = a.mode
     where r.attempt_id = ${attempt.id}
   `;
   const row = rows[0];
