@@ -27,7 +27,7 @@ const question = (id: string, groupId: string, position: number, extra: Partial<
 /** A valid reading test: 1 section, TFNG ×1, notes ×1 (TEXT), MCQ_MULTI ×1 (2 marks) = 4 marks. */
 function validContent(): VersionContent {
   return {
-    version: { type: "reading", mode: "practice", time_limit_seconds: null },
+    version: { type: "reading", enabledModes: ["practice"] },
     sections: [section("s1", 1)],
     groups: [
       group("g1", "s1", 1),
@@ -63,7 +63,7 @@ describe("validateVersionContent (api-contract §12.6)", () => {
   it("reports an empty version", () => {
     const content = { ...validContent(), sections: [], groups: [], questions: [], keys: new Map() };
     expect(codes(content).errors).toEqual(["NO_SECTIONS"]);
-    expect(codes({ ...content, version: { type: "reading", mode: "mock", time_limit_seconds: null } }).errors).toContain("MISSING_DURATION");
+    expect(codes({ ...content, version: { type: "reading", enabledModes: [] } }).errors).toContain("NO_MODE_ENABLED");
   });
 
   it("reports empty sections and groups, and a missing passage", () => {
@@ -75,7 +75,7 @@ describe("validateVersionContent (api-contract §12.6)", () => {
 
   it("needs audio for LISTENING and warns that it was not verified", () => {
     const content = validContent();
-    content.version = { type: "listening", mode: "practice", time_limit_seconds: null };
+    content.version = { type: "listening", enabledModes: ["practice", "mock"] };
     content.sections = [section("s1", 1, { content: null })];
     expect(codes(content).errors).toEqual(["MISSING_AUDIO"]);
     content.sections = [section("s1", 1, { content: null, audio_object_key: "tests/l1/s1.mp3" })];

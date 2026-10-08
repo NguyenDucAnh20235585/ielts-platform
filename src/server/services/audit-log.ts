@@ -7,6 +7,8 @@ import type { Queryable } from "@/server/db/types";
 export type AuditAction =
   | "test.create"
   | "test.archive"
+  | "test.hide"
+  | "test.unhide"
   | "test_version.publish"
   | "test_version.settings_update"
   | "answer_key.update"

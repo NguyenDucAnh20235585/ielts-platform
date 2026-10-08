@@ -2,9 +2,12 @@ import { z } from "zod";
 
 import { rulesInputSchema } from "@/features/grading/schemas";
 import { apiEnum } from "@/features/test/api-enum-schema";
-import { TEST_MODES, TEST_STATUSES, TEST_TYPES } from "@/features/test/api-enums";
+import { TEST_MODES, TEST_TYPES } from "@/features/test/api-enums";
 import { optionListSchema } from "@/features/test/question-options";
 import { paginationQuery } from "@/server/http/pagination";
+
+import { ADMIN_TEST_STATUSES } from "./admin-views";
+import { settingsPatchSchema } from "./settings";
 
 /**
  * Request schemas for /api/admin/* (api-contract §6–7). Bodies are strict
@@ -41,18 +44,18 @@ const orderNo = z.number().int().min(1).optional();
 export const rulesBody = z.strictObject(rulesInputSchema.shape);
 
 export const adminTestsQuery = z.object({
-  status: apiEnum(TEST_STATUSES).optional(),
+  status: apiEnum(ADMIN_TEST_STATUSES).optional(),
   type: apiEnum(TEST_TYPES).optional(),
   search: z.string().max(100).optional(),
   ...paginationQuery,
 });
 
+/** Both modes are created with their defaults; `settings` overrides them (same shape as the settings PATCH). */
 export const createTestBody = z.strictObject({
   title,
   type: apiEnum(TEST_TYPES),
-  mode: apiEnum(TEST_MODES),
-  duration_seconds: z.number().int().nullable().optional(),
   description: optionalText(TEXT_MAX),
+  settings: settingsPatchSchema.optional(),
 });
 
 export const updateTestBody = z.strictObject({
@@ -113,7 +116,12 @@ export const answerKeyBody = z.strictObject({
   explanation: optionalText(TEXT_MAX),
 });
 
-/** POST endpoints that take no body (publish, validate, archive). */
+/** GET …/preview: the mode whose settings the preview shows (default: first enabled, MOCK before PRACTICE). */
+export const previewQuery = z.object({
+  mode: apiEnum(TEST_MODES).optional(),
+});
+
+/** POST endpoints that take no body (publish, validate, archive, hide, unhide). */
 export const emptyBody = z.strictObject({});
 
 export type CreateTestBody = z.infer<typeof createTestBody>;

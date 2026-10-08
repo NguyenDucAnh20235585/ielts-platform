@@ -27,7 +27,14 @@ import {
   updateQuestion,
   updateSection,
 } from "@/server/services/admin-content";
-import { archiveTest, createAdminTest, getAdminTest, listAdminTests, updateAdminTest } from "@/server/services/admin-tests";
+import {
+  archiveTest,
+  createAdminTest,
+  getAdminTest,
+  listAdminTests,
+  setTestHidden,
+  updateAdminTest,
+} from "@/server/services/admin-tests";
 import {
   getVersionEditor,
   previewVersion,
@@ -46,9 +53,9 @@ const NOW = new Date();
 const READING_MOCK_1_VERSION = "a0000000-0000-4000-8000-000000000011";
 const KEY_FIELDS = ["answer_key", "correct_answer", "accepted", "grading_config", "explanation"];
 
-async function newDraft(admin: CurrentUser, mode: "PRACTICE" | "MOCK" = "PRACTICE") {
+async function newDraft(admin: CurrentUser) {
   const title = `IT admin ${randomUUID()}`;
-  const created = await createAdminTest(sql, admin, createTestBody.parse({ title, type: "READING", mode }));
+  const created = await createAdminTest(sql, admin, createTestBody.parse({ title, type: "READING" }));
   return { title, testId: created.test.id, versionId: created.test_version.id, created };
 }
 
@@ -71,16 +78,23 @@ async function auditActions(resourceId: string): Promise<string[]> {
 const errorCodes = (report: { errors: { code: string }[] }) => report.errors.map((e) => e.code);
 
 describe("tests and versions (W2-01)", () => {
-  it("creates a DRAFT test with version 1 and the default settings", async () => {
+  it("creates a DRAFT test with version 1 and both modes at their defaults", async () => {
     const admin = await createUser(sql, "admin");
     const { title, testId, versionId, created } = await newDraft(admin);
-    expect(created.test).toMatchObject({ title, type: "READING", status: "DRAFT", access_type: "PUBLIC", current_version: null });
-    expect(created.test.draft_version).toMatchObject({ id: versionId, version_number: 1, status: "DRAFT", mode: "PRACTICE", attempt_count: 0 });
+    expect(created.test).toMatchObject({
+      title, type: "READING", status: "DRAFT", visibility: "VISIBLE", access_type: "PUBLIC", current_version: null,
+    });
+    expect(created.test.draft_version).toMatchObject({
+      id: versionId, version_number: 1, status: "DRAFT", modes: ["PRACTICE", "MOCK"], attempt_count: 0,
+    });
 
     const editor = await getVersionEditor(sql, versionId);
     expect(editor).toMatchObject({
       test: { id: testId, type: "READING", status: "DRAFT" },
-      settings: { mode: "PRACTICE", duration_seconds: null, answer_visibility: "IMMEDIATELY_IN_PRACTICE", allow_pause: true, max_plays: null },
+      settings: {
+        practice: { enabled: true, duration_seconds: null, answer_visibility: "IMMEDIATELY_IN_PRACTICE", allow_pause: true, max_plays: null },
+        mock: { enabled: true, duration_seconds: 3600, max_attempts: null, answer_visibility: "AFTER_SUBMIT", allow_pause: false, max_plays: 1 },
+      },
       band_conversion: { source: "DEFAULT" },
       sections: [],
     });
@@ -89,12 +103,19 @@ describe("tests and versions (W2-01)", () => {
     const listed = await listAdminTests(sql, { search: title, page: 1, limit: 20 });
     expect(listed.items.map((t) => t.id)).toEqual([testId]);
     expect((await listAdminTests(sql, { search: title, status: "published", page: 1, limit: 20 })).items).toEqual([]);
+    expect((await listAdminTests(sql, { search: title, status: "draft", page: 1, limit: 20 })).items).toHaveLength(1);
     expect(await auditActions(testId)).toEqual(["test.create"]);
 
-    const mock = await createAdminTest(sql, admin, createTestBody.parse({ title: "IT mock listening", type: "LISTENING", mode: "MOCK" }));
-    expect(mock.test_version).toMatchObject({ mode: "MOCK", duration_seconds: 1920 });
-    const tooShort = createTestBody.parse({ title: "x", type: "READING", mode: "MOCK", duration_seconds: 30 });
-    expect((await apiError(createAdminTest(sql, admin, tooShort))).code).toBe("INVALID_SETTINGS");
+    const listening = await createAdminTest(sql, admin, createTestBody.parse({ title: "IT listening", type: "LISTENING" }));
+    expect((await getVersionEditor(sql, listening.test_version.id)).settings.mock.duration_seconds).toBe(1920);
+    const practiceOnly = await createAdminTest(
+      sql, admin, createTestBody.parse({ title: "IT practice only", type: "READING", settings: { mock: { enabled: false } } }),
+    );
+    expect(practiceOnly.test_version.modes).toEqual(["PRACTICE"]);
+    for (const settings of [{ mock: { duration_seconds: 30 } }, { practice: { enabled: false }, mock: { enabled: false } }]) {
+      const body = createTestBody.parse({ title: "x", type: "READING", settings });
+      expect((await apiError(createAdminTest(sql, admin, body))).code).toBe("INVALID_SETTINGS");
+    }
   });
 
   it("edits metadata at any time, the type only before publishing and while there are no sections", async () => {
@@ -110,19 +131,30 @@ describe("tests and versions (W2-01)", () => {
     expect((await apiError(updateAdminTest(sql, randomUUID(), {}))).code).toBe("TEST_NOT_FOUND");
   });
 
-  it("changes settings of a draft only when the result is valid (audited)", async () => {
+  it("changes the settings of each mode of a draft only when the result is valid (audited)", async () => {
     const admin = await createUser(sql, "admin");
     const { versionId } = await newDraft(admin);
-    const toMock = await apiError(updateVersionSettings(sql, admin, versionId, settingsPatchSchema.parse({ mode: "MOCK" })));
-    expect(toMock.code).toBe("INVALID_SETTINGS");
+    for (const bad of [{ mock: { duration_seconds: null } }, { practice: { enabled: false }, mock: { enabled: false } }]) {
+      const error = await apiError(updateVersionSettings(sql, admin, versionId, settingsPatchSchema.parse(bad)));
+      expect(error.code).toBe("INVALID_SETTINGS");
+    }
 
-    const patch = settingsPatchSchema.parse({ mode: "MOCK", duration_seconds: 2400, answer_visibility: "AFTER_SUBMIT", max_attempts: 2 });
+    const patch = settingsPatchSchema.parse({
+      practice: { enabled: false },
+      mock: { duration_seconds: 2400, answer_visibility: "NEVER", max_attempts: 2 },
+    });
     await expect(updateVersionSettings(sql, admin, versionId, patch)).resolves.toEqual({
       id: versionId,
       status: "DRAFT",
       settings: {
-        mode: "MOCK", duration_seconds: 2400, max_attempts: 2, answer_visibility: "AFTER_SUBMIT",
-        allow_pause: true, allow_replay: true, allow_seek: true, max_plays: null,
+        practice: {
+          enabled: false, duration_seconds: null, max_attempts: null, answer_visibility: "IMMEDIATELY_IN_PRACTICE",
+          allow_pause: true, allow_replay: true, allow_seek: true, max_plays: null,
+        },
+        mock: {
+          enabled: true, duration_seconds: 2400, max_attempts: 2, answer_visibility: "NEVER",
+          allow_pause: false, allow_replay: false, allow_seek: false, max_plays: 1,
+        },
       },
     });
     expect(await auditActions(versionId)).toEqual(["test_version.settings_update"]);
@@ -246,7 +278,7 @@ describe("content editing → validate → publish (W2-02, W2-03)", () => {
       () => updateSection(sql, section.id, { title: "x" }),
       () => deleteGroup(sql, mcq.id),
       () => key(q1.id, { correct_answer: { choice: "i" } }),
-      () => updateVersionSettings(sql, admin, versionId, { allow_pause: false }),
+      () => updateVersionSettings(sql, admin, versionId, { mock: { allow_pause: true } }),
     ]) {
       expect((await apiError(call())).code).toBe("NOT_DRAFT");
     }
@@ -254,22 +286,28 @@ describe("content editing → validate → publish (W2-02, W2-03)", () => {
 
     // Students can take it now.
     const student = await createUser(sql);
-    await expect(startAttempt(sql, student, testId, NOW)).resolves.toMatchObject({ attempt: { status: "CREATED", test_version_id: versionId } });
+    await expect(startAttempt(sql, student, testId, "mock", NOW)).resolves.toMatchObject({
+      attempt: { status: "CREATED", mode: "MOCK", test_version_id: versionId },
+    });
   });
 
-  it("publishing a new draft archives the previous version; archiving the test is terminal", async () => {
+  it("publishing a new draft archives the previous version; hide/unhide; archiving the test is terminal", async () => {
     const admin = await createUser(sql, "admin");
-    const { testId, versionId: v1 } = await newDraft(admin);
+    const { title, testId, versionId: v1 } = await newDraft(admin);
     await addMinimalContent(admin, v1);
     await publishVersion(sql, admin, v1, NOW);
 
     // POST …/versions is P2, so version 2 is created directly in the database here.
     const inserted = await sql<{ id: string }[]>`
-      insert into public.test_versions (test_id, version_number, mode, answer_visibility)
-      values (${testId}, 2, 'practice', 'immediately_in_practice')
-      returning id
+      insert into public.test_versions (test_id, version_number) values (${testId}, 2) returning id
     `;
     const v2 = inserted[0]?.id ?? "";
+    await sql`
+      insert into public.test_version_modes
+        (test_version_id, mode, enabled, time_limit_seconds, answer_visibility, allow_pause, allow_replay, allow_seek)
+      values (${v2}, 'practice', true, null, 'immediately_in_practice', true, true, true),
+             (${v2}, 'mock', false, 3600, 'after_submit', false, false, false)
+    `;
     await addMinimalContent(admin, v2);
     await publishVersion(sql, admin, v2, NOW);
 
@@ -278,16 +316,27 @@ describe("content editing → validate → publish (W2-02, W2-03)", () => {
     expect(detail.test.current_version?.id).toBe(v2);
     expect((await apiError(publishVersion(sql, admin, v1, NOW))).code).toBe("INVALID_STATUS_TRANSITION");
 
-    // Re-publishing after an unpublish (P2 endpoint, simulated here) keeps the original published_at.
-    await sql`update public.tests set status = 'draft' where id = ${testId}`;
-    const republished = await publishVersion(sql, admin, v2, new Date(NOW.getTime() + 60_000));
-    expect(republished.published_at).toBe(NOW.toISOString());
+    expect((await apiError(publishVersion(sql, admin, v2, NOW))).code).toBe("ALREADY_PUBLISHED");
 
-    await expect(archiveTest(sql, admin, testId)).resolves.toEqual({ status: "ARCHIVED" });
+    // Hide and show again (D-015). Hiding twice changes nothing.
+    const student = await createUser(sql);
+    await expect(setTestHidden(sql, admin, testId, true)).resolves.toMatchObject({
+      status: "HIDDEN", visibility: "HIDDEN", current_version: { id: v2 },
+    });
+    await expect(setTestHidden(sql, admin, testId, true)).resolves.toMatchObject({ status: "HIDDEN" });
+    expect((await listAdminTests(sql, { search: title, status: "hidden", page: 1, limit: 20 })).items).toHaveLength(1);
+    expect((await apiError(startAttempt(sql, student, testId, "practice", NOW))).code).toBe("TEST_NOT_PUBLISHED");
+    await expect(setTestHidden(sql, admin, testId, false)).resolves.toMatchObject({ status: "PUBLISHED", visibility: "VISIBLE" });
+    await expect(startAttempt(sql, student, testId, "practice", NOW)).resolves.toMatchObject({ attempt: { test_version_id: v2 } });
+    expect((await apiError(startAttempt(sql, await createUser(sql), testId, "mock", NOW))).code).toBe("MODE_NOT_AVAILABLE");
+
+    // Archive the whole test: terminal.
+    await expect(archiveTest(sql, admin, testId)).resolves.toMatchObject({ status: "ARCHIVED", visibility: "ARCHIVED" });
     expect((await apiError(archiveTest(sql, admin, testId))).code).toBe("ALREADY_ARCHIVED");
+    expect((await apiError(setTestHidden(sql, admin, testId, false))).code).toBe("TEST_ARCHIVED");
     expect((await apiError(publishVersion(sql, admin, v2, NOW))).code).toBe("TEST_ARCHIVED");
     await expect(updateAdminTest(sql, testId, { title: "Archived test" })).resolves.toMatchObject({ status: "ARCHIVED", title: "Archived test" });
-    expect(await auditActions(testId)).toEqual(["test.create", "test.archive"]);
+    expect(await auditActions(testId)).toEqual(["test.create", "test.hide", "test.unhide", "test.archive"]);
   });
 
   it("keeps positions contiguous when sections and groups are inserted or deleted", async () => {

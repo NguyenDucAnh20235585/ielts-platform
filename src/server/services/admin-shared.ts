@@ -3,8 +3,9 @@ import "server-only";
 import { buildAdminSections } from "@/features/admin/admin-tree";
 import type { AnswerKeyRow } from "@/features/admin/answer-key-row";
 import type { AdminTestRow, VersionBriefRow } from "@/features/admin/admin-views";
-import type { VersionSettings } from "@/features/admin/settings";
-import type { DbAnswerVisibility, DbTestStatus, DbTestType } from "@/features/test/api-enums";
+import { settingsFromRows, type VersionSettings } from "@/features/admin/settings";
+import type { DbTestStatus, DbTestType, DbTestVisibility } from "@/features/test/api-enums";
+import { MODE_ORDER, type ModeSettingsRow } from "@/features/test/mode-settings";
 import type { Queryable, TransactionSql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
 import { resolveMediaUrl } from "@/server/media/urls";
@@ -15,7 +16,7 @@ import { loadVersionStructure } from "./test-structure";
 
 export async function loadAdminTestRow(sql: Queryable, testId: string, options: { lock?: boolean } = {}) {
   const rows = await sql<AdminTestRow[]>`
-    select id, title, description, type, status, access_type, current_version_id, created_at, updated_at
+    select id, title, description, type, visibility, access_type, created_at, updated_at
     from public.tests
     where id = ${testId}
     ${options.lock ? sql`for update` : sql``}
@@ -23,14 +24,16 @@ export async function loadAdminTestRow(sql: Queryable, testId: string, options: 
   return rows[0] ?? null;
 }
 
-/** All versions of the given tests, newest first, with attempt counts. */
+/** All versions of the given tests, newest first, with enabled modes and attempt counts. */
 export async function loadVersionBriefs(sql: Queryable, testIds: readonly string[]): Promise<VersionBriefRow[]> {
   if (testIds.length === 0) {
     return [];
   }
   const rows = await sql<VersionBriefRow[]>`
-    select tv.id, tv.test_id, tv.version_number, tv.status, tv.mode, tv.time_limit_seconds, tv.published_at,
-           tv.created_at, tv.updated_at,
+    select tv.id, tv.test_id, tv.version_number, tv.status, tv.published_at, tv.created_at, tv.updated_at,
+           coalesce((select array_agg(m.mode order by m.mode)
+                     from public.test_version_modes m
+                     where m.test_version_id = tv.id and m.enabled), '{}') as modes,
            (select count(*)::int from public.attempts a where a.test_version_id = tv.id) as attempt_count
     from public.test_versions tv
     where tv.test_id in ${sql(testIds)}
@@ -39,26 +42,25 @@ export async function loadVersionBriefs(sql: Queryable, testIds: readonly string
   return [...rows];
 }
 
-/** A version with its settings, test and attempt count (admin views). */
+/** A version with its test and attempt count (admin views). */
 export type VersionInfoRow = VersionBriefRow & {
-  max_attempts: number | null;
-  answer_visibility: DbAnswerVisibility;
-  allow_pause: boolean;
-  allow_replay: boolean;
-  allow_seek: boolean;
-  max_plays: number | null;
   band_table_id: string | null;
   test_title: string;
   test_type: DbTestType;
-  test_status: DbTestStatus;
+  test_visibility: DbTestVisibility;
+  test_has_published: boolean;
 };
 
 export async function loadVersionInfo(sql: Queryable, versionId: string, options: { lock?: boolean } = {}) {
   const rows = await sql<VersionInfoRow[]>`
-    select tv.id, tv.test_id, tv.version_number, tv.status, tv.mode, tv.time_limit_seconds, tv.published_at,
-           tv.created_at, tv.updated_at, tv.max_attempts, tv.answer_visibility, tv.allow_pause, tv.allow_replay,
-           tv.allow_seek, tv.max_plays, tv.band_table_id,
-           t.title as test_title, t.type as test_type, t.status as test_status,
+    select tv.id, tv.test_id, tv.version_number, tv.status, tv.published_at, tv.created_at, tv.updated_at,
+           tv.band_table_id,
+           coalesce((select array_agg(m.mode order by m.mode)
+                     from public.test_version_modes m
+                     where m.test_version_id = tv.id and m.enabled), '{}') as modes,
+           t.title as test_title, t.type as test_type, t.visibility as test_visibility,
+           exists (select 1 from public.test_versions p
+                   where p.test_id = tv.test_id and p.status = 'published') as test_has_published,
            (select count(*)::int from public.attempts a where a.test_version_id = tv.id) as attempt_count
     from public.test_versions tv
     join public.tests t on t.id = tv.test_id
@@ -68,17 +70,44 @@ export async function loadVersionInfo(sql: Queryable, versionId: string, options
   return rows[0] ?? null;
 }
 
-export function settingsOf(row: VersionInfoRow): VersionSettings {
-  return {
-    mode: row.mode,
-    time_limit_seconds: row.time_limit_seconds,
-    max_attempts: row.max_attempts,
-    answer_visibility: row.answer_visibility,
-    allow_pause: row.allow_pause,
-    allow_replay: row.allow_replay,
-    allow_seek: row.allow_seek,
-    max_plays: row.max_plays,
-  };
+/** The settings of a version, one entry per mode (test_version_modes). */
+export async function loadModeSettings(sql: Queryable, versionId: string): Promise<VersionSettings> {
+  const rows = await sql<ModeSettingsRow[]>`
+    select mode, enabled, time_limit_seconds, max_attempts, answer_visibility,
+           allow_pause, allow_replay, allow_seek, max_plays
+    from public.test_version_modes
+    where test_version_id = ${versionId}
+  `;
+  return settingsFromRows(rows);
+}
+
+/** Inserts (new version) or updates the version's two mode rows. */
+export async function writeModeSettings(
+  tx: Queryable,
+  versionId: string,
+  settings: VersionSettings,
+  action: "insert" | "update",
+): Promise<void> {
+  for (const mode of MODE_ORDER) {
+    const m = settings[mode];
+    if (action === "insert") {
+      await tx`
+        insert into public.test_version_modes
+          (test_version_id, mode, enabled, time_limit_seconds, max_attempts, answer_visibility,
+           allow_pause, allow_replay, allow_seek, max_plays)
+        values (${versionId}, ${mode}, ${m.enabled}, ${m.time_limit_seconds}, ${m.max_attempts},
+                ${m.answer_visibility}, ${m.allow_pause}, ${m.allow_replay}, ${m.allow_seek}, ${m.max_plays})
+      `;
+    } else {
+      await tx`
+        update public.test_version_modes
+        set enabled = ${m.enabled}, time_limit_seconds = ${m.time_limit_seconds}, max_attempts = ${m.max_attempts},
+            answer_visibility = ${m.answer_visibility}, allow_pause = ${m.allow_pause},
+            allow_replay = ${m.allow_replay}, allow_seek = ${m.allow_seek}, max_plays = ${m.max_plays}
+        where test_version_id = ${versionId} and mode = ${mode}
+      `;
+    }
+  }
 }
 
 /** Answer keys of a version, by question id. Admin paths only — never used by student endpoints. */

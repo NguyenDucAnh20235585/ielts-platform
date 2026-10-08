@@ -1,9 +1,9 @@
+import type { DbTestMode, DbTestType } from "@/features/test/api-enums";
 import {
   type GroupRow,
   orderQuestions,
   type QuestionRow,
   type SectionRow,
-  type VersionRow,
 } from "@/features/test/student-content";
 import { parseOptions } from "@/features/test/question-options";
 import { FULL_TEST_MARKS } from "@/features/grading/band";
@@ -26,7 +26,7 @@ export type ValidationErrorCode =
   | "MISSING_SELECT_COUNT"
   | "NUMBERING_GAP"
   | "NUMBERING_DUPLICATE"
-  | "MISSING_DURATION";
+  | "NO_MODE_ENABLED";
 
 export type ValidationWarningCode = "BAND_NOT_AVAILABLE" | "GAP_TOKEN_MISMATCH" | "AUDIO_NOT_VERIFIED";
 
@@ -47,7 +47,7 @@ export type ValidationReport = {
 };
 
 export type VersionContent = {
-  version: Pick<VersionRow, "type" | "mode" | "time_limit_seconds">;
+  version: { type: DbTestType; enabledModes: readonly DbTestMode[] };
   sections: readonly SectionRow[];
   groups: readonly GroupRow[];
   questions: readonly QuestionRow[];
@@ -96,8 +96,8 @@ export function validateVersionContent(content: VersionContent): ValidationRepor
   const { version, groups, questions, keys } = content;
   const sections = [...content.sections].sort((a, b) => a.position - b.position);
 
-  if (version.mode === "mock" && version.time_limit_seconds === null) {
-    errors.push(issue("MISSING_DURATION", "MOCK tests need duration_seconds."));
+  if (version.enabledModes.length === 0) {
+    errors.push(issue("NO_MODE_ENABLED", "Enable at least one mode (PRACTICE or MOCK)."));
   }
   if (sections.length === 0) {
     errors.push(issue("NO_SECTIONS", "The test has no sections."));
