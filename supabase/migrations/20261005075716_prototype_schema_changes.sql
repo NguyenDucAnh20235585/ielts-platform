@@ -2,6 +2,10 @@
 -- Prototype 1 schema changes (CR-01 … CR-13)
 --
 -- Spec:    docs/backend/database-schema.md (BE requirements + change requests)
+-- Revised: 2026-10-08 after the lead's review (D-015): the student picks the
+--          mode (PRACTICE / MOCK) per attempt, so settings live per mode in
+--          test_version_modes; tests have no publish status of their own —
+--          only a visibility switch (visible / hidden / archived).
 -- Author:  Backend (Khiêm). Written by BE while the DB owner (Cong) is away,
 --          per decision D-008 — to be reviewed by Cong (schema) and Bùi (RLS)
 --          before merge.
@@ -13,7 +17,7 @@
 -- Custom SQLSTATEs raised by triggers (the backend maps them to API errors):
 --   IE001  content/settings of a non-draft test version are read-only → 409 NOT_DRAFT
 --   IE002  append-only table (audit_logs, results)                   → 500 INTERNAL_ERROR
---   IE003  invalid test version status transition                     → 409 INVALID_STATUS_TRANSITION
+--   IE003  invalid status transition (test version, test visibility)  → 409 INVALID_STATUS_TRANSITION
 -- =============================================================================
 
 
@@ -124,35 +128,22 @@ from t, (values
 
 
 -- -----------------------------------------------------------------------------
--- CR-03  test_versions: mode, settings as typed columns, band table
+-- CR-03  test_versions: band table, author, lifecycle checks. The settings
+-- (time limit, attempts, answer visibility, audio rules) depend on the mode
+-- the student picks, so they move to test_version_modes (D-015).
 -- -----------------------------------------------------------------------------
 alter table public.test_versions
-    add column mode text not null check (mode in ('practice', 'mock')),
-    -- Practice tests may have no time limit (D-005).
-    alter column time_limit_seconds drop not null,
-    drop constraint test_versions_time_limit_seconds_check,
-    add constraint test_versions_time_limit_seconds_check
-        check (time_limit_seconds between 60 and 14400),
-    add column max_attempts integer check (max_attempts > 0),           -- null = unlimited
-    add column answer_visibility text not null default 'after_submit'
-        check (answer_visibility in ('never', 'after_submit', 'immediately_in_practice')),
-    add column allow_pause boolean not null default false,
-    add column allow_replay boolean not null default false,
-    add column allow_seek boolean not null default false,
-    add column max_plays integer check (max_plays > 0),                 -- null = unlimited
+    drop column time_limit_seconds,
     add column band_table_id uuid references public.band_tables(id) on delete restrict,  -- null = default for the skill
     add column created_by uuid references auth.users(id) on delete set null,
-    add constraint test_versions_mock_requires_time_limit
-        check (mode <> 'mock' or time_limit_seconds is not null),
-    add constraint test_versions_mock_visibility
-        check (mode <> 'mock' or answer_visibility <> 'immediately_in_practice'),
     -- A version leaves 'draft' only by being published.
     add constraint test_versions_published_at_check
         check (status = 'draft' or published_at is not null),
     -- Lets other tables reference (version id, test id) as a pair.
     add constraint test_versions_id_test_id_key unique (id, test_id);
 
--- One draft and one current (published) version per test.
+-- One draft and one current (published) version per test. The published
+-- version IS the test's current version (there is no pointer on tests).
 create unique index test_versions_one_draft_per_test
     on public.test_versions (test_id) where status = 'draft';
 create unique index test_versions_one_published_per_test
@@ -160,25 +151,54 @@ create unique index test_versions_one_published_per_test
 
 
 -- -----------------------------------------------------------------------------
--- CR-02  tests: type, visibility status, current version, access
+-- CR-03b  test_version_modes: one row per mode (practice, mock) and version.
+-- The admin sets each mode per test (enabled, time limit, attempts, answer
+-- visibility, audio rules). Frozen with the version once it is published.
+-- -----------------------------------------------------------------------------
+create table public.test_version_modes (
+    test_version_id uuid not null references public.test_versions(id) on delete cascade,
+    mode text not null check (mode in ('practice', 'mock')),
+    enabled boolean not null default true,
+    time_limit_seconds integer
+        check (time_limit_seconds between 60 and 14400),                -- null = no time limit
+    max_attempts integer check (max_attempts > 0),                      -- null = unlimited
+    answer_visibility text not null
+        check (answer_visibility in ('never', 'after_submit', 'immediately_in_practice')),
+    allow_pause boolean not null,
+    allow_replay boolean not null,
+    allow_seek boolean not null,
+    max_plays integer check (max_plays > 0),                            -- null = unlimited
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    primary key (test_version_id, mode),
+    constraint test_version_modes_mock_requires_time_limit
+        check (mode <> 'mock' or time_limit_seconds is not null),
+    constraint test_version_modes_mock_visibility
+        check (mode <> 'mock' or answer_visibility <> 'immediately_in_practice')
+);
+-- "At least one mode enabled" is checked by the backend (publish validation,
+-- settings PATCH): a row-level CHECK cannot see the other row.
+
+create trigger test_version_modes_updated_at
+before update on public.test_version_modes
+for each row execute function public.set_updated_at();
+
+
+-- -----------------------------------------------------------------------------
+-- CR-02  tests: type, visibility, access. Publishing is tracked on
+-- test_versions only (D-015): students see a test when it is 'visible' AND
+-- has a published version. 'hidden' can be undone; 'archived' is terminal.
 -- -----------------------------------------------------------------------------
 alter table public.tests
     add column type text not null check (type in ('reading', 'listening')),
-    add column status text not null default 'draft'
-        check (status in ('draft', 'published', 'archived')),
-    add column current_version_id uuid,
+    add column visibility text not null default 'visible'
+        check (visibility in ('visible', 'hidden', 'archived')),
     add column access_type text not null default 'public'
         check (access_type in ('public', 'private', 'assigned')),
     add column created_by uuid references auth.users(id) on delete set null,
-    add constraint tests_title_length check (char_length(title) between 1 and 200),
-    -- The current version must belong to this test.
-    add constraint tests_current_version_fkey
-        foreign key (current_version_id, id)
-        references public.test_versions (id, test_id) on delete restrict,
-    add constraint tests_published_has_version
-        check (status <> 'published' or current_version_id is not null);
+    add constraint tests_title_length check (char_length(title) between 1 and 200);
 
-create index tests_status_type_idx on public.tests (status, type);
+create index tests_visibility_type_idx on public.tests (visibility, type);
 
 
 -- -----------------------------------------------------------------------------
@@ -284,8 +304,14 @@ alter table public.attempts
 create unique index attempts_one_active_per_user_test
     on public.attempts (user_id, test_id) where status in ('created', 'in_progress');
 
--- Counting attempts per user per test (max_attempts).
-create index attempts_user_test_idx on public.attempts (user_id, test_id);
+-- The attempt's mode must exist on its version (D-015).
+alter table public.attempts
+    add constraint attempts_mode_fkey
+        foreign key (test_version_id, mode)
+        references public.test_version_modes (test_version_id, mode) on delete restrict;
+
+-- Counting attempts per user, test and mode (max_attempts is per mode).
+create index attempts_user_test_mode_idx on public.attempts (user_id, test_id, mode);
 
 
 -- -----------------------------------------------------------------------------
@@ -342,6 +368,10 @@ set search_path = ''
 as $$
     select case p_table
         when 'sections' then (
+            select tv.status
+            from public.test_versions tv
+            where tv.id = p_parent_id)
+        when 'test_version_modes' then (
             select tv.status
             from public.test_versions tv
             where tv.id = p_parent_id)
@@ -425,8 +455,14 @@ create trigger answer_keys_draft_only
 before insert or update or delete on public.answer_keys
 for each row execute function public.assert_content_version_is_draft('question_id');
 
--- Settings of a non-draft version are frozen; status only moves forward
--- (draft → published → archived); only drafts can be deleted.
+-- Mode settings are frozen with their version, like the content.
+create trigger test_version_modes_draft_only
+before insert or update or delete on public.test_version_modes
+for each row execute function public.assert_content_version_is_draft('test_version_id');
+
+-- Identity and band table of a non-draft version are frozen (its mode
+-- settings are guarded by test_version_modes_draft_only); status only moves
+-- forward (draft → published → archived); only drafts can be deleted.
 create or replace function public.guard_test_version_changes()
 returns trigger
 language plpgsql
@@ -442,13 +478,9 @@ begin
     end if;
 
     if old.status <> 'draft' and (
-        new.test_id, new.version_number, new.mode, new.time_limit_seconds,
-        new.max_attempts, new.answer_visibility, new.allow_pause, new.allow_replay,
-        new.allow_seek, new.max_plays, new.band_table_id
+        new.test_id, new.version_number, new.band_table_id
     ) is distinct from (
-        old.test_id, old.version_number, old.mode, old.time_limit_seconds,
-        old.max_attempts, old.answer_visibility, old.allow_pause, old.allow_replay,
-        old.allow_seek, old.max_plays, old.band_table_id
+        old.test_id, old.version_number, old.band_table_id
     ) then
         raise exception 'Settings of a % test version are read-only', old.status
             using errcode = 'IE001';
@@ -469,6 +501,25 @@ $$;
 create trigger test_versions_guard
 before update or delete on public.test_versions
 for each row execute function public.guard_test_version_changes();
+
+-- 'archived' is terminal for a test; 'visible' <-> 'hidden' is free (D-015).
+create or replace function public.guard_test_visibility()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+    if old.visibility = 'archived' and new.visibility <> 'archived' then
+        raise exception 'An archived test cannot be shown or hidden again'
+            using errcode = 'IE003';
+    end if;
+    return new;
+end;
+$$;
+
+create trigger tests_guard_visibility
+before update of visibility on public.tests
+for each row execute function public.guard_test_visibility();
 
 -- Append-only tables: results never change after submit (BE_and_DATABASE_Agreement
 -- §5 "result cũ không đổi"); audit logs are never edited.
@@ -500,6 +551,7 @@ for each statement execute function public.reject_update_delete();
 -- all data access goes through the Next.js server)
 -- -----------------------------------------------------------------------------
 alter table public.profiles enable row level security;
+alter table public.test_version_modes enable row level security;
 alter table public.band_tables enable row level security;
 alter table public.band_table_ranges enable row level security;
 alter table public.audit_logs enable row level security;
