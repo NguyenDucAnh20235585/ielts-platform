@@ -6,6 +6,7 @@ import type { BandRange } from "@/features/grading/band";
 import { type AttemptQuestion, gradeAttempt } from "@/features/grading/grade-attempt";
 import { buildGradingSnapshot } from "@/features/grading/snapshot";
 import { orderQuestions } from "@/features/test/student-content";
+import { jsonValue } from "@/server/db/json";
 import type { Queryable, Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
 
@@ -110,7 +111,7 @@ export async function finalizeAttempt(tx: Queryable, attempt: AttemptRow, now: D
       (attempt_id, raw_score, max_score, band_score, grading_snapshot,
        correct_count, incorrect_count, unanswered_count, time_taken_seconds)
     values
-      (${attempt.id}, ${grade.rawScore}, ${grade.maxScore}, ${grade.bandScore}, ${tx.json(toJsonValue(snapshot))},
+      (${attempt.id}, ${grade.rawScore}, ${grade.maxScore}, ${grade.bandScore}, ${tx.json(jsonValue(snapshot))},
        ${grade.correctCount}, ${grade.incorrectCount}, ${grade.unansweredCount}, ${timeTaken})
   `;
   const updated = await tx<AttemptRow[]>`
@@ -127,14 +128,6 @@ export async function finalizeAttempt(tx: Queryable, attempt: AttemptRow, now: D
   return row;
 }
 
-/**
- * The snapshot holds students' answers and answer keys typed as `unknown`;
- * a JSON round trip gives postgres.js a plain JSON value to store as jsonb.
- */
-function toJsonValue(value: unknown) {
-  return JSON.parse(JSON.stringify(value));
-}
-
 /** Runs grading; any failure becomes GRADING_FAILED so the transaction rolls back. */
 function gradeOrFail<Result>(attemptId: string, run: () => Result): Result {
   try {
@@ -147,7 +140,7 @@ function gradeOrFail<Result>(attemptId: string, run: () => Result): Result {
 }
 
 /** The version's band table, or the default table for its test type. */
-async function loadBandTable(tx: Queryable, versionId: string): Promise<{ id: string | null; ranges: BandRange[] }> {
+export async function loadBandTable(tx: Queryable, versionId: string): Promise<{ id: string | null; ranges: BandRange[] }> {
   const rows = await tx<{ id: string; min_raw: number; max_raw: number; band: string }[]>`
     select b.id, r.min_raw, r.max_raw, r.band
     from public.test_versions tv
