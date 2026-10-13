@@ -28,7 +28,7 @@ export function StudentShell({ children }: { children: ReactNode }) {
           return <Link href={href} key={href} className={active ? s.sidebarActive : ""} aria-current={active ? "page" : undefined} onClick={() => setMenuOpen(false)}><StudentIcon name={icon} />{label}</Link>;
         })}
       </nav>
-      <div className={s.sidebarBottom}><div className={s.sidebarHint}><StudentIcon name="shield" /><p>Tiến trình và kết quả được lưu theo từng lần làm bài.</p></div>
+      <div className={s.sidebarBottom}>{user.role === "ADMIN" && <Link href="/admin/tests" className={s.textLink}><StudentIcon name="shield" />Khu vực quản trị</Link>}<div className={s.sidebarHint}><StudentIcon name="shield" /><p>Tiến trình và kết quả được lưu theo từng lần làm bài.</p></div>
         <button type="button" className={s.logoutButton} onClick={() => void logout()}><StudentIcon name="logout" />Đăng xuất</button>
       </div>
     </aside>

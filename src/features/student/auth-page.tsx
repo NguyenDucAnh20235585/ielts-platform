@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/features/auth/supabase-browser";
-import { errorText } from "./api";
+import { errorText, studentApi } from "./api";
+import type { StudentUser } from "./types";
 import { Brand, Notice } from "./ui";
 import { StudentIcon } from "./student-icons";
 import s from "./student.module.css";
@@ -26,22 +27,24 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [recoveryReady, setRecoveryReady] = useState(mode !== "reset");
-  function nextRoute() {
+  async function nextRoute() {
     const value = new URLSearchParams(window.location.search).get("next");
-    return value?.startsWith("/student") && !value.includes("\\") ? value : "/student";
+    if (value && /^\/(student|admin)(\/|$|\?)/.test(value) && !/[\\\r\n]/.test(value)) return value;
+    const user = await studentApi<StudentUser>("/api/me");
+    return user.role === "ADMIN" ? "/admin/tests" : "/student";
   }
   useEffect(() => {
     let active = true;
     try {
       const supabase = supabaseBrowser();
-      void supabase.auth.getSession().then(({ data, error: sessionError }) => {
+      void supabase.auth.getSession().then(async ({ data, error: sessionError }) => {
         if (!active) return;
         if (mode === "reset") {
           setRecoveryReady(Boolean(data.session));
           if (!data.session || sessionError) setError("Liên kết khôi phục chưa hợp lệ hoặc đã hết hạn. Hãy yêu cầu gửi lại email.");
         } else if (data.session && mode === "login") {
-          const value = new URLSearchParams(window.location.search).get("next");
-          router.replace(value?.startsWith("/student") && !value.includes("\\") ? value : "/student");
+          const target = await nextRoute();
+          if (active) router.replace(target);
         }
       }).catch((err: unknown) => { if (active) setError(errorText(err)); });
     } catch (err) { void Promise.resolve().then(() => { if (active) setError(errorText(err)); }); }
@@ -57,7 +60,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
       if (mode === "login") {
         const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (authError) { setError(authMessage(authError.code)); return; }
-        router.replace(nextRoute()); router.refresh();
+        router.replace(await nextRoute()); router.refresh();
       } else if (mode === "register") {
         const { data, error: authError } = await supabase.auth.signUp({ email: email.trim(), password,
           options: { emailRedirectTo: window.location.origin + "/login" } });
