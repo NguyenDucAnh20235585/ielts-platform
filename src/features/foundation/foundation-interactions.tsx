@@ -1,20 +1,18 @@
 "use client";
 
 import {
-  createContext,
-  useContext,
   useEffect,
-  useRef,
   useState,
   type ButtonHTMLAttributes,
   type ReactNode,
 } from "react";
 
+import { useRouter } from "next/navigation";
+
 import FoundationIcon from "./foundation-icons";
 import styles from "./foundation.module.css";
 
 type AccountIntent = "login" | "register";
-const AccountContext = createContext<((intent: AccountIntent) => void) | null>(null);
 
 const navigation = [
   { href: "#gioi-thieu", label: "Giới thiệu" },
@@ -24,65 +22,17 @@ const navigation = [
 ] as const;
 
 export function FoundationProvider({ children }: { children: ReactNode }) {
-  const [accountIntent, setAccountIntent] = useState<AccountIntent | null>(null);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (accountIntent && !dialog.open) dialog.showModal();
-    if (!accountIntent && dialog.open) dialog.close();
-  }, [accountIntent]);
-
-  return (
-    <AccountContext.Provider value={setAccountIntent}>
-      {children}
-      <dialog
-        ref={dialogRef}
-        className={styles.accountDialog}
-        aria-labelledby="account-dialog-title"
-        aria-describedby="account-dialog-description"
-        onCancel={() => setAccountIntent(null)}
-        onClose={() => setAccountIntent(null)}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) setAccountIntent(null);
-        }}
-      >
-        <div className={styles.dialogContent}>
-          <button type="button" className={styles.dialogClose} aria-label="Đóng thông báo"
-            onClick={() => setAccountIntent(null)}>
-            <FoundationIcon name="close" />
-          </button>
-          <span className={styles.dialogIcon}>
-            <FoundationIcon name="book" width="28" height="28" />
-          </span>
-          <span className={styles.eyebrow}>IELTS READING & LISTENING</span>
-          <h2 id="account-dialog-title">
-            {accountIntent === "register" ? "Đăng ký tài khoản" : "Bắt đầu luyện tập"}
-          </h2>
-          <p id="account-dialog-description">
-            Khu vực đăng nhập và đăng ký đang được hoàn thiện. Bạn có thể khám phá các kỹ năng và cách luyện tập ngay trên
-            trang này trong lúc chờ nhé.
-          </p>
-          <a href="#cach-luyen-tap" className={`${styles.button} ${styles.primaryButton}`}
-            onClick={() => setAccountIntent(null)}>
-            Khám phá cách luyện tập
-            <FoundationIcon name="arrow" width="16" height="16" />
-          </a>
-        </div>
-      </dialog>
-    </AccountContext.Provider>
-  );
+  return <>{children}</>;
 }
 
 export function AccountButton({ intent = "login", children, ...props }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "type"> & {
   intent?: AccountIntent;
   children: ReactNode;
 }) {
-  const openAccount = useContext(AccountContext);
+  const router = useRouter();
 
   return (
-    <button type="button" {...props} onClick={() => openAccount?.(intent)}>
+    <button type="button" {...props} onClick={() => router.push(intent === "register" ? "/register" : "/login?next=%2Fstudent%2Ftests")}>
       {children}
     </button>
   );
