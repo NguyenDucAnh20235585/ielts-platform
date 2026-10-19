@@ -1,7 +1,7 @@
 import "server-only";
 
 import { isFinalized } from "@/features/attempt/attempt-view";
-import { isPastGrace } from "@/features/attempt/timer";
+import { isExpired } from "@/features/attempt/timer";
 import type { CurrentUser } from "@/server/auth/current-user";
 import type { Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
@@ -25,14 +25,27 @@ export async function submitAttempt(
   const attempt = await sql.begin(async (tx) => {
     const locked = await loadOwnAttempt(tx, attemptId, user.id, { lock: true });
     if (locked.status === "created") {
-      throw new ApiError("ATTEMPT_NOT_STARTED", "Call begin before submitting.");
+      throw new ApiError(
+        "ATTEMPT_NOT_STARTED",
+        "Call begin before submitting.",
+      );
     }
     if (isFinalized(locked.status)) {
       return locked; // already submitted: same result, nothing re-graded
     }
     // Answers sent with the submit are kept only while the grace period lasts.
-    if (finalAnswers && finalAnswers.length > 0 && !isPastGrace(timerOf(locked), now)) {
-      await writeAnswers(tx, locked.id, locked.test_version_id, finalAnswers, now);
+    if (
+      finalAnswers &&
+      finalAnswers.length > 0 &&
+      !isExpired(timerOf(locked), now)
+    ) {
+      await writeAnswers(
+        tx,
+        locked.id,
+        locked.test_version_id,
+        finalAnswers,
+        now,
+      );
     }
     return finalizeAttempt(tx, locked, now);
   });

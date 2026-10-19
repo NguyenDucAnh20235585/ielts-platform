@@ -1,9 +1,18 @@
 import "server-only";
 
+import {
+  GRACE_SECONDS,
+  finalOutcome,
+  isExpired,
+  isPastGrace,
+} from "@/features/attempt/timer";
+
 import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
-import { GRACE_SECONDS, finalOutcome, isPastGrace } from "@/features/attempt/timer";
 import type { BandRange } from "@/features/grading/band";
-import { type AttemptQuestion, gradeAttempt } from "@/features/grading/grade-attempt";
+import {
+  type AttemptQuestion,
+  gradeAttempt,
+} from "@/features/grading/grade-attempt";
 import { buildGradingSnapshot } from "@/features/grading/snapshot";
 import { orderQuestions } from "@/features/test/student-content";
 import { jsonValue } from "@/server/db/json";
@@ -43,18 +52,33 @@ export function timerOf(attempt: AttemptRow) {
  * Lock → grade → save result → update status, all or nothing
  * (BE_and_DATABASE_Agreement §4).
  */
-export async function finalizeAttempt(tx: Queryable, attempt: AttemptRow, now: Date): Promise<AttemptRow> {
+export async function finalizeAttempt(
+  tx: Queryable,
+  attempt: AttemptRow,
+  now: Date,
+): Promise<AttemptRow> {
   if (attempt.status !== "in_progress" || attempt.started_at === null) {
     throw new Error(`Cannot finalize an attempt in status ${attempt.status}.`);
   }
 
-  const structure = await loadVersionStructure(tx, attempt.test_version_id, attempt.mode);
+  const structure = await loadVersionStructure(
+    tx,
+    attempt.test_version_id,
+    attempt.mode,
+  );
   if (!structure) {
     throw new Error("Test version of the attempt is missing.");
   }
 
   // Answer keys are read only here, on the grading path.
-  const keys = await tx<{ question_id: string; correct_answer: unknown; grading_config: unknown; explanation: string | null }[]>`
+  const keys = await tx<
+    {
+      question_id: string;
+      correct_answer: unknown;
+      grading_config: unknown;
+      explanation: string | null;
+    }[]
+  >`
     select k.question_id, k.correct_answer, k.grading_config, k.explanation
     from public.answer_keys k
     join public.questions q on q.id = k.question_id
@@ -68,11 +92,17 @@ export async function finalizeAttempt(tx: Queryable, attempt: AttemptRow, now: D
   const bandTable = await loadBandTable(tx, attempt.test_version_id);
 
   const keyByQuestion = new Map(keys.map((k) => [k.question_id, k]));
-  const answerByQuestion = new Map(answers.map((a) => [a.question_id, a.answer]));
+  const answerByQuestion = new Map(
+    answers.map((a) => [a.question_id, a.answer]),
+  );
   const outcome = finalOutcome(attempt.expires_at, now);
 
   const { grade, snapshot } = gradeOrFail(attempt.id, () => {
-    const ordered = orderQuestions(structure.sections, structure.groups, structure.questions);
+    const ordered = orderQuestions(
+      structure.sections,
+      structure.groups,
+      structure.questions,
+    );
     const gradable: AttemptQuestion[] = ordered.map((q) => ({
       questionId: q.row.id,
       sectionId: q.sectionId,
@@ -91,7 +121,11 @@ export async function finalizeAttempt(tx: Queryable, attempt: AttemptRow, now: D
         testVersionId: attempt.test_version_id,
         gradedAt: now,
         bandTable,
-        sections: structure.sections.map((s) => ({ sectionId: s.id, orderNo: s.position, title: s.title })),
+        sections: structure.sections.map((s) => ({
+          sectionId: s.id,
+          orderNo: s.position,
+          title: s.title,
+        })),
         questions: ordered.map((q) => ({
           questionId: q.row.id,
           questionType: q.row.question_type,
@@ -105,7 +139,12 @@ export async function finalizeAttempt(tx: Queryable, attempt: AttemptRow, now: D
     };
   });
 
-  const timeTaken = Math.max(0, Math.floor((outcome.submittedAt.getTime() - attempt.started_at.getTime()) / 1000));
+  const timeTaken = Math.max(
+    0,
+    Math.floor(
+      (outcome.submittedAt.getTime() - attempt.started_at.getTime()) / 1000,
+    ),
+  );
   await tx`
     insert into public.results
       (attempt_id, raw_score, max_score, band_score, grading_snapshot,
@@ -133,15 +172,28 @@ function gradeOrFail<Result>(attemptId: string, run: () => Result): Result {
   try {
     return run();
   } catch (error) {
-    const summary = error instanceof Error ? `${error.name}: ${error.message}` : "unknown error";
-    console.error(`[grading] attempt ${attemptId} could not be graded — ${summary}`);
-    throw new ApiError("GRADING_FAILED", "The attempt could not be graded. It was not submitted; please try again.");
+    const summary =
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : "unknown error";
+    console.error(
+      `[grading] attempt ${attemptId} could not be graded — ${summary}`,
+    );
+    throw new ApiError(
+      "GRADING_FAILED",
+      "The attempt could not be graded. It was not submitted; please try again.",
+    );
   }
 }
 
 /** The version's band table, or the default table for its test type. */
-export async function loadBandTable(tx: Queryable, versionId: string): Promise<{ id: string | null; ranges: BandRange[] }> {
-  const rows = await tx<{ id: string; min_raw: number; max_raw: number; band: string }[]>`
+export async function loadBandTable(
+  tx: Queryable,
+  versionId: string,
+): Promise<{ id: string | null; ranges: BandRange[] }> {
+  const rows = await tx<
+    { id: string; min_raw: number; max_raw: number; band: string }[]
+  >`
     select b.id, r.min_raw, r.max_raw, r.band
     from public.test_versions tv
     join public.tests t on t.id = tv.test_id
@@ -154,7 +206,11 @@ export async function loadBandTable(tx: Queryable, versionId: string): Promise<{
   `;
   return {
     id: rows[0]?.id ?? null,
-    ranges: rows.map((r) => ({ minRaw: r.min_raw, maxRaw: r.max_raw, band: Number(r.band) })),
+    ranges: rows.map((r) => ({
+      minRaw: r.min_raw,
+      maxRaw: r.max_raw,
+      band: Number(r.band),
+    })),
   };
 }
 
@@ -165,7 +221,12 @@ export type ExpiryCheck = { attempt: AttemptRow; finalizedNow: boolean };
  * finalize it now as AUTO_SUBMITTED. Commits on its own, so callers can
  * report "expired" afterwards without rolling the finalization back.
  */
-export async function finalizeIfExpired(sql: Sql, attemptId: string, userId: string, now: Date): Promise<ExpiryCheck> {
+export async function finalizeIfExpired(
+  sql: Sql,
+  attemptId: string,
+  userId: string,
+  now: Date,
+): Promise<ExpiryCheck> {
   const current = await loadOwnAttempt(sql, attemptId, userId);
   if (!isPastGrace(timerOf(current), now)) {
     return { attempt: current, finalizedNow: false };
@@ -175,12 +236,20 @@ export async function finalizeIfExpired(sql: Sql, attemptId: string, userId: str
     if (!isPastGrace(timerOf(locked), now)) {
       return { attempt: locked, finalizedNow: false }; // finalized by a parallel request
     }
-    return { attempt: await finalizeAttempt(tx, locked, now), finalizedNow: true };
+    return {
+      attempt: await finalizeAttempt(tx, locked, now),
+      finalizedNow: true,
+    };
   });
 }
 
 /** Finalizes all of a user's expired attempts (optionally for one test) before listing them. */
-export async function finalizeExpiredForUser(sql: Sql, userId: string, now: Date, testId?: string): Promise<void> {
+export async function finalizeExpiredForUser(
+  sql: Sql,
+  userId: string,
+  now: Date,
+  testId?: string,
+): Promise<void> {
   const cutoff = new Date(now.getTime() - GRACE_SECONDS * 1000);
   const expired = await sql<{ id: string }[]>`
     select id from public.attempts
@@ -196,19 +265,30 @@ export async function finalizeExpiredForUser(sql: Sql, userId: string, now: Date
 export function assertAcceptsChanges(check: ExpiryCheck, now: Date): void {
   const { attempt } = check;
   if (check.finalizedNow) {
-    throw new ApiError("ATTEMPT_EXPIRED", "Time is up; the attempt was submitted automatically.", {
-      status: "AUTO_SUBMITTED",
-    });
+    throw new ApiError(
+      "ATTEMPT_EXPIRED",
+      "Time is up; the attempt was submitted automatically.",
+      {
+        status: "AUTO_SUBMITTED",
+      },
+    );
   }
   if (attempt.status === "created") {
     throw new ApiError("ATTEMPT_NOT_STARTED", "Call begin before answering.");
   }
   if (isFinalized(attempt.status)) {
-    throw new ApiError("ATTEMPT_LOCKED", "This attempt has already been submitted.", {
-      status: attempt.status === "auto_submitted" ? "AUTO_SUBMITTED" : "SUBMITTED",
-    });
+    throw new ApiError(
+      "ATTEMPT_LOCKED",
+      "This attempt has already been submitted.",
+      {
+        status:
+          attempt.status === "auto_submitted" ? "AUTO_SUBMITTED" : "SUBMITTED",
+      },
+    );
   }
-  if (isPastGrace(timerOf(attempt), now)) {
-    throw new ApiError("ATTEMPT_EXPIRED", "Time is up for this attempt.", { status: "IN_PROGRESS" });
+  if (isExpired(timerOf(attempt), now)) {
+    throw new ApiError("ATTEMPT_EXPIRED", "Time is up for this attempt.", {
+      status: "IN_PROGRESS",
+    });
   }
 }

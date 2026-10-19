@@ -31,6 +31,17 @@ export function isPastGrace(attempt: TimedAttempt, now: Date): boolean {
   );
 }
 
+export function isExpired(
+  attempt: { status: string; expiresAt: Date | null },
+  now: Date,
+): boolean {
+  return (
+    attempt.status === "in_progress" &&
+    attempt.expiresAt !== null &&
+    now.getTime() >= attempt.expiresAt.getTime()
+  );
+}
+
 /**
  * How a finalized attempt is recorded (api-contract §5 submit):
  * SUBMITTED if the student submitted before expires_at, otherwise
