@@ -25,11 +25,11 @@ function validateOptions(options: Option[]) {
 }
 function useFormState(value: unknown) {
   const { setDirty } = useAdmin();
-  const baseline = useRef(JSON.stringify(value));
+  const [baseline] = useState(() => JSON.stringify(value));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
-  const dirty = JSON.stringify(value) !== baseline.current && JSON.stringify(value) !== saved;
+  const dirty = JSON.stringify(value) !== baseline && JSON.stringify(value) !== saved;
   useDraftGuard(dirty);
   async function save(action: () => Promise<void>) {
     if (busy) return;

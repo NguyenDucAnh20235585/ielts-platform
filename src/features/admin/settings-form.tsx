@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useAdmin, useDraftGuard } from "./admin-context";
 import { AdminIcon } from "./admin-icons";
 import { Alert } from "./admin-ui";
@@ -12,11 +12,11 @@ import s from "./admin.module.css";
 export function SettingsForm({ version, readOnly, onSave }: { version: VersionEditor; readOnly: boolean; onSave: SaveNode }) {
   const { setDirty } = useAdmin();
   const [settings, setSettings] = useState<ModeSettingsMap>(version.settings);
-  const baseline = useRef(JSON.stringify(version.settings));
+  const [baseline] = useState(() => JSON.stringify(version.settings));
   const [saved, setSaved] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const dirty = JSON.stringify(settings) !== baseline.current && JSON.stringify(settings) !== saved;
+  const dirty = JSON.stringify(settings) !== baseline && JSON.stringify(settings) !== saved;
   useDraftGuard(dirty);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

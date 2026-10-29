@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SkillBadge } from "@/features/student/ui";
 import { Markdown } from "@/features/student/markdown";
 import { AdminIcon } from "./admin-icons";
@@ -17,27 +17,37 @@ import s from "./admin.module.css";
 type Cursor = { kind: "section" | "group" | "question"; id?: string; sectionId?: string; groupId?: string };
 type Tab = "content" | "settings" | "validation";
 export function AdminWorkspacePage({ versionId }: { versionId: string }) {
-  const { user, dirty, setDirty, confirmLeave } = useAdmin();
   const url = "/api/admin/test-versions/" + encodeURIComponent(versionId);
   const resource = useAdminResource<VersionEditor>(url);
   const version = resource.data;
-  const [cursor, setCursor] = useState<Cursor>({ kind: "section" });
+  const [message, setMessage] = useState<string | null>(null);
+  if (!version) return <div className={s.workspaceGate}><Link className={s.backLink} href="/admin/tests"><AdminIcon name="back" />Danh sách đề</Link>
+    {message && <Alert>{message} Tải lại nội dung để xem dữ liệu mới nhất.</Alert>}
+    <Empty loading={resource.loading} title={resource.loading ? "Đang tải trình soạn…" : "Chưa thể tải phiên bản"} description={resource.error} onRetry={resource.error ? () => void resource.refresh() : undefined} /></div>;
+  return <AdminWorkspaceEditor key={versionId} url={url} version={version} resource={resource} message={message} setMessage={setMessage} />;
+}
+function AdminWorkspaceEditor({ url, version, resource, message, setMessage }: {
+  url: string;
+  version: VersionEditor;
+  resource: ReturnType<typeof useAdminResource<VersionEditor>>;
+  message: string | null;
+  setMessage: (value: string | null) => void;
+}) {
+  const { user, dirty, setDirty, confirmLeave } = useAdmin();
+  // Khởi tạo lựa chọn một lần khi dữ liệu đã tải, giữ nguyên sau mỗi lần lưu.
+  const [cursor, setCursor] = useState<Cursor>(() => {
+    const section = version.sections[0];
+    return section ? { kind: "section", id: section.id, sectionId: section.id } : { kind: "section" };
+  });
   const [tab, setTab] = useState<Tab>("content");
   const [revision, setRevision] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<ValidationReport | null>(null);
   const [publish, setPublish] = useState(false);
   const [deleting, setDeleting] = useState<Cursor | null>(null);
   const [treeOpen, setTreeOpen] = useState(false);
   const [showPassage, setShowPassage] = useState(false);
-  useEffect(() => {
-    if (!version) return;
-    // Chỉ chọn section mặc định khi tải lần đầu, không đổi lựa chọn sau mỗi lần lưu.
-    setCursor((current) => current.id || current.sectionId || current.groupId || revision > 0 ? current :
-      version.sections[0] ? { kind: "section", id: version.sections[0].id, sectionId: version.sections[0].id } : current);
-  }, [version, revision]);
   const readOnly = version?.status !== "DRAFT" || version.test.status === "ARCHIVED";
   const section = version?.sections.find((item) => item.id === (cursor.kind === "section" ? cursor.id : cursor.sectionId));
   const group = section?.question_groups.find((item) => item.id === (cursor.kind === "group" ? cursor.id : cursor.groupId));
@@ -102,9 +112,6 @@ export function AdminWorkspacePage({ versionId }: { versionId: string }) {
     }
     confirmLeave(() => { setTab("content"); setCursor(target); setRevision((value) => value + 1); });
   }
-  if (!version) return <div className={s.workspaceGate}><Link className={s.backLink} href="/admin/tests"><AdminIcon name="back" />Danh sách đề</Link>
-    {message && <Alert>{message} Tải lại nội dung để xem dữ liệu mới nhất.</Alert>}
-    <Empty loading={resource.loading} title={resource.loading ? "Đang tải trình soạn…" : "Chưa thể tải phiên bản"} description={resource.error} onRetry={resource.error ? () => void resource.refresh() : undefined} /></div>;
   const kindLabel = cursor.kind === "section" ? version.test.type === "READING" ? "passage" : "section" : cursor.kind === "group" ? "nhóm câu hỏi" : "câu hỏi";
   const editorKey = (cursor.id ?? "new") + cursor.kind + revision;
   return <div className={s.workspace} aria-busy={busy || resource.loading}>
