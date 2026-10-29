@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import {useState, type FormEvent } from "react";
 import { SkillBadge, Pagination } from "@/features/student/ui";
 import { AdminShell } from "./admin-shell";
 import { AdminIcon } from "./admin-icons";
@@ -21,9 +21,7 @@ export function AdminCataloguePage() {
   const page = Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1);
   const limit = [5, 10, 20, 50].includes(Number(params.get("limit"))) ? Number(params.get("limit")) : 10;
   const search = (params.get("search") ?? "").slice(0, 100);
-  const [input, setInput] = useState(search);
   const [create, setCreate] = useState(false);
-  useEffect(() => { setInput(search); }, [search]);
   const query = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (type) query.set("type", type);
   if (status) query.set("status", status);
@@ -41,16 +39,17 @@ export function AdminCataloguePage() {
     <section className={s.pageHeading}><div><span className={s.eyebrow}>Không gian quản trị</span><h1>Quản lý đề thi</h1><p>Biên soạn và xuất bản đề IELTS Reading & Listening.</p></div>
       <button className={s.primary} type="button" onClick={() => setCreate(true)}><AdminIcon name="plus" />Tạo đề mới</button></section>
     <section className={s.filters} aria-label="Lọc danh sách đề">
-      <form className={s.search} onSubmit={(event) => { event.preventDefault(); filter({ search: input.trim() }); }}>
-        <AdminIcon name="search" /><input aria-label="Tìm theo tên đề" placeholder="Tìm theo tên đề…" value={input} maxLength={100} onChange={(event) => setInput(event.target.value)} />
-        <button className={s.textButton} type="submit">Tìm</button>
-      </form>
+      <CatalogueSearch
+        key={search}
+        search={search}
+        onSearch={(value) => filter({ search: value })}
+      />
       <div className={s.segmented} aria-label="Kỹ năng">{[["", "Tất cả"], ["READING", "Reading"], ["LISTENING", "Listening"]].map(([value, label]) =>
         <button type="button" key={value} aria-pressed={type === value} className={type === value ? s.segmentActive : ""} onClick={() => filter({ type: value })}>{label}</button>)}</div>
       <select aria-label="Trạng thái đề" value={status} onChange={(event) => filter({ status: event.target.value })}>
         <option value="">Tất cả trạng thái</option><option value="DRAFT">Bản nháp</option><option value="PUBLISHED">Đã xuất bản</option><option value="HIDDEN">Đang ẩn</option><option value="ARCHIVED">Đã lưu trữ</option>
       </select>
-      <button className={s.secondary} type="button" onClick={() => { setInput(""); router.replace("/admin/tests", { scroll: false }); }}><AdminIcon name="replay" />Đặt lại</button>
+      <button className={s.secondary} type="button" onClick={() => {router.replace("/admin/tests", { scroll: false }); }}><AdminIcon name="replay" />Đặt lại</button>
     </section>
     {resource.loading ? <Empty loading title="Đang tải danh sách đề…" /> : resource.error ? <Empty title="Chưa thể tải danh sách đề" description={resource.error} onRetry={() => void resource.refresh()} /> :
       resource.data && (resource.data.items.length === 0 ? <Empty title={page > 1 ? "Trang này không có đề" : search || type || status ? "Không tìm thấy đề phù hợp" : "Chưa có đề thi"}
@@ -75,7 +74,35 @@ export function AdminCataloguePage() {
     {create && <CreateTest onClose={() => setCreate(false)} onCreated={(id) => router.push(versionUrl(id))} />}
   </AdminShell>;
 }
+function CatalogueSearch({
+  search,
+  onSearch,
+}: {
+  search: string;
+  onSearch: (value: string) => void;
+}) {
+  const [input, setInput] = useState(search);
 
+  return (
+    <form
+      className={s.search}
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSearch(input.trim());
+      }}
+    >
+      <AdminIcon name="search" />
+      <input
+        aria-label="Tìm theo tên đề"
+        placeholder="Tìm theo tên đề…"
+        value={input}
+        maxLength={100}
+        onChange={(event) => setInput(event.target.value)}
+      />
+      <button className={s.textButton} type="submit">Tìm</button>
+    </form>
+  );
+}
 function CreateTest({ onClose, onCreated }: { onClose: () => void; onCreated: (id: string) => void }) {
   const { confirmLeave, setDirty } = useAdmin();
   const [title, setTitle] = useState("");
