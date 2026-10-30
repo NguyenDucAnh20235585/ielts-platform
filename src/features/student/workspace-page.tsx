@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useAttempt } from "./use-attempt";
 import { useStudent } from "./student-context";
@@ -121,7 +122,8 @@ export function WorkspacePage({ attemptId }: { attemptId: string }) {
           <div className={s.groupInstruction}><Markdown text={group.instruction} />{group.content && <Markdown text={group.content} />}
             {group.options && group.questions.some((q) => q.type.startsWith("MATCHING_")) && <ul className={s.optionBank}>{group.options.map((option) => <li key={option.key}><strong>{option.key}</strong>{option.text}</li>)}</ul>}
           </div>
-          {group.image && <img className={s.questionImage} src={group.image.url} alt="Hình minh họa của nhóm câu hỏi" />}
+          {group.image && <Image className={s.questionImage} src={group.image.url} alt="Hình minh họa của nhóm câu hỏi"
+            width={0} height={0} unoptimized loading="eager" style={{ width: "auto", height: "auto" }} />}
           {group.questions.map((question) => <QuestionCard key={question.id} question={question} value={attempt.answers[question.id]}
             flagged={Boolean(attempt.flags[question.id])} current={(activeQuestion ?? sectionQuestions[0]?.id) === question.id} disabled={disabled}
             onChange={(value) => attempt.changeAnswer(question.id, value)} onFlag={() => attempt.toggleFlag(question.id)} onFocus={() => setActiveQuestion(question.id)} />)}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useResource } from "./use-resource";
 import { StudentShell } from "./student-shell";
@@ -43,7 +44,8 @@ export function ResultPage({ attemptId }: { attemptId: string }) {
           <h3>{section.title || "Phần " + section.order_no}</h3><div className={result.test.type === "READING" ? s.reviewSplit : s.reviewListening}>
             {section.content && <div className={s.reviewPassage}><Markdown text={section.instruction} /><Markdown text={section.content} passage /></div>}
             <div>{section.question_groups.map((group) => <div key={group.id} className={s.questionGroup}><div className={s.groupInstruction}><Markdown text={group.instruction} /><Markdown text={group.content} /></div>
-              {group.image && <img src={group.image.url} className={s.questionImage} alt="Hình minh họa của nhóm câu hỏi" />}
+              {group.image && <Image src={group.image.url} className={s.questionImage} alt="Hình minh họa của nhóm câu hỏi"
+                width={0} height={0} unoptimized loading="eager" style={{ width: "auto", height: "auto" }} />}
               {group.questions.map((question) => {
                 const answer = answerMap.get(question.id);
                 return <div key={question.id}><QuestionCard question={question} value={(answer?.your_answer as AnswerValue | undefined) ?? null} flagged={false} current={false} disabled onChange={() => {}} onFlag={() => {}} onFocus={() => {}} />
