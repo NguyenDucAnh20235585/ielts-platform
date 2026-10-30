@@ -27,10 +27,15 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
   const restoring = useRef(false);
   const shouldPlay = useRef(false);
   const firstLoad = useRef(true);
+  const settings = version.settings;
+  // Chỉ đồng bộ sau khi khôi phục audio và khi section được chọn có audio hợp lệ.
+  if (settings.allow_seek && index !== null) {
+    const next = playable.findIndex((item) => item.id === selectedSection);
+    if (next >= 0 && next !== index) setIndex(next);
+  }
   const section = index === null ? undefined : playable[index];
   const key = section ? "ielts:audio:" + user.id + ":" + attemptId + ":" + section.id : "";
   const pointerKey = "ielts:audio-current:" + user.id + ":" + attemptId;
-  const settings = version.settings;
   function persist() { if (key) { try { localStorage.setItem(key, JSON.stringify(state.current)); } catch {} } }
   useEffect(() => {
     let active = true;
@@ -73,11 +78,6 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
     player.load();
     return () => { player.pause(); };
   }, [key, section]);
-  useEffect(() => {
-    if (!settings.allow_seek || index === null) return;
-    const next = playable.findIndex((item) => item.id === selectedSection);
-    if (next >= 0 && next !== index) setIndex(next);
-  }, [selectedSection, settings.allow_seek, playable, index]);
   useEffect(() => { if (disabled) audioRef.current?.pause(); }, [disabled]);
   async function startPlayback() {
     const player = audioRef.current;
