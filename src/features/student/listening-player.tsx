@@ -24,6 +24,8 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
   const [volume, setVolume] = useState(1);
   const audioRef = useRef<HTMLAudioElement>(null);
   const state = useRef<Playback>({ time: 0, plays: 0, ended: false });
+  const activeKey = useRef("");
+  const metadataReady = useRef(false);
   const restoring = useRef(false);
   const shouldPlay = useRef(false);
   const firstLoad = useRef(true);
@@ -36,7 +38,8 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
   const section = index === null ? undefined : playable[index];
   const key = section ? "ielts:audio:" + user.id + ":" + attemptId + ":" + section.id : "";
   const pointerKey = "ielts:audio-current:" + user.id + ":" + attemptId;
-  function persist() { if (key) { try { localStorage.setItem(key, JSON.stringify(state.current)); } catch {} } }
+  function isCurrentPlayback() { return activeKey.current === key && metadataReady.current; }
+  function persist() { if (key && activeKey.current === key) { try { localStorage.setItem(key, JSON.stringify(state.current)); } catch {} } }
   useEffect(() => {
     let active = true;
     let next = 0;
@@ -67,6 +70,8 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
       const value = JSON.parse(localStorage.getItem(key) ?? "null") as Playback | null;
       if (value && Number.isFinite(value.time) && Number.isFinite(value.plays)) cached = { time: Math.max(0, value.time), plays: Math.max(0, value.plays), ended: Boolean(value.ended) };
     } catch {}
+    activeKey.current = key;
+    metadataReady.current = false;
     state.current = cached;
     restoring.current = false;
     const continueAutomatically = shouldPlay.current || (firstLoad.current && new URLSearchParams(window.location.search).get("start") === "1");
@@ -76,12 +81,12 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
       setTime(cached.time); setPlays(cached.plays); setEnded(cached.ended); setPlaying(false); setReady(false); setDuration(0); setError(null);
     });
     player.load();
-    return () => { player.pause(); };
+    return () => { activeKey.current = ""; metadataReady.current = false; player.pause(); };
   }, [key, section]);
   useEffect(() => { if (disabled) audioRef.current?.pause(); }, [disabled]);
   async function startPlayback() {
     const player = audioRef.current;
-    if (!player || disabled) return;
+    if (!player || disabled || !isCurrentPlayback()) return;
     if (state.current.ended) {
       if (!settings.allow_replay || (settings.max_plays !== null && state.current.plays >= settings.max_plays)) return;
       state.current.time = 0; state.current.ended = false;
@@ -89,8 +94,8 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
       state.current.plays += 1;
     } else if (state.current.plays === 0) state.current.plays = 1;
     setPlays(state.current.plays); setEnded(false); persist();
-    try { await player.play(); setError(null); }
-    catch { setError("Nhấn Phát để bắt đầu hoặc tiếp tục nghe."); }
+    try { await player.play(); if (activeKey.current === key) setError(null); }
+    catch { if (activeKey.current === key) setError("Nhấn Phát để bắt đầu hoặc tiếp tục nghe."); }
   }
   if (index === null && playable.length) return <div className={s.listeningPlayer} role="status">Đang khôi phục audio…</div>;
   if (index === null || !section) return <div className={s.audioError}>Audio chưa khả dụng cho bài này.</div>;
@@ -99,31 +104,36 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
     <audio ref={audioRef} src={section.audio?.url} preload="auto"
       onLoadedMetadata={() => {
         const player = audioRef.current;
-        if (!player) return;
+        if (!player || activeKey.current !== key) return;
         setDuration(Number.isFinite(player.duration) ? player.duration : 0);
         if (state.current.time > 0 && !state.current.ended && state.current.time < player.duration) {
           restoring.current = true; player.currentTime = state.current.time;
         }
+        metadataReady.current = true;
       }}
-      onCanPlay={() => { setReady(true); if (shouldPlay.current) { shouldPlay.current = false; void startPlayback(); } }}
-      onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+      onCanPlay={() => { if (!isCurrentPlayback()) return; setReady(true); if (shouldPlay.current) { shouldPlay.current = false; void startPlayback(); } }}
+      onPlay={() => { if (isCurrentPlayback()) setPlaying(true); }} onPause={() => { if (activeKey.current === key) setPlaying(false); }}
       onTimeUpdate={() => {
+        // Đổi src/load() có thể phát timeupdate trước khi cache mới được khôi phục.
+        if (!isCurrentPlayback()) return;
         const value = audioRef.current?.currentTime ?? 0;
         if (!restoring.current) { state.current.time = value; persist(); }
         setTime(value);
       }}
       onSeeking={() => {
+        if (!isCurrentPlayback()) return;
         const player = audioRef.current;
         if (player && !settings.allow_seek && !restoring.current && Math.abs(player.currentTime - state.current.time) > 1) {
           restoring.current = true; player.currentTime = state.current.time;
         }
       }}
-      onSeeked={() => { restoring.current = false; }}
+      onSeeked={() => { if (isCurrentPlayback()) restoring.current = false; }}
       onEnded={() => {
+        if (!isCurrentPlayback() || !audioRef.current?.ended) return;
         state.current.ended = true; state.current.time = audioRef.current?.duration ?? time; persist(); setEnded(true);
         if (index + 1 < playable.length) { shouldPlay.current = true; setIndex(index + 1); onSection(playable[index + 1].id); }
       }}
-      onError={() => { setReady(false); setError("Không thể tải audio. Kiểm tra kết nối và thử tải lại."); }}
+      onError={() => { if (activeKey.current !== key) return; metadataReady.current = false; setReady(false); setError("Không thể tải audio. Kiểm tra kết nối và thử tải lại."); }}
     />
     <button className={s.audioPlayButton} type="button" aria-label={playing ? "Tạm dừng audio" : ended ? "Nghe lại audio" : "Phát audio"}
       disabled={disabled || !ready || replayBlocked || (playing && !settings.allow_pause)}
