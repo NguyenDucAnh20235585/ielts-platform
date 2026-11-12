@@ -1,0 +1,148 @@
+.catalogue { display: flex; min-width: 0; flex-direction: column; gap: 28px; color: var(--text); font-size: 14px; line-height: 1.6; }
+.hero { display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+.heroText { min-width: 0; }
+.eyebrow { display: inline-block; margin-bottom: 10px; color: var(--primary); font-size: 10px; font-weight: 600; letter-spacing: 1.8px; line-height: 1.8; }
+.hero h1 { margin: 0; color: var(--text); font-size: clamp(28px, 3vw, 36px); font-weight: 700; letter-spacing: -.8px; line-height: 1.4; }
+.hero p { max-width: 690px; margin: 12px 0 0; color: var(--text-muted); font-size: 13px; line-height: 1.9; }
+.totalCard { display: flex; min-width: 175px; flex-shrink: 0; align-items: center; gap: 14px; padding: 20px 24px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.totalIcon { display: grid; width: 44px; height: 44px; flex-shrink: 0; place-items: center; border-radius: 11px; background: var(--secondary); color: var(--on-secondary); }
+.totalLabel { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 11px; line-height: 1.7; }
+.totalCard strong { display: flex; align-items: baseline; gap: 8px; color: var(--text); font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.8px; line-height: 1.2; }
+.totalCard small { color: var(--text-muted); font-size: 12px; font-weight: 400; letter-spacing: 0; }
+
+.filters { min-width: 0; padding: 22px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.filterHeading { display: flex; min-height: 48px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 18px; margin-bottom: 20px; }
+.filterTabs { display: flex; min-width: 0; align-items: stretch; gap: 5px; padding: 5px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); }
+.tabButton { display: inline-flex; min-height: 38px; align-items: center; justify-content: center; gap: 7px; padding: 8px 12px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 500; line-height: 1.6; }
+.tabLabel { white-space: nowrap; }
+.tabIcon { flex-shrink: 0; }
+.tabButton:hover { background: var(--surface-hover); color: var(--brand-accent); }
+.tabButton[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+.tabButton[aria-pressed="true"]:hover { background: var(--primary-hover); color: var(--on-primary); }
+.tabCount { display: grid; min-width: 23px; min-height: 23px; flex-shrink: 0; place-items: center; padding: 2px 6px; border-radius: 6px; background: var(--secondary); color: var(--on-secondary); font-size: 10px; font-variant-numeric: tabular-nums; line-height: 1.5; }
+.tabButton[aria-pressed="true"] .tabCount { background: var(--on-primary); color: var(--primary); }
+.clearButton { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 6px; padding: 6px 8px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--brand-accent); font-size: 11px; font-weight: 500; line-height: 1.7; }
+.clearButton:hover { background: var(--surface-hover); }
+.filterControls { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 18px; }
+.field { display: flex; min-width: 0; flex-direction: column; gap: 8px; }
+.field label { color: var(--text); font-size: 12px; font-weight: 500; line-height: 1.6; }
+.field :is(input, select) { display: block; width: 100%; min-width: 0; height: 46px; padding: 11px 14px; border: 1px solid var(--control-border); border-radius: 8px; background: var(--background); color: var(--text); caret-color: var(--primary); font: inherit; font-size: 12px; line-height: 1.6; }
+.field :is(input, select):hover { border-color: var(--brand-accent); }
+.field :is(input, select):focus-visible { border-color: var(--brand-accent); outline: 3px solid var(--brand-accent); outline-offset: 2px; }
+.field input::placeholder { color: var(--text-muted); opacity: 1; }
+.field select { padding-right: 32px; }
+.field option { background: var(--surface); color: var(--text); }
+.searchControl { position: relative; }
+.searchControl > svg { position: absolute; top: 50%; left: 14px; color: var(--text-muted); pointer-events: none; transform: translateY(-50%); }
+.searchControl input { padding-left: 42px; }
+
+.sectionHeading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; margin-bottom: 18px; }
+.resultsHeading { margin: 0; color: var(--text); font-size: 18px; font-weight: 600; letter-spacing: -.3px; line-height: 1.6; }
+.resultsHeading:focus-visible { outline: 3px solid var(--brand-accent); outline-offset: 5px; }
+.resultSummary { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.8; }
+.catalogueGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.testCard { display: flex; min-width: 0; flex-direction: column; padding: 24px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.testCard:hover, .testCard:focus-within { border-color: var(--brand-accent); background: var(--surface-hover); }
+.cardHeading { display: flex; min-width: 0; align-items: center; gap: 14px; }
+.cardIcon { display: grid; width: 52px; height: 52px; flex-shrink: 0; place-items: center; border: 1px solid var(--border); border-radius: 12px; background: var(--secondary); color: var(--on-secondary); }
+.cardLabels { display: flex; min-width: 0; flex-direction: column; gap: 8px; }
+.skillName { color: var(--text); font-family: var(--serif); font-size: 23px; font-weight: 700; letter-spacing: -.4px; line-height: 1.2; }
+.modeBadges { display: flex; min-width: 0; flex-wrap: wrap; gap: 5px; }
+.badge { display: inline-flex; min-height: 23px; align-items: center; justify-content: center; padding: 3px 7px; border: 1px solid var(--border); border-radius: 5px; background: var(--background); color: var(--text-muted); font-size: 9px; font-weight: 500; line-height: 1.6; }
+.practiceBadge { background: var(--secondary); color: var(--on-secondary); }
+.activeBadge { border-color: var(--primary); background: var(--primary); color: var(--on-primary); }
+.cardTitle { display: -webkit-box; min-height: 51px; overflow: hidden; margin: 20px 0 10px; color: var(--text); font-size: 16px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.cardDescription { display: -webkit-box; min-height: 65px; overflow: hidden; margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.cardFacts { display: flex; flex-direction: column; gap: 12px; margin: 20px 0 22px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); }
+.questionCount { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.7; }
+.questionCount svg { flex-shrink: 0; color: var(--primary); }
+.questionCount strong { color: var(--text); font-weight: 600; }
+.modeList { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
+.modeList:empty { display: none; }
+.modeRow { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 10px; }
+.modeDuration { display: flex; min-width: 0; align-items: flex-start; gap: 6px; color: var(--text-muted); font-size: 10px; line-height: 1.8; }
+.modeDuration svg { flex-shrink: 0; margin-top: 2px; }
+.remaining { color: var(--primary); font-size: 9px; font-weight: 500; line-height: 1.8; }
+.noAttempts { color: var(--danger); }
+.catalogue .primaryButton, .secondaryButton { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 9px; padding: 11px 16px; border: 1px solid var(--primary); border-radius: 8px; background: var(--primary); color: var(--on-primary); font-size: 12px; font-weight: 600; line-height: 1.6; }
+.catalogue .primaryButton:hover { border-color: var(--primary-hover); background: var(--primary-hover); }
+.testCard .primaryButton { width: 100%; margin-top: auto; }
+.secondaryButton { border-color: var(--control-border); background: var(--surface); color: var(--brand-accent); }
+.secondaryButton:hover { border-color: var(--brand-accent); background: var(--surface-hover); }
+.catalogue :is(.primaryButton, .secondaryButton) svg { flex-shrink: 0; }
+.notice { display: flex; align-items: flex-start; gap: 10px; padding: 14px 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--secondary); color: var(--on-secondary); }
+.notice svg { flex-shrink: 0; margin-top: 2px; }
+.notice p { margin: 0; font-size: 12px; line-height: 1.8; }
+
+.pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 20px; margin-top: 24px; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.paginationRange { margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.8; }
+.paginationRange strong { color: var(--text); font-weight: 600; }
+.pageNumbers, .pageNumberItem { display: flex; align-items: center; gap: 5px; }
+.pageNumbers button { display: grid; min-width: 36px; min-height: 36px; place-items: center; padding: 7px; border: 1px solid var(--control-border); border-radius: 7px; background: var(--surface); color: var(--text); font-size: 11px; font-weight: 500; line-height: 1.6; }
+.pageNumbers button:hover:not(:disabled) { border-color: var(--brand-accent); background: var(--surface-hover); color: var(--brand-accent); }
+.pageNumbers button[aria-current="page"] { border-color: var(--primary); background: var(--primary); color: var(--on-primary); }
+.pageNumbers button[aria-current="page"]:hover { border-color: var(--primary-hover); background: var(--primary-hover); color: var(--on-primary); }
+.pageNumbers button:disabled { cursor: not-allowed; opacity: .45; }
+.pageEllipsis { padding-inline: 2px; color: var(--text-muted); font-size: 12px; }
+.pageSummary { color: var(--text-muted); font-size: 10px; line-height: 1.8; }
+
+@media (min-width: 1280px) {
+  .catalogueGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .hero { gap: 22px; }
+  .totalCard { min-width: 156px; padding: 18px; }
+  .filterControls { grid-template-columns: minmax(0, 1fr) 210px; }
+  .testCard { padding: 22px; }
+}
+@media (max-width: 700px) {
+  .catalogueGrid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .cardTitle { min-height: 0; }
+  .cardDescription { min-height: 0; }
+}
+@media (max-width: 600px) {
+  .catalogue { gap: 24px; }
+  .hero { flex-direction: column; align-items: stretch; gap: 20px; }
+  .hero h1 { font-size: 28px; letter-spacing: -.5px; }
+  .hero p { font-size: 12px; }
+  .totalCard { min-width: 0; gap: 12px; padding: 16px 20px; border-radius: 14px; }
+  .totalCard > div { display: flex; flex: 1; align-items: center; justify-content: space-between; gap: 16px; }
+  .totalLabel { margin: 0; }
+  .totalCard strong { font-size: 28px; }
+  .totalIcon { width: 38px; height: 38px; }
+  .filters { padding: 18px; border-radius: 14px; }
+  .filterHeading { margin-bottom: 18px; }
+  .filterTabs { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
+  .tabButton { min-width: 0; gap: 5px; padding: 8px 5px; font-size: 11px; }
+  .tabCount { min-width: 20px; min-height: 20px; padding-inline: 4px; font-size: 9px; }
+  .tabIcon { display: none; }
+  .clearButton { margin-left: auto; }
+  .filterControls { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .field :is(input, select) { font-size: 16px; }
+  .sectionHeading { margin-bottom: 16px; }
+  .resultsHeading { font-size: 16px; }
+  .resultSummary { font-size: 11px; }
+  .cardTitle { font-size: 15px; }
+  .modeDuration { font-size: 11px; }
+  .remaining { font-size: 10px; }
+  .pagination { justify-content: center; gap: 16px; padding: 16px; }
+  .paginationRange { width: 100%; text-align: center; }
+  .pageSummary { width: 100%; text-align: center; }
+  .pageNumbers { justify-content: center; flex-wrap: wrap; }
+  .pageNumbers button { min-width: 34px; min-height: 36px; }
+  .notice { padding: 14px; }
+}
+@media (max-width: 380px) {
+  .filters { padding: 16px; }
+  .tabButton { flex-direction: column; gap: 6px; padding-block: 10px; }
+  .testCard { padding: 20px; }
+  .pagination { padding-inline: 12px; }
+  .pageNumbers, .pageNumberItem { gap: 4px; }
+  .pageNumbers button { min-width: 30px; min-height: 34px; padding: 6px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :global([data-theme-ready="true"]) .catalogue,
+  :global([data-theme-ready="true"]) .catalogue :is(.eyebrow, .hero p, .totalCard, .totalIcon, .totalLabel, .totalCard strong, .totalCard small, .filters, .filterTabs, .tabButton, .tabCount, .clearButton, .field label, .field input, .field select, .searchControl > svg, .resultsHeading, .resultSummary, .testCard, .cardIcon, .skillName, .badge, .cardTitle, .cardDescription, .cardFacts, .questionCount, .questionCount strong, .questionCount svg, .modeList, .modeDuration, .remaining, .primaryButton, .secondaryButton, .notice, .pagination, .paginationRange, .paginationRange strong, .pageNumbers button, .pageEllipsis, .pageSummary) {
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, outline-color 180ms ease;
+  }
+}

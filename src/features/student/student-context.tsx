@@ -18,7 +18,7 @@ export function useStudent() {
 export function StudentProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const themedOverview = pathname === "/student";
+  const themedPage = pathname === "/student" || pathname === "/student/tests";
   const [user, setUser] = useState<StudentUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [revision, setRevision] = useState(0);
@@ -43,7 +43,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       router.refresh();
     } catch (err) { setError(errorText(err)); }
   }
-  if ((!user || error) && themedOverview) return (
+  if ((!user || error) && themedPage) return (
     <StudentThemeShell user={user ?? undefined} onLogout={user ? logout : undefined} centered>
       <StudentThemeStatus
         headingAs="h1"
@@ -59,5 +59,5 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     <StatusPanel loading={!error} title={error ? "Chưa thể mở khu vực học viên" : "Đang mở khu vực học viên…"} description={error ?? undefined}
       onRetry={error ? () => { setError(null); setRevision((n) => n + 1); } : undefined} />
   </div></div>;
-  return <Context.Provider value={{ user, logout }}>{themedOverview ? children : <div className={s.root}>{children}</div>}</Context.Provider>;
+  return <Context.Provider value={{ user, logout }}>{themedPage ? children : <div className={s.root}>{children}</div>}</Context.Provider>;
 }
