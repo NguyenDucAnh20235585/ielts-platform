@@ -1,6 +1,7 @@
 import Link from "next/link";
 import FoundationIcon from "./foundation-icons";
 import { FoundationHeader } from "./foundation-interactions";
+import { FoundationTheme } from "./foundation-theme";
 import styles from "./foundation.module.css";
 
 const skills = [
@@ -10,7 +11,7 @@ const skills = [
 
 export default function FoundationPage() {
   return (
-    <div className={styles.page}>
+    <FoundationTheme>
       <a className={styles.skipLink} href="#noi-dung-chinh">
         Chuyển đến nội dung chính
       </a>
@@ -58,6 +59,6 @@ export default function FoundationPage() {
           </a>
         </div>
       </footer>
-    </div>
+    </FoundationTheme>
   );
 }

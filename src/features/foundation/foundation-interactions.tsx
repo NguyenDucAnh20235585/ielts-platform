@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import FoundationIcon from "./foundation-icons";
+import { FoundationThemeToggle } from "./foundation-theme";
 import styles from "./foundation.module.css";
 
 export function FoundationHeader() {
@@ -27,6 +28,7 @@ export function FoundationHeader() {
             <FoundationIcon name="info" width="18" height="18" />
             <span>Giới thiệu</span>
           </button>
+          <FoundationThemeToggle />
           <Link href="/login?next=%2Fstudent%2Ftests" className={styles.loginButton}>
             <FoundationIcon name="user" width="18" height="18" />
             <span>Đăng nhập</span>
