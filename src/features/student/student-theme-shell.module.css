@@ -1,0 +1,67 @@
+.header { position: relative; z-index: 1; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+.headerInner { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 24px; }
+.headerActions { display: flex; align-items: center; gap: 16px; }
+.identity { display: flex; min-width: 0; align-items: center; gap: 10px; padding-right: 16px; border-right: 1px solid var(--border); }
+.avatar { display: grid; width: 38px; height: 38px; flex-shrink: 0; place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--secondary); color: var(--on-secondary); }
+.identityText { display: flex; min-width: 0; max-width: 190px; flex-direction: column; gap: 2px; }
+.identityText strong, .identityText span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.identityText strong { color: var(--text); font-size: 12px; font-weight: 600; line-height: 1.6; }
+.identityText span { color: var(--text-muted); font-size: 11px; line-height: 1.6; }
+.logoutButton { display: inline-flex; min-width: 40px; min-height: 40px; flex-shrink: 0; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--surface); color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.logoutButton:hover { border-color: var(--danger); background: var(--danger-surface); color: var(--danger); }
+.navigationBorder { border-top: 1px solid var(--border); }
+.navigation { display: flex; align-items: stretch; gap: 8px; padding-block: 8px; }
+.navigation .navLink { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 8px; padding: 9px 16px; border: 1px solid transparent; border-radius: 8px; color: var(--text-muted); font-size: 12px; font-weight: 500; line-height: 1.6; }
+.navigation .navLink:hover { background: var(--surface-hover); color: var(--brand-accent); }
+.navigation .navLink[aria-current="page"] { background: var(--secondary); color: var(--on-secondary); }
+.navigationIcon { flex-shrink: 0; }
+
+.main { position: relative; flex: 1; isolation: isolate; overflow: clip; padding: 40px 0 56px; font-family: var(--font-be-vietnam-pro), Arial, Helvetica, sans-serif; }
+.centered { display: grid; align-items: center; padding-block: 64px; }
+.centered .statusPanel { width: min(520px, 100%); margin-inline: auto; padding: 40px 28px; }
+.centered .statusTitle { font-size: 23px; line-height: 1.5; }
+
+.statusPanel { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px 24px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: center; }
+.statusIcon { display: grid; width: 48px; height: 48px; flex-shrink: 0; place-items: center; border-radius: 12px; background: var(--secondary); color: var(--on-secondary); }
+.statusTitle { margin: 0; color: var(--text); font-size: 15px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
+.statusDescription { max-width: 380px; margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
+.errorPanel { border-color: var(--control-border); }
+.errorPanel .statusIcon { background: var(--danger-surface); color: var(--danger); }
+.retryButton { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; padding: 9px 16px; border: 1px solid var(--primary); border-radius: 8px; background: var(--primary); color: var(--on-primary); font-size: 12px; font-weight: 600; line-height: 1.6; }
+.retryButton:hover { border-color: var(--primary-hover); background: var(--primary-hover); }
+.spinner { width: 22px; height: 22px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; }
+
+@media (max-width: 1100px) {
+  .identityText { display: none; }
+  .identity { padding-right: 0; border-right: 0; }
+}
+@media (max-width: 900px) {
+  .headerInner { min-height: 62px; }
+  .headerActions { gap: 12px; }
+  .logoutLabel { display: none; }
+  .logoutButton { padding: 8px; }
+  .main { padding-block: 32px 40px; }
+}
+@media (max-width: 600px) {
+  .headerInner { min-height: 64px; gap: 12px; }
+  .headerActions { gap: 8px; }
+  .identity { display: none; }
+  .navigation { gap: 6px; padding-block: 9px; }
+  .navigation .navLink { flex: 1; padding-inline: 10px; font-size: 11px; text-align: center; }
+  .navigationIcon { display: none; }
+  .main { padding-block: 28px 36px; }
+  .statusPanel { padding: 28px 18px; }
+  .centered { padding-block: 40px; }
+  .centered .statusPanel { padding: 32px 22px; }
+  .centered .statusTitle { font-size: 20px; }
+}
+@media (max-width: 380px) {
+  .navigation .navLink { padding-inline: 8px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :global([data-theme-ready="true"]) :is(.header, .navigationBorder, .avatar, .identity, .identityText strong, .identityText span, .logoutButton, .navLink, .statusPanel, .statusIcon, .statusTitle, .statusDescription, .retryButton) {
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+  }
+  .spinner { animation: student-theme-spin 800ms linear infinite; }
+}
+@keyframes student-theme-spin { to { transform: rotate(360deg); } }
