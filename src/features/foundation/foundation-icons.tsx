@@ -3,10 +3,10 @@ import type { ReactNode, SVGProps } from "react";
 export type FoundationIconName =
   | "book" | "headphones" | "arrow" | "compass" | "save" | "check"
   | "scales" | "cloud" | "history" | "clipboard" | "user-plus"
-  | "sliders" | "shield" | "user" | "menu" | "close" | "monitor";
+  | "sliders" | "shield" | "user" | "menu" | "close" | "monitor" | "info" | "mail";
 
 const paths: Record<FoundationIconName, ReactNode> = {
-  book: <><path d="M12 5.5C9.2 3.9 5.9 3.6 3 4.6v14c2.9-1 6.2-.7 9 .9 2.8-1.6 6.1-1.9 9-.9v-14c-2.9-1-6.2-.7-9 .9Z" /><path d="M12 5.5v14M6 8h3M6 11h3M15 8h3M15 11h3M15 14h3" /></>,
+  book: <><path d="M12 5.5C9.2 3.9 5.9 3.6 3 4.6v14c2.9-1 6.2-.7 9 .9 2.8-1.6 6.1-1.9 9-.9v-14c-2.9-1-6.2-.7-9 .9Z" /><path d="M12 5.5v14" /></>,
   headphones: <><path d="M4 14v-3a8 8 0 0 1 16 0v3" /><rect x="3" y="12" width="4" height="8" rx="2" /><rect x="17" y="12" width="4" height="8" rx="2" /></>,
   arrow: <path d="M4 12h16m-6-6 6 6-6 6" />,
   compass: <><circle cx="12" cy="12" r="9" /><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z" /></>,
@@ -23,6 +23,8 @@ const paths: Record<FoundationIconName, ReactNode> = {
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
   close: <path d="m6 6 12 12M6 18 18 6" />,
   monitor: <><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M8 21h8m-4-4v4" /></>,
+  info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10v.01" /></>,
+  mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 6 9 7 9-7" /></>,
 };
 
 export default function FoundationIcon({ name, ...props }: SVGProps<SVGSVGElement> & { name: FoundationIconName }) {
