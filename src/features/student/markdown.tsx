@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import s from "./student.module.css";
+import defaultStyles from "./student.module.css";
 
 function inline(text: string): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\x60[^\x60]+\x60|\[[^\]]+\]\([^\s)]+\))/g);
@@ -12,8 +12,9 @@ function inline(text: string): ReactNode[] {
     return <Fragment key={i}>{part}</Fragment>;
   });
 }
-export function Markdown({ text, passage = false }: { text: string | null; passage?: boolean }) {
+export function Markdown({ text, passage = false, classNames = defaultStyles }: { text: string | null; passage?: boolean; classNames?: Record<string, string> }) {
   if (!text) return null;
+  const s = classNames;
   const blocks = text.replace(/\r\n/g, "\n").split(/\n\s*\n/);
   return <div className={passage ? s.passageText : s.markdown}>
     {blocks.map((block, index) => {

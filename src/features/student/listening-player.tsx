@@ -5,7 +5,7 @@ import type { StudentSection, StudentTestVersion } from "./types";
 import { useStudent } from "./student-context";
 import { StudentIcon } from "./student-icons";
 import { clockLabel } from "./format";
-import s from "./student.module.css";
+import s from "./workspace.module.css";
 
 type Playback = { time: number; plays: number; ended: boolean };
 export function ListeningPlayer({ sections, version, attemptId, selectedSection, disabled, onSection }: {
