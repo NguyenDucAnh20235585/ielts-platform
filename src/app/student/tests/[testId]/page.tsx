@@ -1,5 +1,5 @@
 import { TestDetailPage } from "@/features/student/test-detail-page";
-export const metadata = { title: "Chi tiết đề | IELTS R&L" };
+export const metadata = { title: "Chi tiết đề | Ms Chau’s IELTS" };
 export default async function Page({ params, searchParams }: { params: Promise<{ testId: string }>; searchParams: Promise<{ mode?: string }> }) {
   const { testId } = await params;
   const { mode } = await searchParams;

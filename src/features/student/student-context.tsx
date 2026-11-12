@@ -18,7 +18,7 @@ export function useStudent() {
 export function StudentProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const themedPage = pathname === "/student" || pathname === "/student/tests";
+  const themedPage = pathname === "/student" || pathname === "/student/tests" || /^\/student\/tests\/[^/]+$/.test(pathname);
   const [user, setUser] = useState<StudentUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [revision, setRevision] = useState(0);
