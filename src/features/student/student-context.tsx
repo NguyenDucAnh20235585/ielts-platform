@@ -23,6 +23,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     pathname === "/student/tests" ||
     /^\/student\/tests\/[^/]+$/.test(pathname) ||
     /^\/student\/attempts\/[^/]+\/prepare$/.test(pathname) ||
+    /^\/student\/attempts\/[^/]+\/result$/.test(pathname) ||
     /^\/student\/attempts\/[^/]+$/.test(pathname);
   const [user, setUser] = useState<StudentUser | null>(null);
   const [error, setError] = useState<string | null>(null);
