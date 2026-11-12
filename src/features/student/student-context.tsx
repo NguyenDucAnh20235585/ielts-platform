@@ -21,6 +21,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const themedPage =
     pathname === "/student" ||
     pathname === "/student/tests" ||
+    pathname === "/student/history" ||
     /^\/student\/tests\/[^/]+$/.test(pathname) ||
     /^\/student\/attempts\/[^/]+\/prepare$/.test(pathname) ||
     /^\/student\/attempts\/[^/]+\/result$/.test(pathname) ||
