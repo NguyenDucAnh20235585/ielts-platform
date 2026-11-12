@@ -4,7 +4,7 @@ export type FoundationIconName =
   | "book" | "headphones" | "arrow" | "compass" | "save" | "check"
   | "scales" | "cloud" | "history" | "clipboard" | "user-plus"
   | "sliders" | "shield" | "user" | "menu" | "close" | "monitor" | "info" | "mail"
-  | "sun" | "moon";
+  | "sun" | "moon" | "eye" | "eye-off";
 
 const paths: Record<FoundationIconName, ReactNode> = {
   book: <><path d="M12 5.5C9.2 3.9 5.9 3.6 3 4.6v14c2.9-1 6.2-.7 9 .9 2.8-1.6 6.1-1.9 9-.9v-14c-2.9-1-6.2-.7-9 .9Z" /><path d="M12 5.5v14" /></>,
@@ -28,6 +28,8 @@ const paths: Record<FoundationIconName, ReactNode> = {
   mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 6 9 7 9-7" /></>,
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></>,
   moon: <path d="M20.5 13.2A8.7 8.7 0 0 1 10.8 3.5a8.8 8.8 0 1 0 9.7 9.7Z" />,
+  eye: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></>,
+  "eye-off": <><path d="m3 3 18 18M10.6 5.1 12 5c6.5 0 10 7 10 7a20 20 0 0 1-3 4M6.2 6.2A20 20 0 0 0 2 12s3.5 7 10 7c1.8 0 3.5-.5 5-1.3M10 10a3 3 0 0 0 4 4" /></>,
 };
 
 export default function FoundationIcon({ name, ...props }: SVGProps<SVGSVGElement> & { name: FoundationIconName }) {

@@ -12,6 +12,10 @@
   --brand-accent: #433BFF;
   --border: #E8E7F2;
   --control-border: #8C899F;
+  --danger: #B42318;
+  --danger-surface: #FFF1F0;
+  --theme-sun-display: none;
+  --theme-moon-display: block;
   --serif: Georgia, "Times New Roman", serif;
   color-scheme: light;
   display: flex;
@@ -23,7 +27,8 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.page[data-theme="dark"] {
+.page[data-theme="dark"],
+:global(html[data-foundation-theme="dark"]) .page[data-theme="system"] {
   --background: #100F18;
   --surface: #191824;
   --surface-hover: #242233;
@@ -37,18 +42,23 @@
   --brand-accent: #B8B2FF;
   --border: #343147;
   --control-border: #716C89;
+  --danger: #FDA29B;
+  --danger-surface: #321D24;
+  --theme-sun-display: block;
+  --theme-moon-display: none;
   color-scheme: dark;
 }
 
 :global(html):has(.page[data-theme="light"]) { color-scheme: light; }
-:global(html):has(.page[data-theme="dark"]) { color-scheme: dark; }
+:global(html):has(.page[data-theme="dark"]),
+:global(html[data-foundation-theme="dark"]):has(.page[data-theme="system"]) { color-scheme: dark; }
 
-/* Follow the system even before JavaScript is available. An explicit saved
-   choice, applied by the bootstrap script, takes precedence over this fallback. */
+/* Follow the system without JavaScript; a saved preference applied by the
+   layout bootstrap takes precedence until the client theme store is ready. */
 @media (prefers-color-scheme: dark) {
-  :global(html):has(.page[data-theme="system"]) { color-scheme: dark; }
+  :global(html:not([data-foundation-theme="light"])):has(.page[data-theme="system"]) { color-scheme: dark; }
 
-  .page[data-theme="system"] {
+  :global(html:not([data-foundation-theme="light"])) .page[data-theme="system"] {
     --background: #100F18;
     --surface: #191824;
     --surface-hover: #242233;
@@ -62,6 +72,10 @@
     --brand-accent: #B8B2FF;
     --border: #343147;
     --control-border: #716C89;
+    --danger: #FDA29B;
+    --danger-surface: #321D24;
+    --theme-sun-display: block;
+    --theme-moon-display: none;
     color-scheme: dark;
   }
 }
@@ -143,14 +157,8 @@
   color: var(--on-secondary);
 }
 .themeToggle:hover { border-color: var(--brand-accent); background: var(--surface-hover); color: var(--brand-accent); }
-.themeSun { display: none; }
-.themeMoon { display: block; }
-.page[data-theme="dark"] .themeSun { display: block; }
-.page[data-theme="dark"] .themeMoon { display: none; }
-@media (prefers-color-scheme: dark) {
-  .page[data-theme="system"] .themeSun { display: block; }
-  .page[data-theme="system"] .themeMoon { display: none; }
-}
+.themeSun { display: var(--theme-sun-display); }
+.themeMoon { display: var(--theme-moon-display); }
 
 .main {
   position: relative;

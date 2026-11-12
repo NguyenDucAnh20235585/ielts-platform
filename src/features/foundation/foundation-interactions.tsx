@@ -6,8 +6,9 @@ import FoundationIcon from "./foundation-icons";
 import { FoundationThemeToggle } from "./foundation-theme";
 import styles from "./foundation.module.css";
 
-export function FoundationHeader() {
+export function FoundationHeader({ accountAction = "login" }: { accountAction?: "login" | "register" }) {
   const aboutDialog = useRef<HTMLDialogElement>(null);
+  const register = accountAction === "register";
 
   return (
     <header className={styles.header}>
@@ -29,9 +30,9 @@ export function FoundationHeader() {
             <span>Giới thiệu</span>
           </button>
           <FoundationThemeToggle />
-          <Link href="/login?next=%2Fstudent%2Ftests" className={styles.loginButton}>
-            <FoundationIcon name="user" width="18" height="18" />
-            <span>Đăng nhập</span>
+          <Link href={register ? "/register" : "/login?next=%2Fstudent%2Ftests"} className={styles.loginButton}>
+            <FoundationIcon name={register ? "user-plus" : "user"} width="18" height="18" />
+            <span>{register ? "Đăng ký" : "Đăng nhập"}</span>
           </Link>
         </nav>
       </div>

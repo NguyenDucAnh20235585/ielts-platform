@@ -2,13 +2,15 @@
 
 import { useSyncExternalStore, type ReactNode } from "react";
 import FoundationIcon from "./foundation-icons";
+import {
+  foundationSystemThemeQuery as systemThemeQuery,
+  foundationThemeStorageKey as storageKey,
+} from "./foundation-theme-config";
 import styles from "./foundation.module.css";
 
 type Theme = "light" | "dark";
 
-const storageKey = "ms-chau-ielts-foundation-theme";
 const themeEvent = "foundation:theme-change";
-const systemThemeQuery = "(prefers-color-scheme: dark)";
 let sessionPreference: Theme | null | undefined;
 
 function getTheme(): Theme {
@@ -57,18 +59,6 @@ function toggleTheme() {
   window.dispatchEvent(new Event(themeEvent));
 }
 
-// Run inside the foundation root before its content is painted. Keep the
-// document theme untouched so other routes retain their existing appearance.
-const initializeTheme = `(() => {
-  const root = document.currentScript && document.currentScript.parentElement;
-  if (!root) return;
-  let saved;
-  try { saved = localStorage.getItem(${JSON.stringify(storageKey)}); } catch {}
-  root.dataset.theme = saved === "light" || saved === "dark"
-    ? saved
-    : (matchMedia(${JSON.stringify(systemThemeQuery)}).matches ? "dark" : "light");
-})();`;
-
 export function FoundationTheme({ children }: { children: ReactNode }) {
   const theme = useSyncExternalStore(subscribe, getTheme, getServerTheme);
 
@@ -77,9 +67,7 @@ export function FoundationTheme({ children }: { children: ReactNode }) {
       className={styles.page}
       data-theme={theme ?? "system"}
       data-theme-ready={theme ? "true" : undefined}
-      suppressHydrationWarning
     >
-      <script dangerouslySetInnerHTML={{ __html: initializeTheme }} />
       {children}
     </div>
   );

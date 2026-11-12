@@ -1,16 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/features/auth/supabase-browser";
+import { FoundationFooter } from "@/features/foundation/foundation-footer";
+import FoundationIcon from "@/features/foundation/foundation-icons";
+import { FoundationHeader } from "@/features/foundation/foundation-interactions";
+import { FoundationTheme } from "@/features/foundation/foundation-theme";
+import foundation from "@/features/foundation/foundation.module.css";
 import { errorText } from "./api";
-import { Brand, Notice } from "./ui";
-import { StudentIcon } from "./student-icons";
-import s from "./student.module.css";
+import s from "./auth.module.css";
 
 type AuthMode = "login" | "register" | "forgot" | "reset";
-const headings: Record<AuthMode, string> = { login: "Chào mừng bạn trở lại", register: "Bắt đầu hành trình luyện IELTS", forgot: "Khôi phục mật khẩu", reset: "Đặt mật khẩu mới" };
+const headings: Record<AuthMode, string> = {
+  login: "Chào mừng trở lại",
+  register: "Tạo tài khoản",
+  forgot: "Quên mật khẩu?",
+  reset: "Đặt mật khẩu mới",
+};
+const descriptions: Record<AuthMode, string> = {
+  login: "Đăng nhập để tiếp tục hành trình luyện IELTS của bạn.",
+  register: "Lưu tiến trình và theo dõi kết quả sau mỗi buổi luyện tập.",
+  forgot: "Nhập email đã đăng ký để nhận liên kết khôi phục mật khẩu.",
+  reset: "Tạo mật khẩu mới để tiếp tục luyện tập cùng Ms Chau’s IELTS.",
+};
+
+function AuthNotice({ children, danger = false }: { children: ReactNode; danger?: boolean }) {
+  return (
+    <div className={`${s.notice} ${danger ? s.errorNotice : ""}`} role={danger ? "alert" : "status"}>
+      <FoundationIcon name={danger ? "info" : "check"} width="19" height="19" />
+      <p>{children}</p>
+    </div>
+  );
+}
 function authMessage(code: string | undefined) {
   return ({ invalid_credentials: "Email hoặc mật khẩu chưa đúng.", email_not_confirmed: "Bạn cần xác nhận email trước khi đăng nhập.",
     user_already_exists: "Email này đã có tài khoản. Hãy đăng nhập.", weak_password: "Mật khẩu chưa đủ mạnh. Hãy thử mật khẩu khác.",
@@ -76,19 +99,121 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
     } catch (err) { setError(errorText(err)); }
     finally { setBusy(false); }
   }
-  return <div className={[s.root, s.authPage].join(" ")}><header className={s.authHeader}><Brand /><Link className={s.backLink} href="/"><StudentIcon name="back" width="16" height="16" />Trang chủ</Link></header>
-    <main className={s.authCard}><span className={s.authIcon}><StudentIcon name={mode === "forgot" || mode === "reset" ? "shield" : "book"} width="30" height="30" /></span>
-      <span className={s.eyebrow}>IELTS READING & LISTENING</span><h1>{headings[mode]}</h1>
-      <p>{mode === "login" ? "Đăng nhập để tiếp tục bài làm và xem kết quả của bạn." : mode === "register" ? "Tạo tài khoản để lưu tiến trình và lịch sử làm bài." : "Lấy lại quyền truy cập tài khoản của bạn."}</p>
-      {error && <Notice danger>{error}</Notice>}{message && <Notice>{message}</Notice>}
-      <form onSubmit={(event) => void submit(event)} className={s.authForm}>
-        {mode !== "reset" && <label>Email<input type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email của bạn" /></label>}
-        {mode !== "forgot" && <label>{mode === "reset" ? "Mật khẩu mới" : "Mật khẩu"}<div className={s.passwordField}><input type={show ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={mode === "login" ? undefined : 8} value={password} onChange={(event) => setPassword(event.target.value)} /><button type="button" onClick={() => setShow(!show)} aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"}>{show ? "Ẩn" : "Hiện"}</button></div></label>}
-        {(mode === "register" || mode === "reset") && <label>Xác nhận mật khẩu<input type={show ? "text" : "password"} autoComplete="new-password" required minLength={8} value={confirm} onChange={(event) => setConfirm(event.target.value)} /></label>}
-        {mode === "login" && <Link href="/forgot-password" className={s.authForgot}>Quên mật khẩu?</Link>}
-        <button className={s.primaryButton} type="submit" disabled={busy || !recoveryReady}>{busy ? "Đang xử lý…" : mode === "login" ? "Đăng nhập" : mode === "register" ? "Tạo tài khoản" : mode === "forgot" ? "Gửi liên kết khôi phục" : "Cập nhật mật khẩu"}<StudentIcon name="arrow" width="18" height="18" /></button>
-      </form>
-      <div className={s.authSwitch}>{mode === "login" ? <>Chưa có tài khoản? <Link href="/register">Đăng ký</Link></> : mode === "register" ? <>Đã có tài khoản? <Link href="/login">Đăng nhập</Link></> : <Link href={mode === "reset" && message ? "/student" : "/login"}>{mode === "reset" && message ? "Vào khu vực học viên" : "Quay lại đăng nhập"}</Link>}</div>
-    </main><p className={s.authFooter}>Luyện tập có định hướng. Tự tin hơn với IELTS.</p>
-  </div>;
+  return (
+    <FoundationTheme>
+      <a className={foundation.skipLink} href="#noi-dung-tai-khoan">Chuyển đến nội dung chính</a>
+      <FoundationHeader accountAction={mode === "login" ? "register" : "login"} />
+
+      <main id="noi-dung-tai-khoan" className={s.main} tabIndex={-1}>
+        <span className={`${foundation.corner} ${foundation.cornerTop}`} aria-hidden="true" />
+        <span className={`${foundation.corner} ${foundation.cornerBottom}`} aria-hidden="true" />
+
+        <section className={s.card} aria-labelledby="auth-heading">
+          <div className={s.cardHeader}>
+            <span className={s.authIcon}>
+              <FoundationIcon
+                name={mode === "forgot" || mode === "reset" ? "shield" : mode === "register" ? "user-plus" : "book"}
+                width="26"
+                height="26"
+              />
+            </span>
+            <p className={s.eyebrow}>READING &amp; LISTENING PRACTICE</p>
+            <h1 id="auth-heading">{headings[mode]}</h1>
+            <p className={s.description}>{descriptions[mode]}</p>
+          </div>
+
+          {error && <AuthNotice danger>{error}</AuthNotice>}
+          {message && <AuthNotice>{message}</AuthNotice>}
+
+          <form onSubmit={(event) => void submit(event)} className={s.form} aria-busy={busy}>
+            {mode !== "reset" && (
+              <div className={s.field}>
+                <label htmlFor="auth-email">Email</label>
+                <input
+                  id="auth-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Nhập email của bạn"
+                />
+              </div>
+            )}
+
+            {mode !== "forgot" && (
+              <div className={s.field}>
+                <label htmlFor="auth-password">{mode === "reset" ? "Mật khẩu mới" : "Mật khẩu"}</label>
+                <div className={s.passwordField}>
+                  <input
+                    id="auth-password"
+                    name="password"
+                    type={show ? "text" : "password"}
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    required
+                    minLength={mode === "login" ? undefined : 8}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder={mode === "login" ? "Nhập mật khẩu" : "Tạo mật khẩu của bạn"}
+                    aria-describedby={mode === "login" ? undefined : "auth-password-hint"}
+                  />
+                  <button
+                    type="button"
+                    className={s.passwordToggle}
+                    onClick={() => setShow(!show)}
+                    aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                    aria-pressed={show}
+                    aria-controls={mode === "register" || mode === "reset" ? "auth-password auth-confirm" : "auth-password"}
+                  >
+                    <FoundationIcon name={show ? "eye-off" : "eye"} width="19" height="19" />
+                  </button>
+                </div>
+                {mode !== "login" && <p id="auth-password-hint" className={s.fieldHint}>Sử dụng ít nhất 8 ký tự.</p>}
+              </div>
+            )}
+
+            {(mode === "register" || mode === "reset") && (
+              <div className={s.field}>
+                <label htmlFor="auth-confirm">Xác nhận mật khẩu</label>
+                <input
+                  id="auth-confirm"
+                  name="confirmPassword"
+                  type={show ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  value={confirm}
+                  onChange={(event) => setConfirm(event.target.value)}
+                  placeholder="Nhập lại mật khẩu"
+                />
+              </div>
+            )}
+
+            {mode === "login" && <Link href="/forgot-password" className={`${s.textLink} ${s.forgotLink}`}>Quên mật khẩu?</Link>}
+
+            <button className={s.primaryButton} type="submit" disabled={busy || !recoveryReady}>
+              {busy ? "Đang xử lý…" : mode === "login" ? "Đăng nhập" : mode === "register" ? "Tạo tài khoản" : mode === "forgot" ? "Gửi liên kết khôi phục" : "Cập nhật mật khẩu"}
+              {busy ? <span className={s.spinner} aria-hidden="true" /> : <FoundationIcon name="arrow" width="18" height="18" />}
+            </button>
+          </form>
+
+          <div className={s.accountSwitch}>
+            {mode === "login" ? <>Chưa có tài khoản? <Link href="/register" className={s.textLink}>Đăng ký</Link></>
+              : mode === "register" ? <>Đã có tài khoản? <Link href="/login" className={s.textLink}>Đăng nhập</Link></>
+                : <Link href={mode === "reset" && message ? "/student" : "/login"} className={s.textLink}>
+                  {mode === "reset" && message ? "Vào khu vực học viên" : "Quay lại đăng nhập"}
+                </Link>}
+          </div>
+          <Link href="/" className={`${s.textLink} ${s.homeLink}`}>
+            <FoundationIcon name="arrow" className={s.backIcon} width="15" height="15" />Trang chủ
+          </Link>
+        </section>
+      </main>
+
+      <FoundationFooter />
+    </FoundationTheme>
+  );
 }
