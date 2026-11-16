@@ -1,11 +1,6 @@
 import "server-only";
 
-import {
-  GRACE_SECONDS,
-  finalOutcome,
-  isExpired,
-  isPastGrace,
-} from "@/features/attempt/timer";
+import { GRACE_SECONDS, finalOutcome, isPastGrace } from "@/features/attempt/timer";
 
 import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
 import type { BandRange } from "@/features/grading/band";
@@ -217,7 +212,7 @@ export async function loadBandTable(
 export type ExpiryCheck = { attempt: AttemptRow; finalizedNow: boolean };
 
 /**
- * Lazy expiry (D-005): if the attempt is past expires_at + grace, grade and
+ * Lazy expiry (D-005, D-016): if the attempt is past expires_at + grace, grade and
  * finalize it now as AUTO_SUBMITTED. Commits on its own, so callers can
  * report "expired" afterwards without rolling the finalization back.
  */
@@ -286,7 +281,9 @@ export function assertAcceptsChanges(check: ExpiryCheck, now: Date): void {
       },
     );
   }
-  if (isExpired(timerOf(attempt), now)) {
+  // Answers inside the grace window are accepted (D-016). Past it, finalizeIfExpired
+  // has already closed the attempt with the same `now`; this is a defensive re-check.
+  if (isPastGrace(timerOf(attempt), now)) {
     throw new ApiError("ATTEMPT_EXPIRED", "Time is up for this attempt.", {
       status: "IN_PROGRESS",
     });

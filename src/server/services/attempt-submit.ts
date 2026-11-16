@@ -1,7 +1,7 @@
 import "server-only";
 
 import { isFinalized } from "@/features/attempt/attempt-view";
-import { isExpired } from "@/features/attempt/timer";
+import { isPastGrace } from "@/features/attempt/timer";
 import type { CurrentUser } from "@/server/auth/current-user";
 import type { Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
@@ -33,11 +33,13 @@ export async function submitAttempt(
     if (isFinalized(locked.status)) {
       return locked; // already submitted: same result, nothing re-graded
     }
-    // Answers sent with the submit are kept only while the grace period lasts.
+    // Answers sent with the submit count until the grace window ends (D-016):
+    // they cover the FE's submit at 0 s and its last autosave in flight.
+    // finalizeAttempt then records AUTO_SUBMITTED at expires_at if the clock was up.
     if (
       finalAnswers &&
       finalAnswers.length > 0 &&
-      !isExpired(timerOf(locked), now)
+      !isPastGrace(timerOf(locked), now)
     ) {
       await writeAnswers(
         tx,
