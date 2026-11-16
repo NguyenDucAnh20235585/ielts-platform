@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "next typegen && tsc --noEmit",
     "test:integration": "vitest run --config vitest.integration.config.mts",
-    "demo:flow": "vitest run --config vitest.demo.config.mts"
+    "demo:flow": "vitest run --config vitest.demo.config.mts",
+    "bench:flow": "vitest run --config vitest.bench.config.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
