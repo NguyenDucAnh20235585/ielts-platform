@@ -41,13 +41,7 @@ export async function submitAttempt(
       finalAnswers.length > 0 &&
       !isPastGrace(timerOf(locked), now)
     ) {
-      await writeAnswers(
-        tx,
-        locked.id,
-        locked.test_version_id,
-        finalAnswers,
-        now,
-      );
+      await writeAnswers(tx, locked, finalAnswers, now);
     }
     return finalizeAttempt(tx, locked, now);
   });

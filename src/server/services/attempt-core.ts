@@ -222,12 +222,20 @@ export async function finalizeIfExpired(
   userId: string,
   now: Date,
 ): Promise<ExpiryCheck> {
-  const current = await loadOwnAttempt(sql, attemptId, userId);
+  return closeIfPastGrace(sql, await loadOwnAttempt(sql, attemptId, userId), now);
+}
+
+/** finalizeIfExpired for an attempt the caller has just read (unlocked). */
+export async function closeIfPastGrace(
+  sql: Sql,
+  current: AttemptRow,
+  now: Date,
+): Promise<ExpiryCheck> {
   if (!isPastGrace(timerOf(current), now)) {
     return { attempt: current, finalizedNow: false };
   }
   return sql.begin(async (tx) => {
-    const locked = await loadOwnAttempt(tx, attemptId, userId, { lock: true });
+    const locked = await loadOwnAttempt(tx, current.id, current.user_id, { lock: true });
     if (!isPastGrace(timerOf(locked), now)) {
       return { attempt: locked, finalizedNow: false }; // finalized by a parallel request
     }
