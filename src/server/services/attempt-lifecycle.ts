@@ -6,7 +6,14 @@ import {
   toAttemptView,
 } from "@/features/attempt/attempt-view";
 import { remainingSeconds } from "@/features/attempt/timer";
-import { ATTEMPT_STATUSES, type DbTestMode, type DbTestVisibility, TEST_MODES } from "@/features/test/api-enums";
+import { canOpenTest } from "@/features/test/access";
+import {
+  ATTEMPT_STATUSES,
+  type DbAccessType,
+  type DbTestMode,
+  type DbTestVisibility,
+  TEST_MODES,
+} from "@/features/test/api-enums";
 import type { CurrentUser } from "@/server/auth/current-user";
 import { isUniqueViolation } from "@/server/db/errors";
 import type { Sql } from "@/server/db/types";
@@ -44,12 +51,13 @@ export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, 
     attempt = await sql.begin(async (tx) => {
       const tests = await tx<{
         visibility: DbTestVisibility;
+        access_type: DbAccessType;
         version_id: string | null;
         enabled: boolean | null;
         time_limit_seconds: number | null;
         max_attempts: number | null;
       }[]>`
-        select t.visibility, tv.id as version_id, m.enabled, m.time_limit_seconds, m.max_attempts
+        select t.visibility, t.access_type, tv.id as version_id, m.enabled, m.time_limit_seconds, m.max_attempts
         from public.tests t
         left join public.test_versions tv on tv.test_id = t.id and tv.status = 'published'
         left join public.test_version_modes m on m.test_version_id = tv.id and m.mode = ${mode}
@@ -63,13 +71,15 @@ export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, 
       if (test.visibility !== "visible" || test.version_id === null) {
         throw new ApiError("TEST_NOT_PUBLISHED", "This test is not published.");
       }
+      // Checked before the mode so a closed test reveals nothing about its settings (D-017).
+      if (!canOpenTest(user.role, test.access_type)) {
+        throw new ApiError("ACCESS_DENIED", "You do not have access to this test.");
+      }
       if (!test.enabled) {
         throw new ApiError("MODE_NOT_AVAILABLE", `This test cannot be taken in ${TEST_MODES[mode]} mode.`, {
           mode: TEST_MODES[mode],
         });
       }
-      // Prototype 1: every published test is PUBLIC (D-004), so no access check yet.
-
       const active = await tx<{ id: string }[]>`
         select id from public.attempts
         where user_id = ${user.id} and test_id = ${testId} and status in ('created', 'in_progress')

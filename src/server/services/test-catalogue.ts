@@ -9,6 +9,7 @@ import {
   type DbTestVisibility,
   TEST_TYPES,
 } from "@/features/test/api-enums";
+import { canOpenTest, studentAccessTypes } from "@/features/test/access";
 import { type ModeOption, type ModeSettingsRow, sortModes, toModeOption } from "@/features/test/mode-settings";
 import type { CurrentUser } from "@/server/auth/current-user";
 import { likePattern } from "@/server/db/like";
@@ -59,13 +60,20 @@ function toSummary(row: CatalogueRow, modes: ModeOption[]) {
 
 /**
  * Tests with their published version and this user's active attempt.
- * Prototype 1: every published test is visible to every student (D-004).
  * "Published" = visibility VISIBLE and a version with status published (D-015).
+ * `accessTypes` limits the list to the tests the caller may open (D-017).
  */
 async function queryCatalogue(
   sql: Sql,
   userId: string,
-  where: { testId?: string; publishedOnly: boolean; type?: DbTestType; mode?: DbTestMode; search?: string },
+  where: {
+    testId?: string;
+    publishedOnly: boolean;
+    accessTypes?: readonly DbAccessType[];
+    type?: DbTestType;
+    mode?: DbTestMode;
+    search?: string;
+  },
   page: { limit: number; offset: number },
 ) {
   return sql<CatalogueRow[]>`
@@ -86,6 +94,7 @@ async function queryCatalogue(
     where true
       ${where.testId ? sql`and t.id = ${where.testId}` : sql``}
       ${where.publishedOnly ? sql`and t.visibility = 'visible' and tv.id is not null` : sql``}
+      ${where.accessTypes ? sql`and t.access_type in ${sql(where.accessTypes)}` : sql``}
       ${where.type ? sql`and t.type = ${where.type}` : sql``}
       ${where.mode
         ? sql`and exists (select 1 from public.test_version_modes m
@@ -132,7 +141,13 @@ export async function listTests(sql: Sql, user: CurrentUser, query: CatalogueQue
   const rows = await queryCatalogue(
     sql,
     user.id,
-    { publishedOnly: true, type: query.type, mode: query.mode, search: query.search?.trim() || undefined },
+    {
+      publishedOnly: true,
+      accessTypes: studentAccessTypes(user.role),
+      type: query.type,
+      mode: query.mode,
+      search: query.search?.trim() || undefined,
+    },
     { limit: query.limit, offset: offsetOf(query.page, query.limit) },
   );
   const modes = await loadModeOptions(sql, user.id, rows);
@@ -165,6 +180,9 @@ export async function getTestDetail(sql: Sql, user: CurrentUser, testId: string,
   }
   if (row.visibility !== "visible" || row.version_id === null) {
     throw new ApiError("TEST_NOT_PUBLISHED", "This test is not published.");
+  }
+  if (!canOpenTest(user.role, row.access_type)) {
+    throw new ApiError("ACCESS_DENIED", "You do not have access to this test.");
   }
   const modes = await loadModeOptions(sql, user.id, rows);
   const active = await findActiveAttempt(sql, user.id, testId);
