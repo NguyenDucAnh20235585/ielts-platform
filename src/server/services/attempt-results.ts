@@ -1,5 +1,7 @@
 import "server-only";
 
+import type postgres from "postgres";
+
 import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
 import { buildResultPayload, type ResultRow } from "@/features/attempt/result-view";
 import { gradingSnapshotSchema } from "@/features/grading/snapshot";
@@ -17,18 +19,28 @@ import type { Queryable, Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
 import { offsetOf, paginated } from "@/server/http/pagination";
 
-import { finalizeExpiredForUser, finalizeIfExpired } from "./attempt-core";
+import { finalizeIfExpired, readAfterExpiry } from "./attempt-core";
 
-/** Reads the stored result of a finalized attempt (never re-grades). */
-export async function readResult(sql: Queryable, attempt: AttemptRow) {
-  const rows = await sql<(ResultRow & {
-    grading_snapshot: unknown;
-    test_title: string;
-    test_type: DbTestType;
-    version_number: number;
-    answer_visibility: DbAnswerVisibility;
-  })[]>`
-    select r.correct_count, r.incorrect_count, r.unanswered_count, r.raw_score, r.max_score, r.band_score,
+type StoredResultRow = ResultRow & {
+  attempt_id: string;
+  attempt_status: DbAttemptStatus;
+  attempt_mode: DbTestMode;
+  started_at: Date | null;
+  submitted_at: Date | null;
+  test_id: string;
+  grading_snapshot: unknown;
+  test_title: string;
+  test_type: DbTestType;
+  version_number: number;
+  answer_visibility: DbAnswerVisibility;
+};
+
+/** The stored result with its attempt and test, for the attempts matching `where` (alias a = attempts). */
+function queryStoredResults(sql: Queryable, where: postgres.Fragment) {
+  return sql<StoredResultRow[]>`
+    select a.id as attempt_id, a.status as attempt_status, a.mode as attempt_mode,
+           a.started_at, a.submitted_at, a.test_id,
+           r.correct_count, r.incorrect_count, r.unanswered_count, r.raw_score, r.max_score, r.band_score,
            r.time_taken_seconds, r.grading_snapshot,
            t.title as test_title, t.type as test_type, tv.version_number, m.answer_visibility
     from public.results r
@@ -37,21 +49,20 @@ export async function readResult(sql: Queryable, attempt: AttemptRow) {
     join public.test_versions tv on tv.id = a.test_version_id
     -- visibility of the mode the student picked (D-015)
     join public.test_version_modes m on m.test_version_id = a.test_version_id and m.mode = a.mode
-    where r.attempt_id = ${attempt.id}
+    where ${where}
   `;
-  const row = rows[0];
-  if (!row) {
-    throw new Error(`Finalized attempt ${attempt.id} has no result row.`);
-  }
+}
+
+function toResultPayload(row: StoredResultRow) {
   return buildResultPayload({
     attempt: {
-      id: attempt.id,
-      status: attempt.status,
-      mode: attempt.mode,
-      started_at: attempt.started_at,
-      submitted_at: attempt.submitted_at,
+      id: row.attempt_id,
+      status: row.attempt_status,
+      mode: row.attempt_mode,
+      started_at: row.started_at,
+      submitted_at: row.submitted_at,
     },
-    test: { id: attempt.test_id, title: row.test_title, type: row.test_type },
+    test: { id: row.test_id, title: row.test_title, type: row.test_type },
     versionNumber: row.version_number,
     visibility: row.answer_visibility,
     result: row,
@@ -59,8 +70,23 @@ export async function readResult(sql: Queryable, attempt: AttemptRow) {
   });
 }
 
+/** Reads the stored result of a finalized attempt (never re-grades). */
+export async function readResult(sql: Queryable, attempt: AttemptRow) {
+  const row = (await queryStoredResults(sql, sql`r.attempt_id = ${attempt.id}`))[0];
+  if (!row) {
+    throw new Error(`Finalized attempt ${attempt.id} has no result row.`);
+  }
+  return toResultPayload(row);
+}
+
 /** GET /api/attempts/:attemptId/result */
 export async function getResult(sql: Sql, user: CurrentUser, attemptId: string, now: Date) {
+  // A finalized attempt has a result row: one read answers it.
+  const stored = (await queryStoredResults(sql, sql`a.id = ${attemptId} and a.user_id = ${user.id}`))[0];
+  if (stored) {
+    return toResultPayload(stored);
+  }
+  // No result yet (or not the caller's attempt: 404 below). It may have expired just now.
   const { attempt } = await finalizeIfExpired(sql, attemptId, user.id, now);
   if (!isFinalized(attempt.status)) {
     throw new ApiError("RESULT_NOT_READY", "This attempt has not been submitted yet.", {
@@ -74,8 +100,7 @@ export type HistoryQuery = { status?: DbAttemptStatus; test_id?: string; page: n
 
 /** GET /api/attempts — the caller's attempts, newest first (api-contract §2.6 HistoryItem). */
 export async function listHistory(sql: Sql, user: CurrentUser, query: HistoryQuery, now: Date) {
-  await finalizeExpiredForUser(sql, user.id, now);
-  const rows = await sql<{
+  const rows = await readAfterExpiry(sql, user.id, now, undefined, () => sql<{
     id: string;
     status: DbAttemptStatus;
     mode: DbTestMode;
@@ -104,7 +129,7 @@ export async function listHistory(sql: Sql, user: CurrentUser, query: HistoryQue
       ${query.test_id ? sql`and a.test_id = ${query.test_id}` : sql``}
     order by a.created_at desc, a.id
     limit ${query.limit} offset ${offsetOf(query.page, query.limit)}
-  `;
+  `);
   const items = rows.map((row) => ({
     id: row.id,
     test: { id: row.test_id, title: row.title, type: TEST_TYPES[row.type] },

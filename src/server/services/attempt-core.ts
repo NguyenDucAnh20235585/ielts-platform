@@ -1,11 +1,6 @@
 import "server-only";
 
-import {
-  GRACE_SECONDS,
-  finalOutcome,
-  isExpired,
-  isPastGrace,
-} from "@/features/attempt/timer";
+import { GRACE_SECONDS, finalOutcome, isPastGrace } from "@/features/attempt/timer";
 
 import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
 import type { BandRange } from "@/features/grading/band";
@@ -19,7 +14,7 @@ import { jsonValue } from "@/server/db/json";
 import type { Queryable, Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
 
-import { loadVersionStructure } from "./test-structure";
+import { type StructureColumns, structureColumns, toStructure } from "./test-structure";
 
 /** Loads the caller's own attempt. Someone else's attempt is "not found" (D-011). */
 export async function loadOwnAttempt(
@@ -61,35 +56,45 @@ export async function finalizeAttempt(
     throw new Error(`Cannot finalize an attempt in status ${attempt.status}.`);
   }
 
-  const structure = await loadVersionStructure(
-    tx,
-    attempt.test_version_id,
-    attempt.mode,
-  );
-  if (!structure) {
+  // Everything grading needs, in one query (the attempt is locked, so the
+  // answers are final). Answer keys are read only here, on the grading path.
+  const inputs = (
+    await tx<
+      (StructureColumns & {
+        keys: {
+          question_id: string;
+          correct_answer: unknown;
+          grading_config: unknown;
+          explanation: string | null;
+        }[];
+        answers: { question_id: string; answer: unknown }[];
+        band_ranges: BandRangeRow[];
+      })[]
+    >`
+      select ${structureColumns(tx, attempt.test_version_id, attempt.mode)},
+        (select coalesce(json_agg(r), '[]')
+           from public.answer_keys k
+           join public.questions q on q.id = k.question_id
+           join public.question_groups g on g.id = q.question_group_id
+           join public.sections s on s.id = g.section_id
+           cross join lateral (
+             select k.question_id, k.correct_answer, k.grading_config, k.explanation
+           ) r
+           where s.test_version_id = ${attempt.test_version_id}) as keys,
+        (select coalesce(json_agg(r), '[]')
+           from public.attempt_answers aa
+           cross join lateral (select aa.question_id, aa.answer) r
+           where aa.attempt_id = ${attempt.id}) as answers,
+        (select coalesce(json_agg(b order by b.min_raw), '[]')
+           from (${bandRanges(tx, attempt.test_version_id)}) b) as band_ranges
+    `
+  )[0];
+  const structure = toStructure(inputs);
+  if (!inputs || !structure) {
     throw new Error("Test version of the attempt is missing.");
   }
-
-  // Answer keys are read only here, on the grading path.
-  const keys = await tx<
-    {
-      question_id: string;
-      correct_answer: unknown;
-      grading_config: unknown;
-      explanation: string | null;
-    }[]
-  >`
-    select k.question_id, k.correct_answer, k.grading_config, k.explanation
-    from public.answer_keys k
-    join public.questions q on q.id = k.question_id
-    join public.question_groups g on g.id = q.question_group_id
-    join public.sections s on s.id = g.section_id
-    where s.test_version_id = ${attempt.test_version_id}
-  `;
-  const answers = await tx<{ question_id: string; answer: unknown }[]>`
-    select question_id, answer from public.attempt_answers where attempt_id = ${attempt.id}
-  `;
-  const bandTable = await loadBandTable(tx, attempt.test_version_id);
+  const { keys, answers } = inputs;
+  const bandTable = toBandTable(inputs.band_ranges);
 
   const keyByQuestion = new Map(keys.map((k) => [k.question_id, k]));
   const answerByQuestion = new Map(
@@ -145,20 +150,23 @@ export async function finalizeAttempt(
       (outcome.submittedAt.getTime() - attempt.started_at.getTime()) / 1000,
     ),
   );
-  await tx`
-    insert into public.results
-      (attempt_id, raw_score, max_score, band_score, grading_snapshot,
-       correct_count, incorrect_count, unanswered_count, time_taken_seconds)
-    values
-      (${attempt.id}, ${grade.rawScore}, ${grade.maxScore}, ${grade.bandScore}, ${tx.json(jsonValue(snapshot))},
-       ${grade.correctCount}, ${grade.incorrectCount}, ${grade.unansweredCount}, ${timeTaken})
-  `;
+  // Result and status change in one statement: both or neither.
   const updated = await tx<AttemptRow[]>`
-    update public.attempts
+    with saved_result as (
+      insert into public.results
+        (attempt_id, raw_score, max_score, band_score, grading_snapshot,
+         correct_count, incorrect_count, unanswered_count, time_taken_seconds)
+      values
+        (${attempt.id}, ${grade.rawScore}, ${grade.maxScore}, ${grade.bandScore}, ${tx.json(jsonValue(snapshot))},
+         ${grade.correctCount}, ${grade.incorrectCount}, ${grade.unansweredCount}, ${timeTaken})
+      returning attempt_id
+    )
+    update public.attempts a
     set status = ${outcome.status}, submitted_at = ${outcome.submittedAt}
-    where id = ${attempt.id}
-    returning id, user_id, test_id, test_version_id, status, mode, time_limit_seconds,
-              created_at, started_at, expires_at, submitted_at
+    from saved_result r
+    where a.id = r.attempt_id
+    returning a.id, a.user_id, a.test_id, a.test_version_id, a.status, a.mode, a.time_limit_seconds,
+              a.created_at, a.started_at, a.expires_at, a.submitted_at
   `;
   const row = updated[0];
   if (!row) {
@@ -186,14 +194,11 @@ function gradeOrFail<Result>(attemptId: string, run: () => Result): Result {
   }
 }
 
-/** The version's band table, or the default table for its test type. */
-export async function loadBandTable(
-  tx: Queryable,
-  versionId: string,
-): Promise<{ id: string | null; ranges: BandRange[] }> {
-  const rows = await tx<
-    { id: string; min_raw: number; max_raw: number; band: string }[]
-  >`
+type BandRangeRow = { id: string; min_raw: number; max_raw: number; band: string | number };
+
+/** The ranges of a version's band table, or of the default table for its test type (subquery). */
+function bandRanges(sql: Queryable, versionId: string) {
+  return sql`
     select b.id, r.min_raw, r.max_raw, r.band
     from public.test_versions tv
     join public.tests t on t.id = tv.test_id
@@ -202,8 +207,10 @@ export async function loadBandTable(
                          (select d.id from public.band_tables d where d.skill = t.type and d.is_default))
     join public.band_table_ranges r on r.band_table_id = b.id
     where tv.id = ${versionId}
-    order by r.min_raw
   `;
+}
+
+function toBandTable(rows: readonly BandRangeRow[]): { id: string | null; ranges: BandRange[] } {
   return {
     id: rows[0]?.id ?? null,
     ranges: rows.map((r) => ({
@@ -214,10 +221,21 @@ export async function loadBandTable(
   };
 }
 
+/** The version's band table, or the default table for its test type. */
+export async function loadBandTable(
+  tx: Queryable,
+  versionId: string,
+): Promise<{ id: string | null; ranges: BandRange[] }> {
+  const rows = await tx<BandRangeRow[]>`
+    select * from (${bandRanges(tx, versionId)}) b order by b.min_raw
+  `;
+  return toBandTable(rows);
+}
+
 export type ExpiryCheck = { attempt: AttemptRow; finalizedNow: boolean };
 
 /**
- * Lazy expiry (D-005): if the attempt is past expires_at + grace, grade and
+ * Lazy expiry (D-005, D-016): if the attempt is past expires_at + grace, grade and
  * finalize it now as AUTO_SUBMITTED. Commits on its own, so callers can
  * report "expired" afterwards without rolling the finalization back.
  */
@@ -227,12 +245,20 @@ export async function finalizeIfExpired(
   userId: string,
   now: Date,
 ): Promise<ExpiryCheck> {
-  const current = await loadOwnAttempt(sql, attemptId, userId);
+  return closeIfPastGrace(sql, await loadOwnAttempt(sql, attemptId, userId), now);
+}
+
+/** finalizeIfExpired for an attempt the caller has just read (unlocked). */
+export async function closeIfPastGrace(
+  sql: Sql,
+  current: AttemptRow,
+  now: Date,
+): Promise<ExpiryCheck> {
   if (!isPastGrace(timerOf(current), now)) {
     return { attempt: current, finalizedNow: false };
   }
   return sql.begin(async (tx) => {
-    const locked = await loadOwnAttempt(tx, attemptId, userId, { lock: true });
+    const locked = await loadOwnAttempt(tx, current.id, current.user_id, { lock: true });
     if (!isPastGrace(timerOf(locked), now)) {
       return { attempt: locked, finalizedNow: false }; // finalized by a parallel request
     }
@@ -243,22 +269,46 @@ export async function finalizeIfExpired(
   });
 }
 
-/** Finalizes all of a user's expired attempts (optionally for one test) before listing them. */
-export async function finalizeExpiredForUser(
+/** Ids of the user's attempts (optionally for one test) that are past their grace window. */
+async function expiredAttemptIds(
   sql: Sql,
   userId: string,
   now: Date,
   testId?: string,
-): Promise<void> {
+): Promise<string[]> {
   const cutoff = new Date(now.getTime() - GRACE_SECONDS * 1000);
-  const expired = await sql<{ id: string }[]>`
+  const rows = await sql<{ id: string }[]>`
     select id from public.attempts
     where user_id = ${userId} and status = 'in_progress' and expires_at < ${cutoff}
     ${testId ? sql`and test_id = ${testId}` : sql``}
   `;
-  for (const { id } of expired) {
+  return rows.map((row) => row.id);
+}
+
+/**
+ * Runs a read that shows the user's attempts while looking for expired ones
+ * in parallel. Almost always none expired, so the read costs no extra wait;
+ * if some did, they are finalized first and the read runs again, so it never
+ * shows a timed-out attempt as still running.
+ */
+export async function readAfterExpiry<T>(
+  sql: Sql,
+  userId: string,
+  now: Date,
+  testId: string | undefined,
+  read: () => Promise<T>,
+): Promise<T> {
+  const [expired, value] = await Promise.all([
+    expiredAttemptIds(sql, userId, now, testId),
+    read(),
+  ]);
+  if (expired.length === 0) {
+    return value;
+  }
+  for (const id of expired) {
     await finalizeIfExpired(sql, id, userId, now);
   }
+  return read();
 }
 
 /** Shared state checks before changing answers or flags. */
@@ -286,7 +336,9 @@ export function assertAcceptsChanges(check: ExpiryCheck, now: Date): void {
       },
     );
   }
-  if (isExpired(timerOf(attempt), now)) {
+  // Answers inside the grace window are accepted (D-016). Past it, finalizeIfExpired
+  // has already closed the attempt with the same `now`; this is a defensive re-check.
+  if (isPastGrace(timerOf(attempt), now)) {
     throw new ApiError("ATTEMPT_EXPIRED", "Time is up for this attempt.", {
       status: "IN_PROGRESS",
     });

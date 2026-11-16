@@ -156,7 +156,7 @@ describe("attempt flow on Reading Mock 1 (W1-07 – W1-09)", () => {
   });
 });
 
-describe("server timer and lazy expiry (D-005)", () => {
+describe("server timer and lazy expiry (D-005, D-016)", () => {
   async function begunAttempt() {
     const user = await createUser(sql);
     const { attempt } = await startAttempt(sql, user, READING_MOCK_1, "mock", T0);
@@ -166,13 +166,13 @@ describe("server timer and lazy expiry (D-005)", () => {
     return { user, attemptId: attempt.id, questionId: firstQuestion.id };
   }
 
-  it("accepts answers during the 30 s grace period, then auto-submits on the next request", async () => {
+  it("accepts answers during the 15 s grace period, then auto-submits on the next request", async () => {
     const { user, attemptId, questionId } = await begunAttempt();
     await expect(
-      saveAnswers(sql, user, attemptId, [{ question_id: questionId, answer: { choice: "TRUE" } }], secondsAfter(T0, 3600 + 20)),
+      saveAnswers(sql, user, attemptId, [{ question_id: questionId, answer: { choice: "TRUE" } }], secondsAfter(T0, 3600 + 10)),
     ).resolves.toMatchObject({ remaining_seconds: 0 });
 
-    const status = await getAttemptStatus(sql, user, attemptId, secondsAfter(T0, 3600 + 31));
+    const status = await getAttemptStatus(sql, user, attemptId, secondsAfter(T0, 3600 + 16));
     expect(status).toMatchObject({ status: "AUTO_SUBMITTED", remaining_seconds: 0 });
 
     const result = await getResult(sql, user, attemptId, secondsAfter(T0, 3700));
@@ -184,7 +184,7 @@ describe("server timer and lazy expiry (D-005)", () => {
   it("an autosave after the grace period finalizes the attempt and reports ATTEMPT_EXPIRED", async () => {
     const { user, attemptId, questionId } = await begunAttempt();
     const error = await apiError(
-      saveAnswers(sql, user, attemptId, [{ question_id: questionId, answer: { choice: "TRUE" } }], secondsAfter(T0, 3600 + 31)),
+      saveAnswers(sql, user, attemptId, [{ question_id: questionId, answer: { choice: "TRUE" } }], secondsAfter(T0, 3600 + 16)),
     );
     expect(error).toEqual({ code: "ATTEMPT_EXPIRED", details: { status: "AUTO_SUBMITTED" } });
     await expect(getResult(sql, user, attemptId, secondsAfter(T0, 3700))).resolves.toMatchObject({ result: { unanswered_count: 40 } });
