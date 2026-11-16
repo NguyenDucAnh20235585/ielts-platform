@@ -19,7 +19,7 @@ import { isUniqueViolation } from "@/server/db/errors";
 import type { Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
 
-import { finalizeExpiredForUser, finalizeIfExpired, loadOwnAttempt, timerOf } from "./attempt-core";
+import { finalizeExpiredForUser, finalizeIfExpired, timerOf } from "./attempt-core";
 import { loadPreload, loadStudentContent } from "./test-structure";
 
 async function findActiveAttemptId(sql: Sql, userId: string, testId: string): Promise<string | null> {
@@ -132,31 +132,26 @@ export async function startAttempt(sql: Sql, user: CurrentUser, testId: string, 
  * content. Idempotent: an IN_PROGRESS attempt keeps its original timer.
  */
 export async function beginAttempt(sql: Sql, user: CurrentUser, attemptId: string, now: Date) {
-  const check = await finalizeIfExpired(sql, attemptId, user.id, now);
-  if (isFinalized(check.attempt.status)) {
-    throw new ApiError("ATTEMPT_LOCKED", "This attempt has already been submitted.", {
-      status: ATTEMPT_STATUSES[check.attempt.status],
-    });
-  }
-
-  const attempt = await sql.begin(async (tx) => {
-    const locked = await loadOwnAttempt(tx, attemptId, user.id, { lock: true });
-    if (locked.status !== "created") {
-      return locked; // already begun
+  // First call: start the timer in one guarded statement (no transaction needed).
+  const started = await sql<AttemptRow[]>`
+    update public.attempts
+    set status = 'in_progress', started_at = ${now},
+        expires_at = ${now}::timestamptz + make_interval(secs => time_limit_seconds)
+    where id = ${attemptId} and user_id = ${user.id} and status = 'created'
+    returning id, user_id, test_id, test_version_id, status, mode, time_limit_seconds,
+              created_at, started_at, expires_at, submitted_at
+  `;
+  let attempt = started[0];
+  if (!attempt) {
+    // Not CREATED (or not the caller's: 404 below). An IN_PROGRESS attempt keeps its timer.
+    const check = await finalizeIfExpired(sql, attemptId, user.id, now);
+    if (isFinalized(check.attempt.status)) {
+      throw new ApiError("ATTEMPT_LOCKED", "This attempt has already been submitted.", {
+        status: ATTEMPT_STATUSES[check.attempt.status],
+      });
     }
-    const expiresAt =
-      locked.time_limit_seconds === null ? null : new Date(now.getTime() + locked.time_limit_seconds * 1000);
-    const updated = await tx<AttemptRow[]>`
-      update public.attempts
-      set status = 'in_progress', started_at = ${now}, expires_at = ${expiresAt}
-      where id = ${attemptId}
-      returning id, user_id, test_id, test_version_id, status, mode, time_limit_seconds,
-                created_at, started_at, expires_at, submitted_at
-    `;
-    const row = updated[0];
-    if (!row) throw new Error("Attempt update returned no row.");
-    return row;
-  });
+    attempt = check.attempt;
+  }
 
   return buildAttemptPayload(sql, attempt, now);
 }
@@ -181,26 +176,33 @@ export async function getAttemptStatus(sql: Sql, user: CurrentUser, attemptId: s
 
 /** api-contract §2.6 AttemptPayload. Content is withheld until the attempt has begun. */
 async function buildAttemptPayload(sql: Sql, attempt: AttemptRow, now: Date) {
-  const content = await loadStudentContent(sql, attempt.test_version_id, attempt.mode);
+  const begun = attempt.status !== "created";
+  // Independent reads, in parallel.
+  const [content, saved, preload] = await Promise.all([
+    loadStudentContent(sql, attempt.test_version_id, attempt.mode),
+    begun
+      ? sql<{ question_id: string; answer: unknown; saved_at: Date; is_flagged: boolean }[]>`
+          select question_id, answer, saved_at, is_flagged
+          from public.attempt_answers
+          where attempt_id = ${attempt.id}
+        `
+      : [],
+    begun ? null : loadPreload(sql, attempt.test_version_id),
+  ]);
   if (!content) {
     throw new Error("Test version of the attempt is missing.");
   }
-  if (attempt.status === "created") {
+  if (!begun) {
     return {
       attempt: toAttemptView(attempt, now),
       test_version: content.test_version,
       sections: null,
       answers: [],
       flags: [],
-      preload: await loadPreload(sql, attempt.test_version_id),
+      preload,
     };
   }
 
-  const saved = await sql<{ question_id: string; answer: unknown; saved_at: Date; is_flagged: boolean }[]>`
-    select question_id, answer, saved_at, is_flagged
-    from public.attempt_answers
-    where attempt_id = ${attempt.id}
-  `;
   return {
     attempt: toAttemptView(attempt, now),
     test_version: content.test_version,
