@@ -269,22 +269,46 @@ export async function closeIfPastGrace(
   });
 }
 
-/** Finalizes all of a user's expired attempts (optionally for one test) before listing them. */
-export async function finalizeExpiredForUser(
+/** Ids of the user's attempts (optionally for one test) that are past their grace window. */
+async function expiredAttemptIds(
   sql: Sql,
   userId: string,
   now: Date,
   testId?: string,
-): Promise<void> {
+): Promise<string[]> {
   const cutoff = new Date(now.getTime() - GRACE_SECONDS * 1000);
-  const expired = await sql<{ id: string }[]>`
+  const rows = await sql<{ id: string }[]>`
     select id from public.attempts
     where user_id = ${userId} and status = 'in_progress' and expires_at < ${cutoff}
     ${testId ? sql`and test_id = ${testId}` : sql``}
   `;
-  for (const { id } of expired) {
+  return rows.map((row) => row.id);
+}
+
+/**
+ * Runs a read that shows the user's attempts while looking for expired ones
+ * in parallel. Almost always none expired, so the read costs no extra wait;
+ * if some did, they are finalized first and the read runs again, so it never
+ * shows a timed-out attempt as still running.
+ */
+export async function readAfterExpiry<T>(
+  sql: Sql,
+  userId: string,
+  now: Date,
+  testId: string | undefined,
+  read: () => Promise<T>,
+): Promise<T> {
+  const [expired, value] = await Promise.all([
+    expiredAttemptIds(sql, userId, now, testId),
+    read(),
+  ]);
+  if (expired.length === 0) {
+    return value;
+  }
+  for (const id of expired) {
     await finalizeIfExpired(sql, id, userId, now);
   }
+  return read();
 }
 
 /** Shared state checks before changing answers or flags. */

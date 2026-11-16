@@ -118,17 +118,24 @@ export async function loadStudentContent(
 
 export type Preload = { audio: { section_id: string; url: string; expires_at: string | null }[] };
 
-/** Audio the FE should buffer before calling `begin` (api-contract §5, D-013). */
-export async function loadPreload(sql: Queryable, versionId: string): Promise<Preload> {
-  const rows = await sql<{ id: string; audio_object_key: string }[]>`
-    select id, audio_object_key
-    from public.sections
-    where test_version_id = ${versionId} and audio_object_key is not null
-    order by position
-  `;
+export type AudioRow = { id: string; audio_object_key: string };
+
+/** Audio the FE should buffer before calling `begin` (api-contract §5, D-013), from the sections' audio rows in order. */
+export function toPreload(rows: readonly AudioRow[]): Preload {
   const audio = rows.flatMap((row) => {
     const media = resolveMediaUrl(row.audio_object_key);
     return media ? [{ section_id: row.id, url: media.url, expires_at: media.expires_at }] : [];
   });
   return { audio };
+}
+
+/** Audio the FE should buffer before calling `begin` (api-contract §5, D-013). */
+export async function loadPreload(sql: Queryable, versionId: string): Promise<Preload> {
+  const rows = await sql<AudioRow[]>`
+    select id, audio_object_key
+    from public.sections
+    where test_version_id = ${versionId} and audio_object_key is not null
+    order by position
+  `;
+  return toPreload(rows);
 }

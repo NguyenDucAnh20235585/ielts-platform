@@ -10,14 +10,14 @@ import {
   TEST_TYPES,
 } from "@/features/test/api-enums";
 import { canOpenTest, studentAccessTypes } from "@/features/test/access";
-import { type ModeOption, type ModeSettingsRow, sortModes, toModeOption } from "@/features/test/mode-settings";
+import { type ModeSettingsRow, sortModes, toModeOption } from "@/features/test/mode-settings";
 import type { CurrentUser } from "@/server/auth/current-user";
 import { likePattern } from "@/server/db/like";
 import type { Sql } from "@/server/db/types";
 import { ApiError } from "@/server/http/errors";
 import { offsetOf, paginated } from "@/server/http/pagination";
 
-import { finalizeExpiredForUser } from "./attempt-core";
+import { readAfterExpiry } from "./attempt-core";
 
 type CatalogueRow = {
   id: string;
@@ -33,6 +33,8 @@ type CatalogueRow = {
   question_count: number;
   section_count: number;
   active_attempt_id: string | null;
+  /** Enabled modes of the published version, with this user's attempt count in each. */
+  modes: (ModeSettingsRow & { attempts_used: number })[];
   total: number;
 };
 
@@ -45,7 +47,7 @@ export type CatalogueQuery = {
 };
 
 /** api-contract §2.6 TestSummary */
-function toSummary(row: CatalogueRow, modes: ModeOption[]) {
+function toSummary(row: CatalogueRow) {
   return {
     id: row.id,
     title: row.title,
@@ -53,7 +55,7 @@ function toSummary(row: CatalogueRow, modes: ModeOption[]) {
     type: TEST_TYPES[row.type],
     question_count: row.question_count,
     access_type: ACCESS_TYPES[row.access_type],
-    modes,
+    modes: sortModes(row.modes).map((m) => toModeOption(m, m.attempts_used)),
     active_attempt_id: row.active_attempt_id,
   };
 }
@@ -88,6 +90,14 @@ async function queryCatalogue(
            (select a.id from public.attempts a
              where a.user_id = ${userId} and a.test_id = t.id and a.status in ('created', 'in_progress')
              limit 1) as active_attempt_id,
+           coalesce((select json_agg(m) from (
+                       select vm.mode, vm.enabled, vm.time_limit_seconds, vm.max_attempts, vm.answer_visibility,
+                              vm.allow_pause, vm.allow_replay, vm.allow_seek, vm.max_plays,
+                              (select count(*)::int from public.attempts a
+                                where a.user_id = ${userId} and a.test_id = t.id and a.mode = vm.mode) as attempts_used
+                       from public.test_version_modes vm
+                       where vm.test_version_id = tv.id and vm.enabled
+                     ) m), '[]') as modes,
            count(*) over ()::int as total
     from public.tests t
     left join public.test_versions tv on tv.test_id = t.id and tv.status = 'published'
@@ -106,57 +116,23 @@ async function queryCatalogue(
   `;
 }
 
-/** The enabled modes of each listed version, with this user's attempt count per mode. */
-async function loadModeOptions(sql: Sql, userId: string, rows: readonly CatalogueRow[]): Promise<Map<string, ModeOption[]>> {
-  const published = rows.filter((row) => row.version_id !== null);
-  if (published.length === 0) {
-    return new Map();
-  }
-  const modes = await sql<(ModeSettingsRow & { test_version_id: string })[]>`
-    select test_version_id, mode, enabled, time_limit_seconds, max_attempts, answer_visibility,
-           allow_pause, allow_replay, allow_seek, max_plays
-    from public.test_version_modes
-    where test_version_id in ${sql(published.map((row) => row.version_id ?? ""))} and enabled
-  `;
-  const used = await sql<{ test_id: string; mode: DbTestMode; count: number }[]>`
-    select test_id, mode, count(*)::int as count
-    from public.attempts
-    where user_id = ${userId} and test_id in ${sql(published.map((row) => row.id))}
-    group by test_id, mode
-  `;
-  const usedCount = new Map(used.map((u) => [`${u.test_id}:${u.mode}`, u.count]));
-  return new Map(
-    published.map((row) => [
-      row.id,
-      sortModes(modes.filter((m) => m.test_version_id === row.version_id)).map((m) =>
-        toModeOption(m, usedCount.get(`${row.id}:${m.mode}`) ?? 0),
-      ),
-    ]),
-  );
-}
-
 /** GET /api/tests */
 export async function listTests(sql: Sql, user: CurrentUser, query: CatalogueQuery, now: Date) {
-  await finalizeExpiredForUser(sql, user.id, now);
-  const rows = await queryCatalogue(
-    sql,
-    user.id,
-    {
-      publishedOnly: true,
-      accessTypes: studentAccessTypes(user.role),
-      type: query.type,
-      mode: query.mode,
-      search: query.search?.trim() || undefined,
-    },
-    { limit: query.limit, offset: offsetOf(query.page, query.limit) },
+  const rows = await readAfterExpiry(sql, user.id, now, undefined, () =>
+    queryCatalogue(
+      sql,
+      user.id,
+      {
+        publishedOnly: true,
+        accessTypes: studentAccessTypes(user.role),
+        type: query.type,
+        mode: query.mode,
+        search: query.search?.trim() || undefined,
+      },
+      { limit: query.limit, offset: offsetOf(query.page, query.limit) },
+    ),
   );
-  const modes = await loadModeOptions(sql, user.id, rows);
-  return paginated(
-    rows.map((row) => toSummary(row, modes.get(row.id) ?? [])),
-    rows[0]?.total ?? 0,
-    query.page,
-    query.limit,
-  );
+  return paginated(rows.map(toSummary), rows[0]?.total ?? 0, query.page, query.limit);
 }
 
 async function findActiveAttempt(sql: Sql, userId: string, testId: string): Promise<AttemptRow | null> {
@@ -172,8 +148,12 @@ async function findActiveAttempt(sql: Sql, userId: string, testId: string): Prom
 
 /** GET /api/tests/:testId */
 export async function getTestDetail(sql: Sql, user: CurrentUser, testId: string, now: Date) {
-  await finalizeExpiredForUser(sql, user.id, now, testId);
-  const rows = await queryCatalogue(sql, user.id, { testId, publishedOnly: false }, { limit: 1, offset: 0 });
+  const [rows, active] = await readAfterExpiry(sql, user.id, now, testId, () =>
+    Promise.all([
+      queryCatalogue(sql, user.id, { testId, publishedOnly: false }, { limit: 1, offset: 0 }),
+      findActiveAttempt(sql, user.id, testId),
+    ]),
+  );
   const row = rows[0];
   if (!row || row.visibility === "archived") {
     throw new ApiError("TEST_NOT_FOUND", "Test not found.");
@@ -184,10 +164,8 @@ export async function getTestDetail(sql: Sql, user: CurrentUser, testId: string,
   if (!canOpenTest(user.role, row.access_type)) {
     throw new ApiError("ACCESS_DENIED", "You do not have access to this test.");
   }
-  const modes = await loadModeOptions(sql, user.id, rows);
-  const active = await findActiveAttempt(sql, user.id, testId);
   return {
-    ...toSummary(row, modes.get(row.id) ?? []),
+    ...toSummary(row),
     latest_version: {
       id: row.version_id,
       version_number: row.version_number,
@@ -200,11 +178,14 @@ export async function getTestDetail(sql: Sql, user: CurrentUser, testId: string,
 
 /** GET /api/tests/:testId/active-attempt — works for archived tests too (an attempt may still be running). */
 export async function getActiveAttemptForTest(sql: Sql, user: CurrentUser, testId: string, now: Date) {
-  const exists = await sql<{ id: string }[]>`select id from public.tests where id = ${testId}`;
+  const [exists, active] = await readAfterExpiry(sql, user.id, now, testId, () =>
+    Promise.all([
+      sql<{ id: string }[]>`select id from public.tests where id = ${testId}`,
+      findActiveAttempt(sql, user.id, testId),
+    ]),
+  );
   if (!exists[0]) {
     throw new ApiError("TEST_NOT_FOUND", "Test not found.");
   }
-  await finalizeExpiredForUser(sql, user.id, now, testId);
-  const active = await findActiveAttempt(sql, user.id, testId);
   return { active_attempt: active ? toActiveAttemptView(active, now) : null };
 }

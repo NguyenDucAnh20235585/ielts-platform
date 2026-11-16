@@ -5,13 +5,15 @@ import { saveAnswers, setFlag } from "@/server/services/attempt-answers";
 import { beginAttempt, getAttemptStatus, startAttempt } from "@/server/services/attempt-lifecycle";
 import { getResult } from "@/server/services/attempt-results";
 import { submitAttempt } from "@/server/services/attempt-submit";
+import { getTestDetail, listTests } from "@/server/services/test-catalogue";
 
 import { apiError, createPublishedTest, createUser, secondsAfter, testSql } from "./helpers";
 
 /**
  * The timer rule at its exact boundaries, on a real database (D-016):
  * the clock is up AT expires_at; answers still count until expires_at + 15 s
- * inclusive; 1 ms later the attempt is closed with what was saved.
+ * inclusive; 1 ms later the attempt is closed with what was saved — by any
+ * request that looks at it: its own endpoints, the test list and page, a new start.
  */
 
 const sql = testSql();
@@ -112,5 +114,37 @@ describe("timer boundaries (D-016, grace = 15 s)", () => {
     expect(outcomes.every((o) => o.status === "fulfilled")).toBe(true);
     expect(await resultCount(a.attemptId)).toBe(1);
     await expect(getAttemptStatus(sql, a.user, a.attemptId, moment)).resolves.toMatchObject({ status: "AUTO_SUBMITTED" });
+  });
+
+  it("the test page and a new start see the attempt running until the grace window ends, closed 1 ms later", async () => {
+    const a = await running();
+    const testId = (await sql<{ test_id: string }[]>`select test_id from public.attempts where id = ${a.attemptId}`)[0]?.test_id ?? "";
+    await saveAnswers(sql, a.user, a.attemptId, a.correct, at(END + 1));
+
+    const detail = await getTestDetail(sql, a.user, testId, at(GRACE_END));
+    expect(detail.active_attempt).toMatchObject({ attempt_id: a.attemptId, status: "IN_PROGRESS" });
+    const blocked = await apiError(startAttempt(sql, a.user, testId, "mock", at(GRACE_END)));
+    expect(blocked).toEqual({ code: "ACTIVE_ATTEMPT_EXISTS", details: { attempt_id: a.attemptId } });
+
+    // Past the grace window: the list and the test page close it, with the answer saved in time.
+    const list = await listTests(sql, a.user, { page: 1, limit: 100 }, at(GRACE_END + 0.001));
+    expect(list.items.find((t) => t.id === testId)).toMatchObject({ active_attempt_id: null });
+    await expect(getTestDetail(sql, a.user, testId, at(GRACE_END + 0.001))).resolves.toMatchObject({ active_attempt: null });
+    const result = await getResult(sql, a.user, a.attemptId, at(GRACE_END + 1));
+    expect(result.result).toMatchObject({ status: "AUTO_SUBMITTED", correct_count: 1 });
+  });
+
+  it("an expired attempt nobody closed yet does not block a new start", async () => {
+    const a = await running();
+    const testId = (await sql<{ test_id: string }[]>`select test_id from public.attempts where id = ${a.attemptId}`)[0]?.test_id ?? "";
+    await saveAnswers(sql, a.user, a.attemptId, a.correct, at(60));
+
+    const { attempt } = await startAttempt(sql, a.user, testId, "mock", at(GRACE_END + 0.001));
+    expect(attempt).toMatchObject({ status: "CREATED" });
+    expect(attempt.id).not.toBe(a.attemptId);
+    expect(await resultCount(a.attemptId)).toBe(1);
+    const old = await getResult(sql, a.user, a.attemptId, at(GRACE_END + 1));
+    expect(old.result).toMatchObject({ status: "AUTO_SUBMITTED", correct_count: 1 });
+    expect(old.result.submitted_at).toBe(at(END).toISOString());
   });
 });
