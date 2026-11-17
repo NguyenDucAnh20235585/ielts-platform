@@ -4,12 +4,14 @@ import { countWordsAndNumbers, withinWordLimit } from "@/features/grading/word-l
 import type { AnswerValue, StudentQuestion } from "./types";
 import { StudentIcon } from "./student-icons";
 import { Markdown } from "./markdown";
-import s from "./student.module.css";
+import defaultStyles from "./student.module.css";
 
-export function QuestionCard({ question, value, flagged, current, disabled, onChange, onFlag, onFocus }: {
+export function QuestionCard({ question, value, flagged, current, disabled, onChange, onFlag, onFocus, classNames = defaultStyles }: {
   question: StudentQuestion; value: AnswerValue | undefined; flagged: boolean; current: boolean; disabled: boolean;
   onChange: (value: AnswerValue) => void; onFlag: () => void; onFocus: () => void;
+  classNames?: Record<string, string>;
 }) {
+  const s = classNames;
   const id = "question-" + question.id;
   const text = value && "text" in value ? value.text : "";
   const limitOk = withinWordLimit(text, { maxWords: question.config.max_words, allowNumber: question.config.allow_number });
@@ -23,7 +25,7 @@ export function QuestionCard({ question, value, flagged, current, disabled, onCh
     <legend className={s.srOnly}>Câu {question.numbers.join("–")}</legend>
     <div className={s.questionHeading}>
       <span className={current ? s.currentQuestionNumber : s.questionNumber}>{question.numbers.join("–")}</span>
-      <div id={"question-label-" + question.id} className={s.questionPrompt}><Markdown text={question.content} /></div>
+      <div id={"question-label-" + question.id} className={s.questionPrompt}><Markdown text={question.content} classNames={s} /></div>
       <button type="button" className={[s.flagButton, flagged ? s.flaggedButton : ""].join(" ")}
         disabled={disabled} aria-label={flagged ? "Bỏ đánh dấu câu " + question.numbers.join("–") : "Đánh dấu xem lại câu " + question.numbers.join("–")}
         aria-pressed={flagged} title={flagged ? "Bỏ đánh dấu xem lại" : "Đánh dấu xem lại"} onClick={onFlag}>

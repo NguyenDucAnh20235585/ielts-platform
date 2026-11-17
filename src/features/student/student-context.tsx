@@ -6,6 +6,7 @@ import { supabaseBrowser } from "@/features/auth/supabase-browser";
 import { studentApi, errorText, StudentApiError } from "./api";
 import type { StudentUser } from "./types";
 import { Brand, StatusPanel } from "./ui";
+import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
 import s from "./student.module.css";
 
 const Context = createContext<{ user: StudentUser; logout: () => Promise<void> } | null>(null);
@@ -17,6 +18,14 @@ export function useStudent() {
 export function StudentProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const themedPage =
+    pathname === "/student" ||
+    pathname === "/student/tests" ||
+    pathname === "/student/history" ||
+    /^\/student\/tests\/[^/]+$/.test(pathname) ||
+    /^\/student\/attempts\/[^/]+\/prepare$/.test(pathname) ||
+    /^\/student\/attempts\/[^/]+\/result$/.test(pathname) ||
+    /^\/student\/attempts\/[^/]+$/.test(pathname);
   const [user, setUser] = useState<StudentUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [revision, setRevision] = useState(0);
@@ -41,9 +50,21 @@ export function StudentProvider({ children }: { children: ReactNode }) {
       router.refresh();
     } catch (err) { setError(errorText(err)); }
   }
+  if ((!user || error) && themedPage) return (
+    <StudentThemeShell user={user ?? undefined} onLogout={user ? logout : undefined} centered>
+      <StudentThemeStatus
+        headingAs="h1"
+        loading={!error}
+        error={Boolean(error)}
+        title={error ? "Chưa thể mở khu vực học viên" : "Đang mở khu vực học viên…"}
+        description={error ?? "Vui lòng chờ trong giây lát."}
+        onRetry={error ? () => { setError(null); setRevision((n) => n + 1); } : undefined}
+      />
+    </StudentThemeShell>
+  );
   if (!user || error) return <div className={s.root}><div className={s.gate}><Brand />
     <StatusPanel loading={!error} title={error ? "Chưa thể mở khu vực học viên" : "Đang mở khu vực học viên…"} description={error ?? undefined}
       onRetry={error ? () => { setError(null); setRevision((n) => n + 1); } : undefined} />
   </div></div>;
-  return <Context.Provider value={{ user, logout }}><div className={s.root}>{children}</div></Context.Provider>;
+  return <Context.Provider value={{ user, logout }}>{themedPage ? children : <div className={s.root}>{children}</div>}</Context.Provider>;
 }

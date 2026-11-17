@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
+import Script from "next/script";
+import { foundationThemeInitScript } from "@/features/foundation/foundation-theme-config";
 import "./globals.css";
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -17,7 +19,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable} h-full`}>
+    <html lang="vi" className={`${beVietnamPro.variable} h-full`} suppressHydrationWarning>
+      <head>
+        <Script
+          id="foundation-theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: foundationThemeInitScript }}
+        />
+      </head>
       <body className="min-h-full antialiased">{children}</body>
     </html>
   );

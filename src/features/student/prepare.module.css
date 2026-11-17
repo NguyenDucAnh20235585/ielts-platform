@@ -1,0 +1,128 @@
+.prepare { display: flex; width: min(1000px, 100%); min-width: 0; flex-direction: column; gap: 24px; margin-inline: auto; color: var(--text); font-size: 14px; line-height: 1.6; }
+.breadcrumb ol { display: flex; min-width: 0; align-items: center; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.breadcrumb li { display: flex; min-width: 0; align-items: center; gap: 10px; color: var(--text-muted); font-size: 12px; line-height: 1.8; }
+.breadcrumb li:first-child, .breadcrumb li:last-child { flex-shrink: 0; }
+.prepare .breadcrumb a { display: inline-flex; min-height: 32px; align-items: center; gap: 7px; color: var(--brand-accent); text-underline-offset: 4px; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb svg { flex-shrink: 0; }
+.testCrumb { flex: 0 1 auto; }
+.prepare .testCrumb a { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 32px; }
+.statusRow { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.modeBadge, .timerBadge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 11px; font-weight: 500; line-height: 1.7; }
+.modeBadge { background: var(--secondary); color: var(--on-secondary); }
+.timerBadge { background: var(--surface); color: var(--text-muted); }
+.modeBadge svg, .timerBadge svg { flex-shrink: 0; }
+
+.panel { min-width: 0; padding: 28px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.heroHeading { display: flex; min-width: 0; align-items: center; gap: 16px; }
+.heroIcon { display: grid; width: 56px; height: 56px; flex-shrink: 0; place-items: center; border: 1px solid var(--border); border-radius: 13px; background: var(--secondary); color: var(--on-secondary); }
+.heroText { min-width: 0; }
+.eyebrow { display: block; margin-bottom: 8px; color: var(--primary); font-size: 10px; font-weight: 600; letter-spacing: 1.6px; line-height: 1.8; }
+.heroText h1 { margin: 0; color: var(--text); font-size: clamp(26px, 2.7vw, 32px); font-weight: 700; letter-spacing: -.7px; line-height: 1.45; overflow-wrap: anywhere; }
+.testTitle { margin: 18px 0 0; color: var(--text-muted); font-size: 13px; line-height: 1.9; overflow-wrap: anywhere; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 24px 0 0; }
+.facts > div { display: flex; min-width: 0; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); }
+.facts dt { color: var(--text-muted); font-size: 10px; line-height: 1.8; }
+.facts dd { margin: 0; color: var(--text); font-size: 16px; font-weight: 600; line-height: 1.7; overflow-wrap: anywhere; }
+.facts .factHint { color: var(--text-muted); font-size: 10px; font-weight: 400; line-height: 1.8; }
+
+.sectionHeading { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 20px; }
+.sectionHeading > svg { flex-shrink: 0; margin-top: 4px; color: var(--primary); }
+.sectionHeading h2 { margin: 0; color: var(--text); font-size: 18px; font-weight: 600; letter-spacing: -.3px; line-height: 1.6; }
+.instructions { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.instructions li { display: flex; min-width: 0; align-items: flex-start; gap: 14px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); }
+.instructionNumber { display: grid; width: 27px; height: 27px; flex-shrink: 0; place-items: center; margin-top: 1px; border: 1px solid var(--primary); border-radius: 50%; background: var(--primary); color: var(--on-primary); font-size: 11px; font-weight: 600; }
+.instructions p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.9; }
+.instructions strong { color: var(--text); font-weight: 600; }
+
+.readinessGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.checkCard { display: flex; min-width: 0; align-items: flex-start; gap: 10px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); }
+.readyIcon, .pendingIcon, .failedIcon { display: grid; width: 32px; height: 32px; flex-shrink: 0; place-items: center; border-radius: 50%; }
+.readyIcon { border: 1px solid var(--primary); background: var(--primary); color: var(--on-primary); }
+.pendingIcon { border: 1px solid var(--border); background: var(--secondary); color: var(--on-secondary); }
+.failedIcon { border: 1px solid var(--danger); background: var(--danger-surface); color: var(--danger); }
+.checkCard > div { min-width: 0; }
+.checkCard h3 { margin: 0; color: var(--text); font-size: 12px; font-weight: 600; line-height: 1.8; }
+.checkCard p { margin: 5px 0 0; color: var(--text-muted); font-size: 10px; line-height: 1.8; overflow-wrap: anywhere; }
+.failedCard { border-color: var(--danger); }
+.failedCard p { color: var(--danger); }
+.errorNotice { display: flex; min-width: 0; align-items: flex-start; gap: 10px; padding: 16px 18px; border: 1px solid var(--danger); border-radius: 12px; background: var(--danger-surface); color: var(--danger); }
+.panel > .errorNotice { margin-top: 18px; }
+.errorNotice > svg { flex-shrink: 0; margin-top: 2px; }
+.errorNotice > div { min-width: 0; }
+.errorNotice p { margin: 0; font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
+.retryButton { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; margin-top: 12px; padding: 8px 12px; border: 1px solid var(--control-border); border-radius: 7px; background: var(--surface); color: var(--brand-accent); font-size: 11px; font-weight: 500; line-height: 1.6; }
+.retryButton:hover { border-color: var(--brand-accent); background: var(--surface-hover); }
+
+.actionBar { position: sticky; bottom: 16px; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 18px; padding: 18px 22px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.actionInfo { min-width: 0; }
+.prepare .textLink { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; color: var(--brand-accent); font-size: 12px; font-weight: 500; line-height: 1.7; text-underline-offset: 4px; }
+.prepare .textLink:hover { text-decoration: underline; }
+.actionNote { margin: 4px 0 0; color: var(--text-muted); font-size: 10px; line-height: 1.9; }
+.primaryButton { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 10px; padding: 12px 20px; border: 1px solid var(--primary); border-radius: 8px; background: var(--primary); color: var(--on-primary); font-size: 12px; font-weight: 600; line-height: 1.6; }
+.primaryButton:hover:not(:disabled) { border-color: var(--primary-hover); background: var(--primary-hover); }
+.prepare .primaryButton:disabled { cursor: not-allowed; opacity: .6; }
+.prepare :is(.textLink, .primaryButton, .retryButton) svg { flex-shrink: 0; }
+.spinner { width: 17px; height: 17px; flex-shrink: 0; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; }
+.footnote { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; color: var(--text-muted); font-size: 10px; line-height: 1.9; }
+.footnote span { display: inline-flex; min-width: 0; align-items: flex-start; gap: 7px; }
+.footnote svg { flex-shrink: 0; margin-top: 2px; color: var(--primary); }
+
+@media (max-width: 900px) {
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .readinessGrid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .checkCard { align-items: center; }
+  .checkCard > div { display: flex; min-width: 0; flex: 1; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; }
+  .checkCard p { margin: 0; }
+}
+@media (max-width: 600px) {
+  .prepare { gap: 22px; }
+  .breadcrumb ol, .breadcrumb li { gap: 7px; }
+  .breadcrumb li { font-size: 10px; }
+  .statusRow { gap: 8px; }
+  .modeBadge, .timerBadge { padding: 5px 8px; font-size: 10px; }
+  .panel { padding: 22px; border-radius: 14px; }
+  .heroHeading { align-items: flex-start; gap: 13px; }
+  .heroIcon { width: 44px; height: 44px; border-radius: 11px; }
+  .heroIcon svg { width: 23px; height: 23px; }
+  .eyebrow { margin-bottom: 7px; font-size: 9px; letter-spacing: 1px; }
+  .heroText h1 { font-size: 25px; letter-spacing: -.5px; }
+  .testTitle { font-size: 12px; }
+  .facts { gap: 10px; margin-top: 20px; }
+  .facts > div { gap: 6px; padding: 13px; }
+  .facts dd { font-size: 14px; }
+  .facts .factHint { font-size: 9px; }
+  .sectionHeading { gap: 8px; margin-bottom: 18px; }
+  .sectionHeading h2 { font-size: 16px; }
+  .sectionHeading > svg { width: 19px; height: 19px; }
+  .instructions li { gap: 10px; padding: 14px; }
+  .instructionNumber { width: 24px; height: 24px; font-size: 10px; }
+  .instructions p { font-size: 11px; }
+  .checkCard { padding: 14px; }
+  .checkCard h3 { font-size: 11px; }
+  .errorNotice { padding: 14px; }
+  .errorNotice p { font-size: 11px; }
+  .actionBar { position: static; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 18px; }
+  .primaryButton { width: 100%; }
+  .actionNote { font-size: 10px; }
+  .footnote { font-size: 9px; }
+}
+@media (max-width: 380px) {
+  .panel { padding: 18px; }
+  .heroHeading { flex-direction: column; gap: 14px; }
+  .heroText h1 { font-size: 24px; }
+  .facts > div { padding: 11px; }
+  .facts dd { font-size: 13px; }
+  .instructions li { padding: 12px; }
+}
+@media (max-height: 600px) {
+  .actionBar { position: static; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :global([data-theme-ready="true"]) .prepare,
+  :global([data-theme-ready="true"]) .prepare :is(.breadcrumb li, .breadcrumb a, .modeBadge, .timerBadge, .panel, .heroIcon, .eyebrow, .heroText h1, .testTitle, .facts > div, .facts dt, .facts dd, .factHint, .sectionHeading h2, .sectionHeading > svg, .instructions li, .instructionNumber, .instructions p, .instructions strong, .checkCard, .readyIcon, .pendingIcon, .failedIcon, .checkCard h3, .checkCard p, .errorNotice, .retryButton, .actionBar, .textLink, .actionNote, .primaryButton, .footnote, .footnote svg) {
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, outline-color 180ms ease;
+  }
+  .spinner { animation: prepare-spin 800ms linear infinite; }
+}
+@keyframes prepare-spin { to { transform: rotate(360deg); } }
