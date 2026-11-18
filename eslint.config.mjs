@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Next.js output from the UI demo.
+    ".next-ui-demo/**",
   ]),
 ]);
 
