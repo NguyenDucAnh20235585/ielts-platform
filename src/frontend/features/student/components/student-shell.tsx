@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { useStudent } from "./student-context";
+import { useStudent } from "../state/student-context";
 import { AppIcon, type IconName } from "@/frontend/components/ui/icons";
 import { Badge, Brand } from "./ui";
-import s from "./student.module.css";
+import s from "../student.module.css";
 
 const links: { href: string; label: string; icon: IconName }[] = [
   { href: "/student", label: "Tổng quan", icon: "home" },

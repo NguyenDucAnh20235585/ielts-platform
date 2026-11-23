@@ -4,7 +4,7 @@ import Link from "next/link";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/frontend/features/auth/supabase-browser";
-import { Brand } from "@/frontend/features/student/ui";
+import { Brand } from "@/frontend/features/student/components/ui";
 import { adminApi, adminError } from "./client-api";
 import type { AdminUser } from "./client-types";
 import { Alert, Empty, Modal } from "./admin-ui";

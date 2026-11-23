@@ -9,7 +9,7 @@ import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
 import { FoundationHeader } from "@/frontend/features/foundation/foundation-interactions";
 import { FoundationTheme } from "@/frontend/features/foundation/foundation-theme";
 import foundation from "@/frontend/features/foundation/foundation.module.css";
-import { errorText } from "./api";
+import { errorText } from "../api";
 import s from "./auth.module.css";
 
 type AuthMode = "login" | "register" | "forgot" | "reset";

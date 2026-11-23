@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import defaultStyles from "./student.module.css";
+import defaultStyles from "../student.module.css";
 
 function inline(text: string): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\x60[^\x60]+\x60|\[[^\]]+\]\([^\s)]+\))/g);

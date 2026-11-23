@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
-import { studentApi, jsonBody, errorText } from "./api";
-import { useResource } from "./use-resource";
-import { useStudent } from "./student-context";
-import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
+import { studentApi, jsonBody, errorText } from "../api";
+import { useResource } from "../state/use-resource";
+import { useStudent } from "../state/student-context";
+import { StudentThemeShell, StudentThemeStatus } from "../components/student-theme-shell";
 import { AppIcon } from "@/frontend/components/ui/icons";
-import { durationLabel, isFinished, modeLabel, skillLabel } from "./format";
-import type { AttemptPayload, TestDetail } from "./types";
+import { durationLabel, isFinished, modeLabel, skillLabel } from "../format";
+import type { AttemptPayload, TestDetail } from "../types";
 import s from "./prepare.module.css";
 
 export function PreparePage({ attemptId }: { attemptId: string }) {

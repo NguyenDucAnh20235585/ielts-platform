@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import type { Paginated, Skill } from "./types";
+import type { Paginated, Skill } from "../types";
 import { AppIcon } from "@/frontend/components/ui/icons";
-import s from "./student.module.css";
+import s from "../student.module.css";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return <Link href="/" className={s.brand} aria-label="IELTS Reading & Listening — Trang chủ">

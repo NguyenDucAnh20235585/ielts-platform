@@ -1,10 +1,10 @@
 "use client";
 
 import { countWordsAndNumbers, withinWordLimit } from "@/shared/grading/word-limit";
-import type { AnswerValue, StudentQuestion } from "./types";
+import type { AnswerValue, StudentQuestion } from "../types";
 import { AppIcon } from "@/frontend/components/ui/icons";
 import { Markdown } from "./markdown";
-import defaultStyles from "./student.module.css";
+import defaultStyles from "../student.module.css";
 
 export function QuestionCard({ question, value, flagged, current, disabled, onChange, onFlag, onFocus, classNames = defaultStyles }: {
   question: StudentQuestion; value: AnswerValue | undefined; flagged: boolean; current: boolean; disabled: boolean;

@@ -1,4 +1,4 @@
-import { PreparePage } from "@/frontend/features/student/prepare-page";
+import { PreparePage } from "@/frontend/features/student/pages/prepare-page";
 export const metadata = { title: "Chuẩn bị làm bài | Ms Chau’s IELTS" };
 export default async function Page({ params }: { params: Promise<{ attemptId: string }> }) {
   const { attemptId } = await params;

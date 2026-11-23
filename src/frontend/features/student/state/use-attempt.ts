@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { StudentApiError, errorText, jsonBody, studentApi } from "./api";
+import { StudentApiError, errorText, jsonBody, studentApi } from "../api";
 import { useStudent } from "./student-context";
-import { isFinished } from "./format";
+import { isFinished } from "../format";
 import type {
   Answers,
   AnswerValue,
@@ -12,7 +12,7 @@ import type {
   ResultPayload,
   SavePayload,
   TimerStatus,
-} from "./types";
+} from "../types";
 import { clientRemainingSeconds, type ClientClockAnchor } from "./client-clock";
 
 type SaveState = "saved" | "saving" | "pending" | "offline" | "error";

@@ -3,11 +3,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/frontend/features/auth/supabase-browser";
-import { studentApi, errorText, StudentApiError } from "./api";
-import type { StudentUser } from "./types";
-import { Brand, StatusPanel } from "./ui";
-import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
-import s from "./student.module.css";
+import { studentApi, errorText, StudentApiError } from "../api";
+import type { StudentUser } from "../types";
+import { Brand, StatusPanel } from "../components/ui";
+import { StudentThemeShell, StudentThemeStatus } from "../components/student-theme-shell";
+import s from "../student.module.css";
 
 const Context = createContext<{ user: StudentUser; logout: () => Promise<void> } | null>(null);
 export function useStudent() {

@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
-import { useStudent } from "./student-context";
-import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
-import { useResource } from "./use-resource";
+import { useStudent } from "../state/student-context";
+import { StudentThemeShell, StudentThemeStatus } from "../components/student-theme-shell";
+import { useResource } from "../state/use-resource";
 import { AppIcon } from "@/frontend/components/ui/icons";
-import { dateLabel, durationLabel, modeLabel } from "./format";
-import type { HistoryItem, Paginated, Skill } from "./types";
+import { dateLabel, durationLabel, modeLabel } from "../format";
+import type { HistoryItem, Paginated, Skill } from "../types";
 import s from "./overview.module.css";
 
 const skills = [

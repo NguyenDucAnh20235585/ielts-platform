@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { QuestionCard } from "@/frontend/features/student/question-card";
-import { Markdown } from "@/frontend/features/student/markdown";
-import { Brand, SkillBadge } from "@/frontend/features/student/ui";
+import { QuestionCard } from "@/frontend/features/student/components/question-card";
+import { Markdown } from "@/frontend/features/student/components/markdown";
+import { Brand, SkillBadge } from "@/frontend/features/student/components/ui";
 import type { AnswerValue, Answers, StudentQuestion } from "@/frontend/features/student/types";
 import { AdminIcon } from "./admin-icons";
 import { Alert, Empty } from "./admin-ui";

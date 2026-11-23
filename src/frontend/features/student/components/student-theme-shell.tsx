@@ -7,7 +7,7 @@ import { FoundationFooter } from "@/frontend/features/foundation/foundation-foot
 import { FoundationTheme, FoundationThemeToggle } from "@/frontend/features/foundation/foundation-theme";
 import foundation from "@/frontend/features/foundation/foundation.module.css";
 import { AppIcon, type IconName } from "@/frontend/components/ui/icons";
-import type { StudentUser } from "./types";
+import type { StudentUser } from "../types";
 import s from "./student-theme-shell.module.css";
 
 const navigation: { href: string; label: string; icon: IconName }[] = [

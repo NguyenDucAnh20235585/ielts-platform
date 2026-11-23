@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
-import { studentApi, jsonBody, errorText, StudentApiError } from "./api";
-import { useResource } from "./use-resource";
-import { useStudent } from "./student-context";
-import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
+import { studentApi, jsonBody, errorText, StudentApiError } from "../api";
+import { useResource } from "../state/use-resource";
+import { useStudent } from "../state/student-context";
+import { StudentThemeShell, StudentThemeStatus } from "../components/student-theme-shell";
 import { AppIcon } from "@/frontend/components/ui/icons";
-import { dateLabel, durationLabel, modeLabel } from "./format";
-import type { Mode, ModeOption, StartPayload, TestDetail } from "./types";
+import { dateLabel, durationLabel, modeLabel } from "../format";
+import type { Mode, ModeOption, StartPayload, TestDetail } from "../types";
 import s from "./test-detail.module.css";
 
 export function TestDetailPage({ testId, initialMode = null }: { testId: string; initialMode?: Mode | null }) {

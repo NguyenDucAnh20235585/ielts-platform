@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
-import { useResource } from "./use-resource";
-import { useStudent } from "./student-context";
-import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
+import { useResource } from "../state/use-resource";
+import { useStudent } from "../state/student-context";
+import { StudentThemeShell, StudentThemeStatus } from "../components/student-theme-shell";
 import { AppIcon } from "@/frontend/components/ui/icons";
-import { dateLabel, durationLabel, isFinished, modeLabel, statusLabel } from "./format";
-import type { HistoryItem, Paginated, TestSummary } from "./types";
+import { dateLabel, durationLabel, isFinished, modeLabel, statusLabel } from "../format";
+import type { HistoryItem, Paginated, TestSummary } from "../types";
 import s from "./history.module.css";
 
 export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) {

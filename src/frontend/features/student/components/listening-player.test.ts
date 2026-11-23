@@ -5,9 +5,9 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ListeningPlayer } from "./listening-player";
-import type { StudentSection, StudentTestVersion } from "./types";
+import type { StudentSection, StudentTestVersion } from "../types";
 
-vi.mock("./student-context", () => ({
+vi.mock("../state/student-context", () => ({
   useStudent: () => ({ user: { id: "student-audio-test" } }),
 }));
 

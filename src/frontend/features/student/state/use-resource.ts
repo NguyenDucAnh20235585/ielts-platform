@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { studentApi } from "./api";
+import { studentApi } from "../api";
 
 export function useResource<T>(url: string | null) {
   const [state, setState] = useState<{ data: T | null; error: Error | null; loading: boolean }>({

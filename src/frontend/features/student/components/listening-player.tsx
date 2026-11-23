@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { StudentSection, StudentTestVersion } from "./types";
-import { useStudent } from "./student-context";
+import type { StudentSection, StudentTestVersion } from "../types";
+import { useStudent } from "../state/student-context";
 import { AppIcon } from "@/frontend/components/ui/icons";
-import { clockLabel } from "./format";
-import s from "./workspace.module.css";
+import { clockLabel } from "../format";
+import s from "../pages/workspace.module.css";
 
 type Playback = { time: number; plays: number; ended: boolean };
 export function ListeningPlayer({ sections, version, attemptId, selectedSection, disabled, onSection }: {

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { SkillBadge } from "@/frontend/features/student/ui";
-import { Markdown } from "@/frontend/features/student/markdown";
+import { SkillBadge } from "@/frontend/features/student/components/ui";
+import { Markdown } from "@/frontend/features/student/components/markdown";
 import { AdminIcon } from "./admin-icons";
 import { useAdmin } from "./admin-context";
 import { adminApi, adminError, AdminApiError, body, useAdminResource } from "./client-api";

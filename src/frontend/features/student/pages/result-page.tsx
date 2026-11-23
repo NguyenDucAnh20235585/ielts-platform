@@ -3,14 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { useResource } from "./use-resource";
-import { useStudent } from "./student-context";
-import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
+import { useResource } from "../state/use-resource";
+import { useStudent } from "../state/student-context";
+import { StudentThemeShell, StudentThemeStatus } from "../components/student-theme-shell";
 import { AppIcon } from "@/frontend/components/ui/icons";
-import { answerLabel, dateLabel, durationLabel, modeLabel } from "./format";
-import { QuestionCard } from "./question-card";
-import { Markdown } from "./markdown";
-import type { AnswerValue, AttemptPayload, ResultPayload, TestDetail } from "./types";
+import { answerLabel, dateLabel, durationLabel, modeLabel } from "../format";
+import { QuestionCard } from "../components/question-card";
+import { Markdown } from "../components/markdown";
+import type { AnswerValue, AttemptPayload, ResultPayload, TestDetail } from "../types";
 import s from "./result.module.css";
 
 export function ResultPage({ attemptId }: { attemptId: string }) {

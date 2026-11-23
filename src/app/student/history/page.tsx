@@ -1,4 +1,4 @@
-import { HistoryPage } from "@/frontend/features/student/history-page";
+import { HistoryPage } from "@/frontend/features/student/pages/history-page";
 export const metadata = { title: "Lịch sử làm bài | Ms Chau’s IELTS" };
 export default async function Page({ searchParams }: { searchParams: Promise<{ test_id?: string }> }) {
   const { test_id } = await searchParams;
