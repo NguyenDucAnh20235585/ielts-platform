@@ -1,5 +1,5 @@
 import type { ReactNode, SVGProps } from "react";
-import { StudentIcon, type IconName } from "@/frontend/features/student/student-icons";
+import { AppIcon, type IconName } from "@/frontend/components/ui/icons";
 
 type ExtraIcon = "plus" | "save" | "edit" | "trash" | "eye" | "hide" | "archive" | "settings" | "publish" | "chevron";
 const paths: Record<ExtraIcon, ReactNode> = {
@@ -15,7 +15,7 @@ const paths: Record<ExtraIcon, ReactNode> = {
   chevron: <path d="m9 5 7 7-7 7" />,
 };
 export function AdminIcon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName | ExtraIcon }) {
-  if (!(name in paths)) return <StudentIcon name={name as IconName} {...props} />;
+  if (!(name in paths)) return <AppIcon name={name as IconName} {...props} />;
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name as ExtraIcon]}</svg>;
 }

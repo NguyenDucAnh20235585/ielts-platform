@@ -6,7 +6,7 @@ import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
 import { useResource } from "./use-resource";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
-import { StudentIcon } from "./student-icons";
+import { AppIcon } from "@/frontend/components/ui/icons";
 import { dateLabel, durationLabel, isFinished, modeLabel, statusLabel } from "./format";
 import type { HistoryItem, Paginated, TestSummary } from "./types";
 import s from "./history.module.css";
@@ -43,7 +43,7 @@ export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) 
             <p>Xem lại các lần luyện tập, kết quả và tiếp tục bài chưa hoàn tất.</p>
           </div>
           <div className={s.totalCard}>
-            <span className={s.totalIcon}><StudentIcon name="history" width="25" height="25" /></span>
+            <span className={s.totalIcon}><AppIcon name="history" width="25" height="25" /></span>
             <div><span className={s.totalLabel}>{hasFilters ? "Lần làm phù hợp" : "Tổng lần làm bài"}</span><strong>{resource.data?.pagination.total ?? "—"}<small>lần</small></strong></div>
           </div>
         </section>
@@ -51,7 +51,7 @@ export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) 
         <section className={s.filters} aria-labelledby="history-filters-heading">
           <div className={s.filterHeading}>
             <h2 id="history-filters-heading"><FoundationIcon name="sliders" width="19" height="19" />Bộ lọc lịch sử</h2>
-            {hasFilters && <button type="button" className={s.clearButton} onClick={clearFilters}><StudentIcon name="close" width="15" height="15" />Xóa bộ lọc</button>}
+            {hasFilters && <button type="button" className={s.clearButton} onClick={clearFilters}><AppIcon name="close" width="15" height="15" />Xóa bộ lọc</button>}
           </div>
           <div className={s.filterControls}>
             <div className={s.field}>
@@ -73,7 +73,7 @@ export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) 
               </select>
             </div>
           </div>
-          {tests.error && <div className={s.filterNotice} role="status"><StudentIcon name="info" width="18" height="18" /><p>Chưa thể tải danh sách đề để lọc. Bạn vẫn có thể xem lịch sử và lọc theo trạng thái.</p><button type="button" onClick={tests.reload}><StudentIcon name="replay" width="15" height="15" />Tải lại danh sách đề</button></div>}
+          {tests.error && <div className={s.filterNotice} role="status"><AppIcon name="info" width="18" height="18" /><p>Chưa thể tải danh sách đề để lọc. Bạn vẫn có thể xem lịch sử và lọc theo trạng thái.</p><button type="button" onClick={tests.reload}><AppIcon name="replay" width="15" height="15" />Tải lại danh sách đề</button></div>}
         </section>
 
         <section aria-labelledby="history-results-heading" aria-busy={resource.loading}>
@@ -89,8 +89,8 @@ export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) 
             <StudentThemeStatus icon={hasFilters ? "search" : "history"} title={hasFilters ? "Chưa có lần làm bài phù hợp" : "Bạn chưa có lịch sử làm bài"}
               description={hasFilters ? "Thử bỏ bộ lọc hoặc chọn một đề mới để bắt đầu." : "Chọn một đề Reading hoặc Listening để bắt đầu buổi luyện tập đầu tiên."}>
               <div className={s.emptyActions}>
-                {hasFilters && <button type="button" className={s.secondaryButton} onClick={clearFilters}>Xóa bộ lọc<StudentIcon name="close" width="15" height="15" /></button>}
-                <Link href="/student/tests" className={s.primaryButton}>Đến thư viện<StudentIcon name="arrow" width="17" height="17" /></Link>
+                {hasFilters && <button type="button" className={s.secondaryButton} onClick={clearFilters}>Xóa bộ lọc<AppIcon name="close" width="15" height="15" /></button>}
+                <Link href="/student/tests" className={s.primaryButton}>Đến thư viện<AppIcon name="arrow" width="17" height="17" /></Link>
               </div>
             </StudentThemeStatus>
           ) : (
@@ -103,7 +103,7 @@ export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) 
                     <tr key={item.id}>
                       <th scope="row">
                         <div className={s.testCell}>
-                          <span className={s.testIcon}><StudentIcon name={item.test.type === "READING" ? "book" : "headphones"} width="20" height="20" /></span>
+                          <span className={s.testIcon}><AppIcon name={item.test.type === "READING" ? "book" : "headphones"} width="20" height="20" /></span>
                           <div><strong title={item.test.title}>{item.test.title}</strong><span className={s.testMeta}><span className={s.skillName}>{item.test.type === "READING" ? "Reading" : "Listening"}</span><span>· Phiên bản {item.version_number}</span></span></div>
                         </div>
                       </th>
@@ -113,7 +113,7 @@ export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) 
                       <td><strong className={s.score}>{scoreLabel(item)}</strong></td>
                       <td><strong className={s.band}>{item.band_score === null ? "—" : item.band_score.toFixed(1)}</strong></td>
                       <td><span className={s.duration}>{item.time_taken_seconds === null ? "—" : durationLabel(item.time_taken_seconds)}</span></td>
-                      <td><Link className={`${s.actionLink} ${!isFinished(item.status) ? s.continueLink : ""}`} href={attemptHref(item)} aria-label={`${isFinished(item.status) ? "Xem kết quả" : "Tiếp tục làm bài"} ${item.test.title}`}>{isFinished(item.status) ? "Kết quả" : "Tiếp tục"}<StudentIcon name="arrow" width="15" height="15" /></Link></td>
+                      <td><Link className={`${s.actionLink} ${!isFinished(item.status) ? s.continueLink : ""}`} href={attemptHref(item)} aria-label={`${isFinished(item.status) ? "Xem kết quả" : "Tiếp tục làm bài"} ${item.test.title}`}>{isFinished(item.status) ? "Kết quả" : "Tiếp tục"}<AppIcon name="arrow" width="15" height="15" /></Link></td>
                     </tr>
                   ))}</tbody>
                 </table>
@@ -121,17 +121,17 @@ export function HistoryPage({ initialTestId = "" }: { initialTestId?: string }) 
 
               <div className={s.cards}>{resource.data.items.map((item) => (
                 <article key={item.id} className={s.attemptCard} aria-labelledby={"history-title-" + item.id}>
-                  <div className={s.cardHeading}><span className={s.skillPill}><StudentIcon name={item.test.type === "READING" ? "book" : "headphones"} width="16" height="16" /><span>{item.test.type === "READING" ? "Reading" : "Listening"}</span></span><HistoryStatus status={item.status} /></div>
+                  <div className={s.cardHeading}><span className={s.skillPill}><AppIcon name={item.test.type === "READING" ? "book" : "headphones"} width="16" height="16" /><span>{item.test.type === "READING" ? "Reading" : "Listening"}</span></span><HistoryStatus status={item.status} /></div>
                   <h3 id={"history-title-" + item.id} className={s.cardTitle}>{item.test.title}</h3>
                   <p className={s.cardMeta}><span>{modeLabel(item.mode)}</span><span>Phiên bản {item.version_number}</span></p>
-                  <p className={s.cardDate}><StudentIcon name="history" width="15" height="15" /><HistoryDate item={item} /></p>
+                  <p className={s.cardDate}><AppIcon name="history" width="15" height="15" /><HistoryDate item={item} /></p>
                   <dl className={s.cardStats}>
                     <div><dt>Điểm</dt><dd>{scoreLabel(item)}</dd></div>
                     <div><dt>Band</dt><dd>{item.band_score === null ? "—" : item.band_score.toFixed(1)}</dd></div>
                     <div><dt>Thời gian</dt><dd>{item.time_taken_seconds === null ? "Chưa hoàn tất" : durationLabel(item.time_taken_seconds)}</dd></div>
                   </dl>
                   <Link className={isFinished(item.status) ? s.secondaryButton : s.primaryButton} href={attemptHref(item)} aria-label={`${isFinished(item.status) ? "Xem kết quả" : "Tiếp tục làm bài"} ${item.test.title}`}>
-                    {isFinished(item.status) ? "Xem kết quả" : "Tiếp tục làm bài"}<StudentIcon name="arrow" width="17" height="17" />
+                    {isFinished(item.status) ? "Xem kết quả" : "Tiếp tục làm bài"}<AppIcon name="arrow" width="17" height="17" />
                   </Link>
                 </article>
               ))}</div>
@@ -160,7 +160,7 @@ function HistoryDate({ item, className }: { item: HistoryItem; className?: strin
 
 function HistoryStatus({ status }: { status: HistoryItem["status"] }) {
   return <span className={s.statusBadge} data-status={status}>
-    <StudentIcon name={status === "IN_PROGRESS" ? "clock" : status === "CREATED" ? "questions" : status === "AUTO_SUBMITTED" ? "shield" : "check"} width="13" height="13" />{statusLabel(status)}
+    <AppIcon name={status === "IN_PROGRESS" ? "clock" : status === "CREATED" ? "questions" : status === "AUTO_SUBMITTED" ? "shield" : "check"} width="13" height="13" />{statusLabel(status)}
   </span>;
 }
 
@@ -172,12 +172,12 @@ function HistoryPagination({ pagination, onPage }: { pagination: Paginated<unkno
     <div className={s.pagination}>
       <p className={s.paginationRange}>Hiển thị <strong>{(page - 1) * limit + 1}–{Math.min(page * limit, total)}</strong> trong <strong>{total}</strong> lần làm bài</p>
       <nav aria-label="Phân trang lịch sử làm bài" className={s.pageNumbers}>
-        <button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)} aria-label="Trang trước"><StudentIcon name="back" width="16" height="16" /></button>
+        <button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)} aria-label="Trang trước"><AppIcon name="back" width="16" height="16" /></button>
         {pages.map((number, index) => <span key={number} className={s.pageNumberItem}>
           {index > 0 && number > pages[index - 1] + 1 && <span className={s.pageEllipsis} aria-hidden="true">…</span>}
           <button type="button" aria-label={`Trang ${number}`} aria-current={page === number ? "page" : undefined} onClick={() => onPage(number)}>{number}</button>
         </span>)}
-        <button type="button" disabled={page >= total_pages} onClick={() => onPage(page + 1)} aria-label="Trang sau"><StudentIcon name="arrow" width="16" height="16" /></button>
+        <button type="button" disabled={page >= total_pages} onClick={() => onPage(page + 1)} aria-label="Trang sau"><AppIcon name="arrow" width="16" height="16" /></button>
       </nav>
       <span className={s.pageSummary}>Trang {page} / {total_pages}</span>
     </div>

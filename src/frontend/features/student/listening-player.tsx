@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { StudentSection, StudentTestVersion } from "./types";
 import { useStudent } from "./student-context";
-import { StudentIcon } from "./student-icons";
+import { AppIcon } from "@/frontend/components/ui/icons";
 import { clockLabel } from "./format";
 import s from "./workspace.module.css";
 
@@ -138,7 +138,7 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
     <button className={s.audioPlayButton} type="button" aria-label={playing ? "Tạm dừng audio" : ended ? "Nghe lại audio" : "Phát audio"}
       disabled={disabled || !ready || replayBlocked || (playing && !settings.allow_pause)}
       onClick={() => { if (playing && settings.allow_pause) audioRef.current?.pause(); else void startPlayback(); }}>
-      <StudentIcon name={playing ? "pause" : ended ? "replay" : "play"} width="23" height="23" />
+      <AppIcon name={playing ? "pause" : ended ? "replay" : "play"} width="23" height="23" />
     </button>
     <div className={s.audioBody}><div className={s.audioTitle}><strong title={section.title ?? ""}>{section.title || "Section " + section.order_no}</strong>
       <span>{!ready ? "Đang tải…" : playing ? "Đang phát" : ended ? "Đã nghe xong" : "Sẵn sàng"} · {plays}{settings.max_plays === null ? "" : "/" + settings.max_plays} lượt</span></div>
@@ -150,7 +150,7 @@ export function ListeningPlayer({ sections, version, attemptId, selectedSection,
       {error && <div className={s.audioError}>{error}<button type="button" className={s.textButton} onClick={() => { setError(null); audioRef.current?.load(); }}>Tải lại</button></div>}
     </div>
     <span className={s.audioClock}>{clockLabel(time)} / {clockLabel(duration)}</span>
-    <label className={s.volume}><StudentIcon name="volume" width="19" height="19" /><input type="range" aria-label="Âm lượng" min="0" max="1" step="0.05" value={volume} onChange={(event) => {
+    <label className={s.volume}><AppIcon name="volume" width="19" height="19" /><input type="range" aria-label="Âm lượng" min="0" max="1" step="0.05" value={volume} onChange={(event) => {
       const next = Number(event.target.value); setVolume(next); if (audioRef.current) audioRef.current.volume = next;
     }} /></label>
   </section>;

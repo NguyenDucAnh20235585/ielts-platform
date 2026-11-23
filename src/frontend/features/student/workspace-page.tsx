@@ -7,7 +7,7 @@ import foundation from "@/frontend/features/foundation/foundation.module.css";
 import { useAttempt } from "./use-attempt";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
-import { StudentIcon } from "./student-icons";
+import { AppIcon } from "@/frontend/components/ui/icons";
 import { answeredSlots, clockLabel, dateLabel, modeLabel } from "./format";
 import { QuestionCard } from "./question-card";
 import { ListeningPlayer } from "./listening-player";
@@ -99,7 +99,7 @@ export function WorkspacePage({ attemptId }: { attemptId: string }) {
     <a className={foundation.skipLink} href="#noi-dung-bai-lam">Chuyển đến nội dung làm bài</a>
     <header className={s.workspaceHeader}>
       <div className={s.workspaceBrand}>
-        <button type="button" className={s.iconButton} disabled={attempt.submitting} onClick={() => void attempt.leave()} aria-label="Về lịch sử làm bài" title="Về lịch sử làm bài"><StudentIcon name="back" /></button>
+        <button type="button" className={s.iconButton} disabled={attempt.submitting} onClick={() => void attempt.leave()} aria-label="Về lịch sử làm bài" title="Về lịch sử làm bài"><AppIcon name="back" /></button>
         <div className={s.brandBlock}>
           <span className={`${foundation.brand} ${s.brand}`}>Ms Chau’s IELTS</span>
           <h1 className={s.headerTitle} title={data.test_version.title}>{data.test_version.title}</h1>
@@ -108,13 +108,13 @@ export function WorkspacePage({ attemptId }: { attemptId: string }) {
       </div>
       <div className={s.workspaceTools}>
         <span className={[s.timer, attempt.remaining !== null && attempt.remaining < 300 ? s.timerWarning : ""].join(" ")}>
-          <StudentIcon name="clock" width="19" height="19" /><span><small>{attempt.remaining === null ? "Thời gian" : "Còn lại"}</small><strong>{clockLabel(attempt.remaining)}</strong></span>
+          <AppIcon name="clock" width="19" height="19" /><span><small>{attempt.remaining === null ? "Thời gian" : "Còn lại"}</small><strong>{clockLabel(attempt.remaining)}</strong></span>
         </span>
         <span className={`${s.saveStatus} ${attempt.saveState === "error" || attempt.saveState === "offline" ? s.saveWarning : ""}`} title={saveLabel} aria-live="polite">
-          <StudentIcon name={attempt.saveState === "saved" ? "check" : "cloud"} width="17" height="17" /><span>{saveLabel}</span>
+          <AppIcon name={attempt.saveState === "saved" ? "check" : "cloud"} width="17" height="17" /><span>{saveLabel}</span>
         </span>
         <FoundationThemeToggle />
-        <button type="button" className={s.primaryButton} disabled={disabled} onClick={() => setSubmitOpen(true)}>{attempt.submitting ? "Đang nộp…" : "Nộp bài"}<StudentIcon name="arrow" width="17" height="17" /></button>
+        <button type="button" className={s.primaryButton} disabled={disabled} onClick={() => setSubmitOpen(true)}>{attempt.submitting ? "Đang nộp…" : "Nộp bài"}<AppIcon name="arrow" width="17" height="17" /></button>
       </div>
     </header>
     {(attempt.error || attempt.cacheWarning) && <div className={s.workspaceNotice}><WorkspaceNotice danger={Boolean(attempt.error)}><span>{attempt.error || attempt.cacheWarning}</span>
@@ -124,7 +124,7 @@ export function WorkspacePage({ attemptId }: { attemptId: string }) {
     {listening && <ListeningPlayer sections={sections} version={data.test_version} attemptId={attemptId} selectedSection={section.id} disabled={disabled}
       onSection={(id) => { setSectionId(id); setActiveQuestion(null); }} />}
     <div className={s.workspaceTabs}>
-      <span className={s.skillLabel}><StudentIcon name={listening ? "headphones" : "book"} width="19" height="19" />{listening ? "Listening" : "Reading"}</span>
+      <span className={s.skillLabel}><AppIcon name={listening ? "headphones" : "book"} width="19" height="19" />{listening ? "Listening" : "Reading"}</span>
       <div className={s.sectionTabs} role="group" aria-label="Chọn phần thi">{sections.map((item) =>
       <button key={item.id} type="button" className={section.id === item.id ? s.sectionTabActive : ""} aria-pressed={section.id === item.id} onClick={() => goTo(item)}>
         {listening ? "Section" : "Passage"} {item.order_no}{item.numbers && <span> (Câu {item.numbers[0]}–{item.numbers[1]})</span>}
@@ -154,22 +154,22 @@ export function WorkspacePage({ attemptId }: { attemptId: string }) {
     <footer className={s.questionNavigator}>
       <div className={s.navigatorSummary}><strong>{answered}<span> / {data.test_version.question_count}</span></strong><span>Đã trả lời</span></div>
       <div className={s.navigatorCenter}>
-        <div className={s.navigatorLegend}><span><i className={s.answeredDot} />Đã trả lời</span><span><i className={s.unansweredDot} />Chưa trả lời</span><span><StudentIcon name="flag" width="12" height="12" />Xem lại</span><span><i className={s.currentDot} />Câu hiện tại</span></div>
+        <div className={s.navigatorLegend}><span><i className={s.answeredDot} />Đã trả lời</span><span><i className={s.unansweredDot} />Chưa trả lời</span><span><AppIcon name="flag" width="12" height="12" />Xem lại</span><span><i className={s.currentDot} />Câu hiện tại</span></div>
         <nav className={s.navigatorNumbers} aria-label="Điều hướng câu hỏi"><QuestionButtons questions={sectionQuestions} answers={attempt.answers} flags={attempt.flags}
         current={activeQuestion ?? sectionQuestions[0]?.id ?? null} onGo={(question) => goTo(section, question)} /></nav>
       </div>
-      <button type="button" className={s.mobileNavigatorButton} onClick={() => setNavigatorOpen(true)}><StudentIcon name="questions" width="18" height="18" />Bảng câu hỏi</button>
-      <button type="button" className={s.nextSection} disabled={sections.indexOf(section) >= sections.length - 1} onClick={() => goTo(sections[sections.indexOf(section) + 1])}>{listening ? "Section" : "Passage"} kế tiếp<StudentIcon name="arrow" width="16" height="16" /></button>
+      <button type="button" className={s.mobileNavigatorButton} onClick={() => setNavigatorOpen(true)}><AppIcon name="questions" width="18" height="18" />Bảng câu hỏi</button>
+      <button type="button" className={s.nextSection} disabled={sections.indexOf(section) >= sections.length - 1} onClick={() => goTo(sections[sections.indexOf(section) + 1])}>{listening ? "Section" : "Passage"} kế tiếp<AppIcon name="arrow" width="16" height="16" /></button>
     </footer>
     <dialog className={s.modal} ref={submitDialog} aria-labelledby="submit-title" onCancel={() => setSubmitOpen(false)} onClose={() => setSubmitOpen(false)}>
-      <div className={s.modalHeader}><h2 id="submit-title">Xác nhận nộp bài</h2><button type="button" className={s.iconButton} aria-label="Đóng" onClick={() => setSubmitOpen(false)}><StudentIcon name="close" /></button></div>
+      <div className={s.modalHeader}><h2 id="submit-title">Xác nhận nộp bài</h2><button type="button" className={s.iconButton} aria-label="Đóng" onClick={() => setSubmitOpen(false)}><AppIcon name="close" /></button></div>
       <p>Sau khi nộp, bạn không thể chỉnh sửa câu trả lời của lần làm bài này.</p>
       <div className={s.submitStats}><div><strong>{answered}</strong><span>Đã trả lời</span></div><div><strong>{Math.max(0, data.test_version.question_count - answered)}</strong><span>Chưa trả lời</span></div><div><strong>{flagged}</strong><span>Đánh dấu xem lại</span></div></div>
       {answered < data.test_version.question_count && <WorkspaceNotice>Bạn vẫn còn câu chưa trả lời. Có thể quay lại kiểm tra hoặc tiếp tục nộp bài.</WorkspaceNotice>}
-      <div className={s.modalActions}><button type="button" className={s.secondaryButton} onClick={() => setSubmitOpen(false)}>Quay lại làm bài</button><button type="button" className={s.primaryButton} onClick={() => { setSubmitOpen(false); void attempt.submit(); }}>Xác nhận nộp bài<StudentIcon name="arrow" width="17" height="17" /></button></div>
+      <div className={s.modalActions}><button type="button" className={s.secondaryButton} onClick={() => setSubmitOpen(false)}>Quay lại làm bài</button><button type="button" className={s.primaryButton} onClick={() => { setSubmitOpen(false); void attempt.submit(); }}>Xác nhận nộp bài<AppIcon name="arrow" width="17" height="17" /></button></div>
     </dialog>
     <dialog className={[s.modal, s.navigatorModal].join(" ")} ref={navigatorDialog} aria-labelledby="navigator-title" onCancel={() => setNavigatorOpen(false)} onClose={() => setNavigatorOpen(false)}>
-      <div className={s.modalHeader}><h2 id="navigator-title">Bảng câu hỏi</h2><button type="button" className={s.iconButton} aria-label="Đóng bảng câu hỏi" onClick={() => setNavigatorOpen(false)}><StudentIcon name="close" /></button></div>
+      <div className={s.modalHeader}><h2 id="navigator-title">Bảng câu hỏi</h2><button type="button" className={s.iconButton} aria-label="Đóng bảng câu hỏi" onClick={() => setNavigatorOpen(false)}><AppIcon name="close" /></button></div>
       {sections.map((item) => <div key={item.id}><h3>{listening ? "Section" : "Passage"} {item.order_no}</h3><div className={s.modalQuestionNumbers}><QuestionButtons questions={item.question_groups.flatMap((group) => group.questions)} answers={attempt.answers} flags={attempt.flags} current={activeQuestion} onGo={(question) => goTo(item, question)} /></div></div>)}
     </dialog>
   </div></FoundationTheme>;
@@ -178,11 +178,11 @@ function QuestionButtons({ questions, answers, flags, current, onGo }: { questio
   return <>{questions.flatMap((question) => question.numbers.map((number, index) => <button key={number} type="button" title={"Câu " + number + (flags[question.id] ? " — đánh dấu xem lại" : "")}
     aria-label={"Đến câu " + number + (index < answeredSlots(question, answers[question.id]) ? ", đã trả lời" : ", chưa trả lời") + (flags[question.id] ? ", đã đánh dấu" : "")} aria-current={current === question.id ? "step" : undefined}
     className={[s.numberButton, index < answeredSlots(question, answers[question.id]) ? s.numberAnswered : "", current === question.id ? s.numberCurrent : "", flags[question.id] ? s.numberFlagged : ""].join(" ")}
-    onClick={() => onGo(question)}>{number}{flags[question.id] && <span className={s.flagIndicator}><StudentIcon name="flag" width="10" height="10" /></span>}</button>))}</>;
+    onClick={() => onGo(question)}>{number}{flags[question.id] && <span className={s.flagIndicator}><AppIcon name="flag" width="10" height="10" /></span>}</button>))}</>;
 }
 
 function WorkspaceNotice({ children, danger = false }: { children: ReactNode; danger?: boolean }) {
   return <div className={`${s.notice} ${danger ? s.errorNotice : ""}`} role={danger ? "alert" : "status"}>
-    <StudentIcon name="info" width="18" height="18" /><div>{children}</div>
+    <AppIcon name="info" width="18" height="18" /><div>{children}</div>
   </div>;
 }

@@ -2,7 +2,7 @@
 
 import { countWordsAndNumbers, withinWordLimit } from "@/shared/grading/word-limit";
 import type { AnswerValue, StudentQuestion } from "./types";
-import { StudentIcon } from "./student-icons";
+import { AppIcon } from "@/frontend/components/ui/icons";
 import { Markdown } from "./markdown";
 import defaultStyles from "./student.module.css";
 
@@ -29,7 +29,7 @@ export function QuestionCard({ question, value, flagged, current, disabled, onCh
       <button type="button" className={[s.flagButton, flagged ? s.flaggedButton : ""].join(" ")}
         disabled={disabled} aria-label={flagged ? "Bỏ đánh dấu câu " + question.numbers.join("–") : "Đánh dấu xem lại câu " + question.numbers.join("–")}
         aria-pressed={flagged} title={flagged ? "Bỏ đánh dấu xem lại" : "Đánh dấu xem lại"} onClick={onFlag}>
-        <StudentIcon name="flag" width="18" height="18" />{flagged && <span>Xem lại</span>}
+        <AppIcon name="flag" width="18" height="18" />{flagged && <span>Xem lại</span>}
       </button>
     </div>
     {question.answer_format === "TEXT" ? <div className={s.textAnswer}>

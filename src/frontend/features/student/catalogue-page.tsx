@@ -6,7 +6,7 @@ import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
 import { useResource } from "./use-resource";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
-import { StudentIcon } from "./student-icons";
+import { AppIcon } from "@/frontend/components/ui/icons";
 import { durationLabel, modeLabel } from "./format";
 import type { Mode, Paginated, Skill, TestSummary } from "./types";
 import s from "./catalogue.module.css";
@@ -60,7 +60,7 @@ export function CataloguePage({ initialType = "" }: { initialType?: Skill | "" }
             <p>Chọn bài Reading hoặc Listening để luyện tập linh hoạt hoặc trải nghiệm chế độ thi thử tính giờ.</p>
           </div>
           <div className={s.totalCard}>
-            <span className={s.totalIcon}><StudentIcon name="library" width="24" height="24" /></span>
+            <span className={s.totalIcon}><AppIcon name="library" width="24" height="24" /></span>
             <div><span className={s.totalLabel}>Đề phù hợp</span><strong>{resource.data?.pagination.total ?? "—"}<small>đề</small></strong></div>
           </div>
         </section>
@@ -71,7 +71,7 @@ export function CataloguePage({ initialType = "" }: { initialType?: Skill | "" }
               {tabs.map((tab) => (
                 <button key={tab.label} type="button" className={s.tabButton} aria-pressed={type === tab.value}
                   onClick={() => { setType(tab.value); setPage(1); }}>
-                  {tab.value && <StudentIcon name={tab.value === "READING" ? "book" : "headphones"} className={s.tabIcon} width="16" height="16" />}
+                  {tab.value && <AppIcon name={tab.value === "READING" ? "book" : "headphones"} className={s.tabIcon} width="16" height="16" />}
                   <span className={s.tabLabel}>{tab.label}</span>
                   <span className={s.tabCount}>{tab.count ?? "—"}</span>
                 </button>
@@ -79,7 +79,7 @@ export function CataloguePage({ initialType = "" }: { initialType?: Skill | "" }
             </div>
             {hasFilters && (
               <button type="button" className={s.clearButton} onClick={clearFilters}>
-                <StudentIcon name="close" width="15" height="15" />Xóa bộ lọc
+                <AppIcon name="close" width="15" height="15" />Xóa bộ lọc
               </button>
             )}
           </div>
@@ -87,7 +87,7 @@ export function CataloguePage({ initialType = "" }: { initialType?: Skill | "" }
             <div className={s.field}>
               <label htmlFor="catalogue-search">Tìm theo tên đề</label>
               <div className={s.searchControl}>
-                <StudentIcon name="search" width="18" height="18" />
+                <AppIcon name="search" width="18" height="18" />
                 <input id="catalogue-search" type="search" value={search} maxLength={100}
                   onChange={(event) => setSearch(event.target.value)} placeholder="Nhập tên đề bạn muốn luyện tập…" />
               </div>
@@ -105,7 +105,7 @@ export function CataloguePage({ initialType = "" }: { initialType?: Skill | "" }
 
         {(all.error || reading.error || listening.error) && !resource.error && (
           <div className={s.notice} role="status">
-            <StudentIcon name="info" width="19" height="19" />
+            <AppIcon name="info" width="19" height="19" />
             <p>Số lượng theo kỹ năng chưa tải được. Danh sách đề vẫn có thể sử dụng.</p>
           </div>
         )}
@@ -124,7 +124,7 @@ export function CataloguePage({ initialType = "" }: { initialType?: Skill | "" }
           ) : !resource.data?.items.length ? (
             <StudentThemeStatus icon="search" title={hasFilters ? "Không tìm thấy đề" : "Chưa có đề luyện tập"}
               description={hasFilters ? "Thử tên đề khác hoặc bỏ bộ lọc để xem thêm bài luyện." : "Các đề luyện tập sẽ xuất hiện tại đây khi có sẵn."}>
-              {hasFilters && <button type="button" className={s.secondaryButton} onClick={clearFilters}>Xóa bộ lọc<StudentIcon name="close" width="15" height="15" /></button>}
+              {hasFilters && <button type="button" className={s.secondaryButton} onClick={clearFilters}>Xóa bộ lọc<AppIcon name="close" width="15" height="15" /></button>}
             </StudentThemeStatus>
           ) : (
             <>
@@ -155,11 +155,11 @@ export function TestCard({ test }: { test: TestSummary }) {
       <h3 id={`test-title-${test.id}`} className={s.cardTitle} title={test.title}>{test.title}</h3>
       <p className={s.cardDescription}>{test.description || "Chọn chế độ phù hợp để bắt đầu luyện tập."}</p>
       <div className={s.cardFacts}>
-        <p className={s.questionCount}><StudentIcon name="questions" width="16" height="16" /><strong>{test.question_count}</strong> câu hỏi</p>
+        <p className={s.questionCount}><AppIcon name="questions" width="16" height="16" /><strong>{test.question_count}</strong> câu hỏi</p>
         <div className={s.modeList}>
           {test.modes.map((mode) => (
             <div key={mode.mode} className={s.modeRow}>
-              <span className={s.modeDuration}><StudentIcon name="clock" width="14" height="14" /><span>{modeLabel(mode.mode)}: {durationLabel(mode.duration_seconds)}</span></span>
+              <span className={s.modeDuration}><AppIcon name="clock" width="14" height="14" /><span>{modeLabel(mode.mode)}: {durationLabel(mode.duration_seconds)}</span></span>
               {mode.attempts_remaining !== null && <strong className={`${s.remaining} ${mode.attempts_remaining === 0 ? s.noAttempts : ""}`}>{mode.attempts_remaining} lượt còn lại</strong>}
             </div>
           ))}
@@ -169,7 +169,7 @@ export function TestCard({ test }: { test: TestSummary }) {
         href={test.active_attempt_id ? "/student/attempts/" + test.active_attempt_id : "/student/tests/" + test.id}
         aria-label={`${test.active_attempt_id ? "Tiếp tục làm bài" : "Xem đề"} ${test.title}`}>
         {test.active_attempt_id ? "Tiếp tục làm bài" : "Xem đề"}
-        <StudentIcon name={test.active_attempt_id ? "play" : "arrow"} width="17" height="17" />
+        <AppIcon name={test.active_attempt_id ? "play" : "arrow"} width="17" height="17" />
       </Link>
     </article>
   );
@@ -183,14 +183,14 @@ function CataloguePagination({ pagination, onPage }: { pagination: Paginated<unk
     <div className={s.pagination}>
       <p className={s.paginationRange}>Hiển thị <strong>{(page - 1) * limit + 1}–{Math.min(page * limit, total)}</strong> trong <strong>{total}</strong> đề</p>
       <nav aria-label="Phân trang thư viện đề" className={s.pageNumbers}>
-        <button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)} aria-label="Trang trước"><StudentIcon name="back" width="16" height="16" /></button>
+        <button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)} aria-label="Trang trước"><AppIcon name="back" width="16" height="16" /></button>
         {pages.map((n, i) => (
           <span key={n} className={s.pageNumberItem}>
             {i > 0 && n > pages[i - 1] + 1 && <span className={s.pageEllipsis} aria-hidden="true">…</span>}
             <button type="button" aria-label={`Trang ${n}`} aria-current={page === n ? "page" : undefined} onClick={() => onPage(n)}>{n}</button>
           </span>
         ))}
-        <button type="button" disabled={page >= total_pages} onClick={() => onPage(page + 1)} aria-label="Trang sau"><StudentIcon name="arrow" width="16" height="16" /></button>
+        <button type="button" disabled={page >= total_pages} onClick={() => onPage(page + 1)} aria-label="Trang sau"><AppIcon name="arrow" width="16" height="16" /></button>
       </nav>
       <span className={s.pageSummary}>Trang {page} / {total_pages}</span>
     </div>

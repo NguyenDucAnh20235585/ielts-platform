@@ -27,7 +27,7 @@ const paths: Record<IconName, ReactNode> = {
   questions: <><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M8 7h8M8 11h8M8 15h5" /></>,
   infinity: <path d="M12 12c-3-5-5-6-7-4s-2 6 0 8 4 1 7-4c3-5 5-6 7-4s2 6 0 8-4 1-7-4Z" />,
 };
-export function StudentIcon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {
+export function AppIcon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name]}</svg>;
 }

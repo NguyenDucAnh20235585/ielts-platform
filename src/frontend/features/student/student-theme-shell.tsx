@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { FoundationFooter } from "@/frontend/features/foundation/foundation-footer";
 import { FoundationTheme, FoundationThemeToggle } from "@/frontend/features/foundation/foundation-theme";
 import foundation from "@/frontend/features/foundation/foundation.module.css";
-import { StudentIcon, type IconName } from "./student-icons";
+import { AppIcon, type IconName } from "@/frontend/components/ui/icons";
 import type { StudentUser } from "./types";
 import s from "./student-theme-shell.module.css";
 
@@ -37,7 +37,7 @@ export function StudentThemeShell({ children, user, onLogout, centered = false }
           <div className={s.headerActions}>
             {user && (
               <div className={s.identity}>
-                <span className={s.avatar}><StudentIcon name="user" width="18" height="18" /></span>
+                <span className={s.avatar}><AppIcon name="user" width="18" height="18" /></span>
                 <div className={s.identityText}>
                   <strong title={name}>{name}</strong>
                   <span title={user.email ?? undefined}>{user.email || "Học viên"}</span>
@@ -48,7 +48,7 @@ export function StudentThemeShell({ children, user, onLogout, centered = false }
             {user && onLogout && (
               <button type="button" className={s.logoutButton} onClick={() => void onLogout()}
                 aria-label="Đăng xuất" title="Đăng xuất">
-                <StudentIcon name="logout" width="18" height="18" />
+                <AppIcon name="logout" width="18" height="18" />
                 <span className={s.logoutLabel}>Đăng xuất</span>
               </button>
             )}
@@ -61,7 +61,7 @@ export function StudentThemeShell({ children, user, onLogout, centered = false }
                 const active = href === "/student" ? pathname === href : pathname.startsWith(href);
                 return (
                   <Link key={href} href={href} className={s.navLink} aria-current={active ? "page" : undefined}>
-                    <StudentIcon name={icon} className={s.navigationIcon} width="18" height="18" />
+                    <AppIcon name={icon} className={s.navigationIcon} width="18" height="18" />
                     <span>{label}</span>
                   </Link>
                 );
@@ -95,11 +95,11 @@ export function StudentThemeStatus({ loading = false, error = false, title, desc
   return (
     <div className={`${s.statusPanel} ${error ? s.errorPanel : ""}`} role={loading ? "status" : error ? "alert" : undefined} aria-busy={loading}>
       <span className={s.statusIcon}>
-        {loading ? <span className={s.spinner} aria-hidden="true" /> : <StudentIcon name={icon} width="24" height="24" />}
+        {loading ? <span className={s.spinner} aria-hidden="true" /> : <AppIcon name={icon} width="24" height="24" />}
       </span>
       <Heading className={s.statusTitle}>{title}</Heading>
       {description && <p className={s.statusDescription}>{description}</p>}
-      {onRetry && <button type="button" onClick={onRetry} className={s.retryButton}>Thử lại<StudentIcon name="replay" width="16" height="16" /></button>}
+      {onRetry && <button type="button" onClick={onRetry} className={s.retryButton}>Thử lại<AppIcon name="replay" width="16" height="16" /></button>}
       {children}
     </div>
   );

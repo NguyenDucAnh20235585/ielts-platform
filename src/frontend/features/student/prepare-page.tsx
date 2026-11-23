@@ -8,7 +8,7 @@ import { studentApi, jsonBody, errorText } from "./api";
 import { useResource } from "./use-resource";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
-import { StudentIcon } from "./student-icons";
+import { AppIcon } from "@/frontend/components/ui/icons";
 import { durationLabel, isFinished, modeLabel, skillLabel } from "./format";
 import type { AttemptPayload, TestDetail } from "./types";
 import s from "./prepare.module.css";
@@ -80,7 +80,7 @@ export function PreparePage({ attemptId }: { attemptId: string }) {
       <div className={s.prepare}>
         <nav className={s.breadcrumb} aria-label="Đường dẫn">
           <ol>
-            <li><Link href="/student/tests"><StudentIcon name="library" width="16" height="16" />Thư viện đề</Link></li>
+            <li><Link href="/student/tests"><AppIcon name="library" width="16" height="16" />Thư viện đề</Link></li>
             {data && <li className={s.testCrumb}><span aria-hidden="true">/</span><Link href={"/student/tests/" + data.attempt.test_id} title={data.test_version.title}>{data.test_version.title}</Link></li>}
             <li><span aria-hidden="true">/</span><span aria-current="page">Chuẩn bị</span></li>
           </ol>
@@ -92,7 +92,7 @@ export function PreparePage({ attemptId }: { attemptId: string }) {
           <StudentThemeStatus error headingAs="h1" title="Chưa thể chuẩn bị bài" description={resource.error.message} onRetry={resource.reload} />
         ) : !data ? (
           <StudentThemeStatus headingAs="h1" title="Không tìm thấy bài làm" description="Bạn có thể quay lại thư viện để chọn một đề khác.">
-            <Link href="/student/tests" className={s.textLink}>Quay lại thư viện<StudentIcon name="arrow" width="16" height="16" /></Link>
+            <Link href="/student/tests" className={s.textLink}>Quay lại thư viện<AppIcon name="arrow" width="16" height="16" /></Link>
           </StudentThemeStatus>
         ) : isFinished(data.attempt.status) || data.attempt.status === "IN_PROGRESS" ? (
           <StudentThemeStatus loading headingAs="h1" title={isFinished(data.attempt.status) ? "Đang mở kết quả bài làm…" : "Đang tiếp tục bài làm…"} />
@@ -100,12 +100,12 @@ export function PreparePage({ attemptId }: { attemptId: string }) {
           <>
             <div className={s.statusRow}>
               <span className={s.modeBadge}><FoundationIcon name="sliders" width="15" height="15" />Chế độ: {modeLabel(data.attempt.mode)}</span>
-              <span className={s.timerBadge}><StudentIcon name="clock" width="15" height="15" />Chưa tính giờ</span>
+              <span className={s.timerBadge}><AppIcon name="clock" width="15" height="15" />Chưa tính giờ</span>
             </div>
 
             <section className={s.panel} aria-labelledby="prepare-heading">
               <div className={s.heroHeading}>
-                <span className={s.heroIcon}><StudentIcon name="clock" width="28" height="28" /></span>
+                <span className={s.heroIcon}><AppIcon name="clock" width="28" height="28" /></span>
                 <div className={s.heroText}>
                   <span className={s.eyebrow}>CHUẨN BỊ LÀM BÀI</span>
                   <h1 id="prepare-heading">Sẵn sàng bắt đầu bài làm?</h1>
@@ -121,7 +121,7 @@ export function PreparePage({ attemptId }: { attemptId: string }) {
             </section>
 
             <section className={s.panel} aria-labelledby="instructions-heading">
-              <div className={s.sectionHeading}><StudentIcon name="info" width="21" height="21" /><h2 id="instructions-heading">Quy định và hướng dẫn làm bài</h2></div>
+              <div className={s.sectionHeading}><AppIcon name="info" width="21" height="21" /><h2 id="instructions-heading">Quy định và hướng dẫn làm bài</h2></div>
               <ol className={s.instructions} role="list">
                 <li><span className={s.instructionNumber} aria-hidden="true">1</span><p>Đọc kỹ hướng dẫn và giới hạn từ của từng nhóm câu hỏi. Câu trả lời vượt giới hạn vẫn được lưu nhưng có thể không được tính điểm.</p></li>
                 <li><span className={s.instructionNumber} aria-hidden="true">2</span><p>Đáp án được tự lưu. Theo dõi trạng thái <strong>Đã lưu</strong> hoặc <strong>Chờ đồng bộ</strong> trong khi làm bài.</p></li>
@@ -130,19 +130,19 @@ export function PreparePage({ attemptId }: { attemptId: string }) {
             </section>
 
             <section className={s.panel} aria-labelledby="readiness-heading">
-              <div className={s.sectionHeading}><StudentIcon name="cloud" width="21" height="21" /><h2 id="readiness-heading">Kiểm tra tài nguyên</h2></div>
+              <div className={s.sectionHeading}><AppIcon name="cloud" width="21" height="21" /><h2 id="readiness-heading">Kiểm tra tài nguyên</h2></div>
               <div className={s.readinessGrid}>
                 <div className={s.checkCard}>
-                  <span className={s.readyIcon}><StudentIcon name="check" width="17" height="17" /></span>
+                  <span className={s.readyIcon}><AppIcon name="check" width="17" height="17" /></span>
                   <div><h3>Thông tin đề</h3><p>Đã sẵn sàng</p></div>
                 </div>
                 <div className={s.checkCard}>
-                  <span className={s.readyIcon}><StudentIcon name="check" width="17" height="17" /></span>
+                  <span className={s.readyIcon}><AppIcon name="check" width="17" height="17" /></span>
                   <div><h3>Chế độ làm bài</h3><p>{modeLabel(data.attempt.mode)}</p></div>
                 </div>
                 <div className={`${s.checkCard} ${audio.status === "error" ? s.failedCard : ""}`}>
                   <span className={audio.status === "ready" ? s.readyIcon : audio.status === "error" ? s.failedIcon : s.pendingIcon}>
-                    {audio.status === "loading" ? <span className={s.spinner} aria-hidden="true" /> : <StudentIcon name={audio.status === "ready" ? "check" : "info"} width="17" height="17" />}
+                    {audio.status === "loading" ? <span className={s.spinner} aria-hidden="true" /> : <AppIcon name={audio.status === "ready" ? "check" : "info"} width="17" height="17" />}
                   </span>
                   <div>
                     <h3>{data.test_version.type === "LISTENING" ? "Tài nguyên audio" : "Chuẩn bị bài"}</h3>
@@ -152,29 +152,29 @@ export function PreparePage({ attemptId }: { attemptId: string }) {
               </div>
               {audio.status === "error" && (
                 <div className={s.errorNotice} role="alert">
-                  <StudentIcon name="info" width="20" height="20" />
+                  <AppIcon name="info" width="20" height="20" />
                   <div><p>Không thể tải audio cần thiết. Kiểm tra kết nối hoặc quay lại chọn bài khác.</p>
-                    <button type="button" className={s.retryButton} onClick={() => setAudioRevision((n) => n + 1)} aria-label="Tải lại tài nguyên audio"><StudentIcon name="replay" width="15" height="15" />Tải lại audio</button>
+                    <button type="button" className={s.retryButton} onClick={() => setAudioRevision((n) => n + 1)} aria-label="Tải lại tài nguyên audio"><AppIcon name="replay" width="15" height="15" />Tải lại audio</button>
                   </div>
                 </div>
               )}
             </section>
 
-            {error && <div className={s.errorNotice} role="alert"><StudentIcon name="info" width="20" height="20" /><div><p>{error}</p></div></div>}
+            {error && <div className={s.errorNotice} role="alert"><AppIcon name="info" width="20" height="20" /><div><p>{error}</p></div></div>}
 
             <div className={s.actionBar}>
               <div className={s.actionInfo}>
-                <Link className={s.textLink} href={"/student/tests/" + data.attempt.test_id}><StudentIcon name="back" width="17" height="17" />Quay lại chi tiết đề</Link>
+                <Link className={s.textLink} href={"/student/tests/" + data.attempt.test_id}><AppIcon name="back" width="17" height="17" />Quay lại chi tiết đề</Link>
                 <p id="prepare-start-note" className={s.actionNote}>{audio.status === "error" ? "Hãy tải lại audio trước khi bắt đầu." : audio.status === "loading" ? "Vui lòng chờ tài nguyên sẵn sàng." : "Bài làm chỉ bắt đầu khi bạn nhấn “Bắt đầu làm bài”."}</p>
               </div>
               <button className={s.primaryButton} type="button" aria-busy={starting} aria-describedby="prepare-start-note" disabled={audio.status !== "ready" || starting} onClick={() => void begin()}>
                 {starting ? "Đang bắt đầu…" : "Bắt đầu làm bài"}
-                {starting ? <span className={s.spinner} aria-hidden="true" /> : <StudentIcon name="arrow" width="18" height="18" />}
+                {starting ? <span className={s.spinner} aria-hidden="true" /> : <AppIcon name="arrow" width="18" height="18" />}
               </button>
             </div>
 
             <div className={s.footnote}>
-              <span><StudentIcon name="shield" width="15" height="15" />Thời gian và kết quả được xác nhận bởi hệ thống</span>
+              <span><AppIcon name="shield" width="15" height="15" />Thời gian và kết quả được xác nhận bởi hệ thống</span>
               <span>Phiên bản đề {data.test_version.version_number}</span>
             </div>
           </>

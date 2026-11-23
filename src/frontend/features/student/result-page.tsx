@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useResource } from "./use-resource";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
-import { StudentIcon } from "./student-icons";
+import { AppIcon } from "@/frontend/components/ui/icons";
 import { answerLabel, dateLabel, durationLabel, modeLabel } from "./format";
 import { QuestionCard } from "./question-card";
 import { Markdown } from "./markdown";
@@ -31,7 +31,7 @@ export function ResultPage({ attemptId }: { attemptId: string }) {
       <div className={s.result}>
         <nav className={s.breadcrumb} aria-label="Đường dẫn">
           <ol>
-            <li><Link href="/student/history"><StudentIcon name="history" width="16" height="16" />Lịch sử làm bài</Link></li>
+            <li><Link href="/student/history"><AppIcon name="history" width="16" height="16" />Lịch sử làm bài</Link></li>
             <li><span aria-hidden="true">/</span><span aria-current="page">Kết quả</span></li>
           </ol>
         </nav>
@@ -42,7 +42,7 @@ export function ResultPage({ attemptId }: { attemptId: string }) {
           <StudentThemeStatus error headingAs="h1" title="Kết quả chưa sẵn sàng" description={resource.error.message} onRetry={resource.reload} />
         ) : !result || !resource.data ? (
           <StudentThemeStatus headingAs="h1" title="Chưa có kết quả bài làm" description="Bạn có thể trở về lịch sử để xem các lần làm bài khác.">
-            <Link href="/student/history" className={s.textLink}>Về lịch sử làm bài<StudentIcon name="arrow" width="16" height="16" /></Link>
+            <Link href="/student/history" className={s.textLink}>Về lịch sử làm bài<AppIcon name="arrow" width="16" height="16" /></Link>
           </StudentThemeStatus>
         ) : (
           <>
@@ -55,21 +55,21 @@ export function ResultPage({ attemptId }: { attemptId: string }) {
             <section className={s.hero} aria-labelledby="result-test-title">
               <div className={s.heroMain}>
                 <div className={s.heroHeading}>
-                  <span className={s.skillIcon}><StudentIcon name={result.test.type === "READING" ? "book" : "headphones"} width="29" height="29" /></span>
+                  <span className={s.skillIcon}><AppIcon name={result.test.type === "READING" ? "book" : "headphones"} width="29" height="29" /></span>
                   <div className={s.skillDetails}>
                     <span className={s.skillName}>{result.test.type === "READING" ? "Reading" : "Listening"}</span>
                     <div className={s.tags}><span className={s.badge}>{modeLabel(result.mode)}</span><span className={s.badge}>Phiên bản {result.version_number}</span></div>
                   </div>
                 </div>
                 <h2 id="result-test-title" className={s.testTitle}>{result.test.title}</h2>
-                <span className={s.submittedBadge}><StudentIcon name="check" width="14" height="14" />{result.status === "AUTO_SUBMITTED" ? "Tự động nộp" : "Đã nộp"}</span>
+                <span className={s.submittedBadge}><AppIcon name="check" width="14" height="14" />{result.status === "AUTO_SUBMITTED" ? "Tự động nộp" : "Đã nộp"}</span>
                 <dl className={s.facts}>
-                  <div><dt><StudentIcon name="history" width="15" height="15" />Hoàn thành lúc</dt><dd>{dateLabel(result.submitted_at)}</dd></div>
-                  <div><dt><StudentIcon name="clock" width="15" height="15" />Thời gian làm bài</dt><dd>{durationLabel(result.time_taken_seconds)}</dd></div>
+                  <div><dt><AppIcon name="history" width="15" height="15" />Hoàn thành lúc</dt><dd>{dateLabel(result.submitted_at)}</dd></div>
+                  <div><dt><AppIcon name="clock" width="15" height="15" />Thời gian làm bài</dt><dd>{durationLabel(result.time_taken_seconds)}</dd></div>
                 </dl>
               </div>
               <div className={s.scoreCard}>
-                <span className={s.scoreIcon}><StudentIcon name="check" width="23" height="23" /></span>
+                <span className={s.scoreIcon}><AppIcon name="check" width="23" height="23" /></span>
                 <p>Điểm bài làm</p>
                 <strong className={s.scoreValue}>{result.raw_score}<span> / {result.max_score}</span></strong>
                 {result.band_score !== null ? (
@@ -79,13 +79,13 @@ export function ResultPage({ attemptId }: { attemptId: string }) {
             </section>
 
             <section className={s.stats} aria-label="Thống kê câu trả lời">
-              <div className={s.statCard}><dl><dt>Đúng</dt><dd>{result.correct_count}</dd></dl><span className={s.statIcon}><StudentIcon name="check" width="23" height="23" /></span></div>
-              <div className={`${s.statCard} ${s.incorrectStat}`}><dl><dt>Sai</dt><dd>{result.incorrect_count}</dd></dl><span className={s.statIcon}><StudentIcon name="close" width="23" height="23" /></span></div>
-              <div className={`${s.statCard} ${s.unansweredStat}`}><dl><dt>Bỏ trống</dt><dd>{result.unanswered_count}</dd></dl><span className={s.statIcon}><StudentIcon name="questions" width="23" height="23" /></span></div>
+              <div className={s.statCard}><dl><dt>Đúng</dt><dd>{result.correct_count}</dd></dl><span className={s.statIcon}><AppIcon name="check" width="23" height="23" /></span></div>
+              <div className={`${s.statCard} ${s.incorrectStat}`}><dl><dt>Sai</dt><dd>{result.incorrect_count}</dd></dl><span className={s.statIcon}><AppIcon name="close" width="23" height="23" /></span></div>
+              <div className={`${s.statCard} ${s.unansweredStat}`}><dl><dt>Bỏ trống</dt><dd>{result.unanswered_count}</dd></dl><span className={s.statIcon}><AppIcon name="questions" width="23" height="23" /></span></div>
             </section>
 
             <section className={s.sectionCard} aria-labelledby="section-results-title">
-              <div className={s.sectionHeading}><div><h2 id="section-results-title">Kết quả theo phần</h2><p>Số câu trả lời đúng trong từng phần của bài làm.</p></div><StudentIcon name="questions" width="23" height="23" /></div>
+              <div className={s.sectionHeading}><div><h2 id="section-results-title">Kết quả theo phần</h2><p>Số câu trả lời đúng trong từng phần của bài làm.</p></div><AppIcon name="questions" width="23" height="23" /></div>
               {resource.data.section_results.length ? (
                 <ol className={s.sectionResults}>
                   {resource.data.section_results.map((section) => (
@@ -100,16 +100,16 @@ export function ResultPage({ attemptId }: { attemptId: string }) {
             </section>
 
             {!result.answers_visible && (
-              <div className={s.notice} role="status"><StudentIcon name="shield" width="20" height="20" /><p>Đề này không mở đáp án và lời giải. Bạn vẫn có thể xem lại câu trả lời của mình.</p></div>
+              <div className={s.notice} role="status"><AppIcon name="shield" width="20" height="20" /><p>Đề này không mở đáp án và lời giải. Bạn vẫn có thể xem lại câu trả lời của mình.</p></div>
             )}
 
             <div className={s.actions}>
               <button type="button" className={s.primaryButton} aria-expanded={review} aria-controls="review-content" onClick={() => setReview(!review)}>
-                <StudentIcon name="book" width="18" height="18" />{review ? "Thu gọn bài làm" : "Xem lại bài"}
+                <AppIcon name="book" width="18" height="18" />{review ? "Thu gọn bài làm" : "Xem lại bài"}
               </button>
               <div className={s.secondaryActions}>
-                {canRetry && <Link className={s.secondaryButton} href={"/student/tests/" + result.test.id + "?mode=" + result.mode}><StudentIcon name="replay" width="17" height="17" />Làm lại</Link>}
-                <Link className={s.secondaryButton} href="/student/tests">Về thư viện<StudentIcon name="arrow" width="17" height="17" /></Link>
+                {canRetry && <Link className={s.secondaryButton} href={"/student/tests/" + result.test.id + "?mode=" + result.mode}><AppIcon name="replay" width="17" height="17" />Làm lại</Link>}
+                <Link className={s.secondaryButton} href="/student/tests">Về thư viện<AppIcon name="arrow" width="17" height="17" /></Link>
               </div>
             </div>
 
@@ -156,7 +156,7 @@ export function ResultPage({ attemptId }: { attemptId: string }) {
                                   <QuestionCard question={question} value={(answer?.your_answer as AnswerValue | undefined) ?? null} classNames={s} flagged={false} current={false} disabled onChange={() => {}} onFlag={() => {}} onFocus={() => {}} />
                                   {result.answers_visible && answer && (
                                     <div className={`${s.answerReview} ${answer.is_correct ? s.correctReview : answer.your_answer !== null && answer.score === 0 ? s.incorrectReview : ""}`}>
-                                      <div className={s.answerReviewHeading}><span className={s.answerStatus}><StudentIcon name={answer.is_correct ? "check" : answer.your_answer === null ? "questions" : answer.score !== null && answer.score > 0 ? "info" : "close"} width="15" height="15" />{status}</span><span className={s.answerScore}>Điểm: <strong>{answer.score} / {answer.marks}</strong></span></div>
+                                      <div className={s.answerReviewHeading}><span className={s.answerStatus}><AppIcon name={answer.is_correct ? "check" : answer.your_answer === null ? "questions" : answer.score !== null && answer.score > 0 ? "info" : "close"} width="15" height="15" />{status}</span><span className={s.answerScore}>Điểm: <strong>{answer.score} / {answer.marks}</strong></span></div>
                                       <p className={s.correctAnswer}><strong>Đáp án:</strong> {answerLabel(answer.correct_answer)}</p>
                                       {answer.explanation && <div className={s.explanation}><h4>Lời giải</h4><Markdown text={answer.explanation} classNames={s} /></div>}
                                     </div>
