@@ -1,12 +1,12 @@
-import type { DbTestMode, DbTestType } from "@/features/test/api-enums";
+import type { DbTestMode, DbTestType } from "@/shared/test/api-enums";
 import {
   type GroupRow,
   orderQuestions,
   type QuestionRow,
   type SectionRow,
-} from "@/features/test/student-content";
-import { parseOptions } from "@/features/test/question-options";
-import { FULL_TEST_MARKS } from "@/features/grading/band";
+} from "@/shared/test/student-content";
+import { parseOptions } from "@/shared/test/question-options";
+import { FULL_TEST_MARKS } from "@/shared/grading/band";
 
 import { checkAnswerKey } from "./answer-key-validation";
 import type { AnswerKeyRow } from "./answer-key-row";

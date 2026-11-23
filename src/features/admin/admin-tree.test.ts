@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { GroupRow, QuestionRow, SectionRow, VersionRow } from "@/features/test/student-content";
+import type { GroupRow, QuestionRow, SectionRow, VersionRow } from "@/shared/test/student-content";
 
 import { buildAdminSections } from "./admin-tree";
 

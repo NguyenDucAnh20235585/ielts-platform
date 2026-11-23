@@ -1,10 +1,10 @@
 import type { MeResponse } from "@/features/auth/me-response";
 import type { AttemptView, ActiveAttemptView } from "@/features/attempt/attempt-view";
 import type { ResultPayload } from "@/features/attempt/result-view";
-import type { ModeOption } from "@/features/test/mode-settings";
-import type { StudentSection, StudentTestVersion } from "@/features/test/student-content";
+import type { ModeOption } from "@/shared/test/mode-settings";
+import type { StudentSection, StudentTestVersion } from "@/shared/test/student-content";
 
-export type { StudentSection, StudentQuestion, StudentGroup, StudentTestVersion } from "@/features/test/student-content";
+export type { StudentSection, StudentQuestion, StudentGroup, StudentTestVersion } from "@/shared/test/student-content";
 export type { ModeOption, ResultPayload };
 export type StudentUser = MeResponse;
 export type Mode = "PRACTICE" | "MOCK";

@@ -10,8 +10,8 @@ import {
   TEST_STATUSES,
   TEST_TYPES,
   TEST_VISIBILITIES,
-} from "@/features/test/api-enums";
-import { sortModes } from "@/features/test/mode-settings";
+} from "@/shared/test/api-enums";
+import { sortModes } from "@/shared/test/mode-settings";
 
 /**
  * Status of a test as admins see it. Not stored: computed from the test's

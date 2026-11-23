@@ -3,13 +3,13 @@ import "server-only";
 import { GRACE_SECONDS, finalOutcome, isPastGrace } from "@/features/attempt/timer";
 
 import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
-import type { BandRange } from "@/features/grading/band";
+import type { BandRange } from "@/shared/grading/band";
 import {
   type AttemptQuestion,
   gradeAttempt,
-} from "@/features/grading/grade-attempt";
-import { buildGradingSnapshot } from "@/features/grading/snapshot";
-import { orderQuestions } from "@/features/test/student-content";
+} from "@/shared/grading/grade-attempt";
+import { buildGradingSnapshot } from "@/shared/grading/snapshot";
+import { orderQuestions } from "@/shared/test/student-content";
 import { jsonValue } from "@/backend/db/json";
 import type { Queryable, Sql } from "@/backend/db/types";
 import { ApiError } from "@/backend/http/errors";

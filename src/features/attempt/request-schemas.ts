@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { paginationQuery } from "@/backend/http/pagination";
 
-import { ATTEMPT_STATUSES, TEST_MODES, TEST_TYPES } from "@/features/test/api-enums";
-import { apiEnum } from "@/features/test/api-enum-schema";
+import { ATTEMPT_STATUSES, TEST_MODES, TEST_TYPES } from "@/shared/test/api-enums";
+import { apiEnum } from "@/shared/test/api-enum-schema";
 
 /** One answer in PATCH …/answers and POST …/submit (api-contract §2.4). Shape per format is checked later. */
 const answerItem = z.strictObject({

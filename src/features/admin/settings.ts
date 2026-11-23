@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { apiEnum } from "@/features/test/api-enum-schema";
-import { ANSWER_VISIBILITIES, type DbTestMode, type DbTestType, TEST_MODES } from "@/features/test/api-enums";
-import { MODE_ORDER, type ModeSettingsRow } from "@/features/test/mode-settings";
+import { apiEnum } from "@/shared/test/api-enum-schema";
+import { ANSWER_VISIBILITIES, type DbTestMode, type DbTestType, TEST_MODES } from "@/shared/test/api-enums";
+import { MODE_ORDER, type ModeSettingsRow } from "@/shared/test/mode-settings";
 
 /**
  * Settings of a test version: one entry per mode (D-015). The student picks

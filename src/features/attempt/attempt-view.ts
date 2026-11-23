@@ -4,7 +4,7 @@ import {
   type DbAttemptStatus,
   type DbTestMode,
   TEST_MODES,
-} from "@/features/test/api-enums";
+} from "@/shared/test/api-enums";
 
 import { remainingSeconds } from "./timer";
 

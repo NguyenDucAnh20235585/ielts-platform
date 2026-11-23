@@ -13,7 +13,7 @@ export type TestDetail = { test: AdminTest; versions: VersionBrief[] };
 export type AdminUser = MeResponse;
 export type { AdminSection, AdminGroup, AdminQuestion } from "./admin-tree";
 export type { ValidationReport, ValidationIssue } from "./publish-validation";
-export type { StudentContent } from "@/features/test/student-content";
+export type { StudentContent } from "@/shared/test/student-content";
 
 export const versionUrl = (id: string) => "/admin/versions/" + encodeURIComponent(id);
 export const testUrl = (id: string) => "/admin/tests/" + encodeURIComponent(id);

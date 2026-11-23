@@ -8,9 +8,9 @@ import {
   type DbTestType,
   type DbTestVisibility,
   TEST_TYPES,
-} from "@/features/test/api-enums";
-import { canOpenTest, studentAccessTypes } from "@/features/test/access";
-import { type ModeSettingsRow, sortModes, toModeOption } from "@/features/test/mode-settings";
+} from "@/shared/test/api-enums";
+import { canOpenTest, studentAccessTypes } from "@/shared/test/access";
+import { type ModeSettingsRow, sortModes, toModeOption } from "@/shared/test/mode-settings";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import { likePattern } from "@/backend/db/like";
 import type { Sql } from "@/backend/db/types";

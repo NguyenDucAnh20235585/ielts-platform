@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { AnswerFormat } from "@/features/grading/schemas";
+import type { AnswerFormat } from "@/shared/grading/schemas";
 
 export type Option = { key: string; text: string };
 

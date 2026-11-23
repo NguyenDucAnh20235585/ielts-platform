@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { GroupRow, QuestionRow, SectionRow } from "@/features/test/student-content";
+import type { GroupRow, QuestionRow, SectionRow } from "@/shared/test/student-content";
 
 import type { AnswerKeyRow } from "./answer-key-row";
 import { formatNumbers, validateVersionContent, type VersionContent } from "./publish-validation";

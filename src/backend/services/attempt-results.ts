@@ -4,7 +4,7 @@ import type postgres from "postgres";
 
 import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
 import { buildResultPayload, type ResultRow } from "@/features/attempt/result-view";
-import { gradingSnapshotSchema } from "@/features/grading/snapshot";
+import { gradingSnapshotSchema } from "@/shared/grading/snapshot";
 import {
   ATTEMPT_STATUSES,
   type DbAnswerVisibility,
@@ -13,7 +13,7 @@ import {
   type DbTestType,
   TEST_MODES,
   TEST_TYPES,
-} from "@/features/test/api-enums";
+} from "@/shared/test/api-enums";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import type { Queryable, Sql } from "@/backend/db/types";
 import { ApiError } from "@/backend/http/errors";

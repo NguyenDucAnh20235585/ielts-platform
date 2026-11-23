@@ -9,7 +9,7 @@ import {
 } from "@/features/admin/admin-views";
 import type { AdminTestsQuery, CreateTestBody, UpdateTestBody } from "@/features/admin/request-schemas";
 import { applySettingsPatch, defaultSettings, enabledModes, settingsProblem } from "@/features/admin/settings";
-import { TEST_MODES, TEST_TYPES, TEST_VISIBILITIES } from "@/features/test/api-enums";
+import { TEST_MODES, TEST_TYPES, TEST_VISIBILITIES } from "@/shared/test/api-enums";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import { likePattern } from "@/backend/db/like";
 import type { Sql } from "@/backend/db/types";

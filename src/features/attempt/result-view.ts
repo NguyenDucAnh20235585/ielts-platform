@@ -8,8 +8,8 @@ import {
   QUESTION_TYPES,
   TEST_MODES,
   TEST_TYPES,
-} from "@/features/test/api-enums";
-import type { GradingSnapshot } from "@/features/grading/snapshot";
+} from "@/shared/test/api-enums";
+import type { GradingSnapshot } from "@/shared/grading/snapshot";
 
 import { iso } from "./attempt-view";
 

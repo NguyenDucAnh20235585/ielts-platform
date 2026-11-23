@@ -1,6 +1,6 @@
-import type { AnswerFormat, RulesInput } from "@/features/grading/schemas";
-import { ANSWER_FORMATS_API, type DbQuestionType, dbValueOf, QUESTION_TYPES } from "@/features/test/api-enums";
-import type { Option } from "@/features/test/question-options";
+import type { AnswerFormat, RulesInput } from "@/shared/grading/schemas";
+import { ANSWER_FORMATS_API, type DbQuestionType, dbValueOf, QUESTION_TYPES } from "@/shared/test/api-enums";
+import type { Option } from "@/shared/test/question-options";
 
 /**
  * Which answer formats each IELTS question type may use (api-contract §2.2).

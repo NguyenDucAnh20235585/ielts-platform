@@ -1,15 +1,15 @@
 import { z } from "zod";
 
-import type { Rules } from "@/features/grading/rules";
+import type { Rules } from "@/shared/grading/rules";
 import {
   type AnswerFormat,
   choiceKeySchema,
   gradingConfigSchema,
   multiChoiceKeySchema,
   textKeySchema,
-} from "@/features/grading/schemas";
-import { withinWordLimit } from "@/features/grading/word-limit";
-import type { Option } from "@/features/test/question-options";
+} from "@/shared/grading/schemas";
+import { withinWordLimit } from "@/shared/grading/word-limit";
+import type { Option } from "@/shared/test/question-options";
 
 /** What an answer key is checked against: the question's effective format, marks, rules and options. */
 export type KeyTarget = {

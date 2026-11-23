@@ -1,5 +1,5 @@
-import { resolveRules, type Rules } from "@/features/grading/rules";
-import type { AnswerFormat } from "@/features/grading/schemas";
+import { resolveRules, type Rules } from "@/shared/grading/rules";
+import type { AnswerFormat } from "@/shared/grading/schemas";
 
 import {
   ANSWER_FORMATS_API,

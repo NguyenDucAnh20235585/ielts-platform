@@ -2,8 +2,8 @@ import "server-only";
 
 import { type AnswerTarget, type StoredAnswer, validateAnswer } from "@/features/attempt/answer-validation";
 import { GRACE_SECONDS, remainingSeconds } from "@/features/attempt/timer";
-import type { AnswerFormat } from "@/features/grading/schemas";
-import { effectiveOptions } from "@/features/test/question-options";
+import type { AnswerFormat } from "@/shared/grading/schemas";
+import { effectiveOptions } from "@/shared/test/question-options";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import { jsonValue } from "@/backend/db/json";
 import type { Queryable, Sql } from "@/backend/db/types";

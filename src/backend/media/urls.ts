@@ -1,4 +1,4 @@
-import type { MediaUrl } from "@/features/test/student-content";
+import type { MediaUrl } from "@/shared/test/student-content";
 
 /**
  * Turns an R2 object key into a URL the browser can load (D-009).

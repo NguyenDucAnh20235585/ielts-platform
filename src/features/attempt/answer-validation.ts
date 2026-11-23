@@ -1,4 +1,4 @@
-import type { Option } from "@/features/test/question-options";
+import type { Option } from "@/shared/test/question-options";
 import {
   type AnswerFormat,
   type ChoiceAnswer,
@@ -7,7 +7,7 @@ import {
   choiceAnswerSchema,
   multiChoiceAnswerSchema,
   textAnswerSchema,
-} from "@/features/grading/schemas";
+} from "@/shared/grading/schemas";
 import { ApiError } from "@/backend/http/errors";
 
 export type StoredAnswer = ChoiceAnswer | MultiChoiceAnswer | TextAnswer | null;

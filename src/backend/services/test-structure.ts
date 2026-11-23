@@ -1,7 +1,7 @@
 import "server-only";
 
-import type { AnswerFormat } from "@/features/grading/schemas";
-import type { DbTestMode } from "@/features/test/api-enums";
+import type { AnswerFormat } from "@/shared/grading/schemas";
+import type { DbTestMode } from "@/shared/test/api-enums";
 import {
   buildStudentContent,
   type GroupRow,
@@ -9,7 +9,7 @@ import {
   type SectionRow,
   type StudentContent,
   type VersionRow,
-} from "@/features/test/student-content";
+} from "@/shared/test/student-content";
 import type { Queryable } from "@/backend/db/types";
 import { resolveMediaUrl } from "@/backend/media/urls";
 

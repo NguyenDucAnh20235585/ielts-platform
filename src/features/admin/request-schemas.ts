@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { rulesInputSchema } from "@/features/grading/schemas";
-import { apiEnum } from "@/features/test/api-enum-schema";
-import { TEST_MODES, TEST_TYPES } from "@/features/test/api-enums";
-import { optionListSchema } from "@/features/test/question-options";
+import { rulesInputSchema } from "@/shared/grading/schemas";
+import { apiEnum } from "@/shared/test/api-enum-schema";
+import { TEST_MODES, TEST_TYPES } from "@/shared/test/api-enums";
+import { optionListSchema } from "@/shared/test/question-options";
 import { paginationQuery } from "@/backend/http/pagination";
 
 import { ADMIN_TEST_STATUSES } from "./admin-views";

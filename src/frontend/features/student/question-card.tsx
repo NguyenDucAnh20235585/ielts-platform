@@ -1,6 +1,6 @@
 "use client";
 
-import { countWordsAndNumbers, withinWordLimit } from "@/features/grading/word-limit";
+import { countWordsAndNumbers, withinWordLimit } from "@/shared/grading/word-limit";
 import type { AnswerValue, StudentQuestion } from "./types";
 import { StudentIcon } from "./student-icons";
 import { Markdown } from "./markdown";

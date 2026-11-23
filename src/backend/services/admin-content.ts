@@ -20,10 +20,10 @@ import type {
   UpdateQuestionBody,
   UpdateSectionBody,
 } from "@/features/admin/request-schemas";
-import { resolveRules } from "@/features/grading/rules";
-import { type AnswerFormat, rulesInputSchema } from "@/features/grading/schemas";
-import type { DbQuestionType, DbTestType } from "@/features/test/api-enums";
-import { effectiveOptions, parseOptions } from "@/features/test/question-options";
+import { resolveRules } from "@/shared/grading/rules";
+import { type AnswerFormat, rulesInputSchema } from "@/shared/grading/schemas";
+import type { DbQuestionType, DbTestType } from "@/shared/test/api-enums";
+import { effectiveOptions, parseOptions } from "@/shared/test/question-options";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import { jsonValue } from "@/backend/db/json";
 import type { Sql, TransactionSql } from "@/backend/db/types";

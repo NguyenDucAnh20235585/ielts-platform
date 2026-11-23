@@ -5,7 +5,7 @@ import {
   type QuestionRow,
   type SectionRow,
   type VersionRow,
-} from "@/features/test/student-content";
+} from "@/shared/test/student-content";
 
 import { type AnswerKeyRow, toAnswerKeyView } from "./answer-key-row";
 

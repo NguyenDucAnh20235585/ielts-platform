@@ -6,14 +6,14 @@ import {
   toAttemptView,
 } from "@/features/attempt/attempt-view";
 import { isPastGrace, remainingSeconds } from "@/features/attempt/timer";
-import { canOpenTest } from "@/features/test/access";
+import { canOpenTest } from "@/shared/test/access";
 import {
   ATTEMPT_STATUSES,
   type DbAccessType,
   type DbTestMode,
   type DbTestVisibility,
   TEST_MODES,
-} from "@/features/test/api-enums";
+} from "@/shared/test/api-enums";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import { isUniqueViolation } from "@/backend/db/errors";
 import type { Sql } from "@/backend/db/types";
