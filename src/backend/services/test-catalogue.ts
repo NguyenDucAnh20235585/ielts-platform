@@ -1,6 +1,6 @@
 import "server-only";
 
-import { type AttemptRow, toActiveAttemptView } from "@/features/attempt/attempt-view";
+import { type AttemptRow, toActiveAttemptView } from "@/shared/attempt/attempt-view";
 import {
   ACCESS_TYPES,
   type DbAccessType,

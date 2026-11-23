@@ -1,6 +1,6 @@
 import type { MeResponse } from "@/features/auth/me-response";
-import type { AttemptView, ActiveAttemptView } from "@/features/attempt/attempt-view";
-import type { ResultPayload } from "@/features/attempt/result-view";
+import type { AttemptView, ActiveAttemptView } from "@/shared/attempt/attempt-view";
+import type { ResultPayload } from "@/shared/attempt/result-view";
 import type { ModeOption } from "@/shared/test/mode-settings";
 import type { StudentSection, StudentTestVersion } from "@/shared/test/student-content";
 

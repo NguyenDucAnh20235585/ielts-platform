@@ -4,8 +4,8 @@ import {
   type AttemptRow,
   isFinalized,
   toAttemptView,
-} from "@/features/attempt/attempt-view";
-import { isPastGrace, remainingSeconds } from "@/features/attempt/timer";
+} from "@/shared/attempt/attempt-view";
+import { isPastGrace, remainingSeconds } from "@/shared/attempt/timer";
 import { canOpenTest } from "@/shared/test/access";
 import {
   ATTEMPT_STATUSES,

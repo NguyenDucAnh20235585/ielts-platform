@@ -1,7 +1,7 @@
 import "server-only";
 
-import { isFinalized } from "@/features/attempt/attempt-view";
-import { isPastGrace } from "@/features/attempt/timer";
+import { isFinalized } from "@/shared/attempt/attempt-view";
+import { isPastGrace } from "@/shared/attempt/timer";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import type { Sql } from "@/backend/db/types";
 import { ApiError } from "@/backend/http/errors";

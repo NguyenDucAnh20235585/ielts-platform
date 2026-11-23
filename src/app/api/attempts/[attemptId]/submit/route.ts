@@ -1,4 +1,4 @@
-import { submitBody } from "@/features/attempt/request-schemas";
+import { submitBody } from "@/backend/attempt/request-schemas";
 import { requireUser } from "@/backend/auth/current-user";
 import { db } from "@/backend/db/client";
 import { ApiError } from "@/backend/http/errors";

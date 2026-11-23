@@ -1,4 +1,4 @@
-import { catalogueQuery } from "@/features/attempt/request-schemas";
+import { catalogueQuery } from "@/backend/attempt/request-schemas";
 import { requireUser } from "@/backend/auth/current-user";
 import { db } from "@/backend/db/client";
 import { withRoute } from "@/backend/http/route";

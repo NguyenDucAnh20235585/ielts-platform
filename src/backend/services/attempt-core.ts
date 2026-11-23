@@ -1,8 +1,8 @@
 import "server-only";
 
-import { GRACE_SECONDS, finalOutcome, isPastGrace } from "@/features/attempt/timer";
+import { GRACE_SECONDS, finalOutcome, isPastGrace } from "@/shared/attempt/timer";
 
-import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
+import { type AttemptRow, isFinalized } from "@/shared/attempt/attempt-view";
 import type { BandRange } from "@/shared/grading/band";
 import {
   type AttemptQuestion,

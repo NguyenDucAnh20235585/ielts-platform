@@ -1,7 +1,7 @@
 import "server-only";
 
-import { type AnswerTarget, type StoredAnswer, validateAnswer } from "@/features/attempt/answer-validation";
-import { GRACE_SECONDS, remainingSeconds } from "@/features/attempt/timer";
+import { type AnswerTarget, type StoredAnswer, validateAnswer } from "@/backend/attempt/answer-validation";
+import { GRACE_SECONDS, remainingSeconds } from "@/shared/attempt/timer";
 import type { AnswerFormat } from "@/shared/grading/schemas";
 import { effectiveOptions } from "@/shared/test/question-options";
 import type { CurrentUser } from "@/backend/auth/current-user";

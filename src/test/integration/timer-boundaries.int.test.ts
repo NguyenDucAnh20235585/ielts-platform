@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
 
-import { GRACE_SECONDS } from "@/features/attempt/timer";
+import { GRACE_SECONDS } from "@/shared/attempt/timer";
 import { saveAnswers, setFlag } from "@/backend/services/attempt-answers";
 import { beginAttempt, getAttemptStatus, startAttempt } from "@/backend/services/attempt-lifecycle";
 import { getResult } from "@/backend/services/attempt-results";

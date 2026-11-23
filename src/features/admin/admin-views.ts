@@ -1,4 +1,4 @@
-import { iso } from "@/features/attempt/attempt-view";
+import { iso } from "@/shared/attempt/attempt-view";
 import {
   ACCESS_TYPES,
   type DbAccessType,

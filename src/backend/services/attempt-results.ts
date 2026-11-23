@@ -2,8 +2,8 @@ import "server-only";
 
 import type postgres from "postgres";
 
-import { type AttemptRow, isFinalized } from "@/features/attempt/attempt-view";
-import { buildResultPayload, type ResultRow } from "@/features/attempt/result-view";
+import { type AttemptRow, isFinalized } from "@/shared/attempt/attempt-view";
+import { buildResultPayload, type ResultRow } from "@/shared/attempt/result-view";
 import { gradingSnapshotSchema } from "@/shared/grading/snapshot";
 import {
   ATTEMPT_STATUSES,
