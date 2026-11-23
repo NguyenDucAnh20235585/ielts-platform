@@ -1,4 +1,4 @@
-import { CataloguePage } from "@/features/student/catalogue-page";
+import { CataloguePage } from "@/frontend/features/student/pages/catalogue-page";
 export const metadata = { title: "Thư viện đề | Ms Chau’s IELTS" };
 export default async function Page({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
   const { type } = await searchParams;

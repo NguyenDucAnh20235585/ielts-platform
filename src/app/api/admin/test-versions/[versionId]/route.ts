@@ -1,10 +1,10 @@
-import { settingsPatchSchema } from "@/features/admin/settings";
-import { requireAdmin } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseJsonBody, parseUuidParam } from "@/server/http/validation";
-import { getVersionEditor, updateVersionSettings } from "@/server/services/admin-versions";
+import { settingsPatchSchema } from "@/shared/admin/settings";
+import { requireAdmin } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseJsonBody, parseUuidParam } from "@/backend/http/validation";
+import { getVersionEditor, updateVersionSettings } from "@/backend/services/admin-versions";
 
 type Context = RouteContext<"/api/admin/test-versions/[versionId]">;
 

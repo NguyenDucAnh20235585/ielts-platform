@@ -1,10 +1,10 @@
-import { saveAnswersBody } from "@/features/attempt/request-schemas";
-import { requireUser } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseJsonBody, parseUuidParam } from "@/server/http/validation";
-import { saveAnswers } from "@/server/services/attempt-answers";
+import { saveAnswersBody } from "@/backend/attempt/request-schemas";
+import { requireUser } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseJsonBody, parseUuidParam } from "@/backend/http/validation";
+import { saveAnswers } from "@/backend/services/attempt-answers";
 
 /** PATCH /api/attempts/:attemptId/answers — autosave (api-contract §5). */
 export const PATCH = withRoute(async (request: Request, ctx: RouteContext<"/api/attempts/[attemptId]/answers">) => {

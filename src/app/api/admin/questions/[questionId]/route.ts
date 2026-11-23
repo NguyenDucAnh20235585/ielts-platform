@@ -1,10 +1,10 @@
-import { updateQuestionBody } from "@/features/admin/request-schemas";
-import { requireAdmin } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseJsonBody, parseUuidParam } from "@/server/http/validation";
-import { deleteQuestion, updateQuestion } from "@/server/services/admin-content";
+import { updateQuestionBody } from "@/backend/admin/request-schemas";
+import { requireAdmin } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseJsonBody, parseUuidParam } from "@/backend/http/validation";
+import { deleteQuestion, updateQuestion } from "@/backend/services/admin-content";
 
 type Context = RouteContext<"/api/admin/questions/[questionId]">;
 

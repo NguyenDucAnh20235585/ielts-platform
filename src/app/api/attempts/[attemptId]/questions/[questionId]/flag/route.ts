@@ -1,10 +1,10 @@
-import { flagBody } from "@/features/attempt/request-schemas";
-import { requireUser } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseJsonBody, parseUuidParam } from "@/server/http/validation";
-import { setFlag } from "@/server/services/attempt-answers";
+import { flagBody } from "@/backend/attempt/request-schemas";
+import { requireUser } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseJsonBody, parseUuidParam } from "@/backend/http/validation";
+import { setFlag } from "@/backend/services/attempt-answers";
 
 /** PATCH /api/attempts/:attemptId/questions/:questionId/flag (api-contract §5). */
 export const PATCH = withRoute(

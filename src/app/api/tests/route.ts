@@ -1,9 +1,9 @@
-import { catalogueQuery } from "@/features/attempt/request-schemas";
-import { requireUser } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { withRoute } from "@/server/http/route";
-import { parseQuery } from "@/server/http/validation";
-import { listTests } from "@/server/services/test-catalogue";
+import { catalogueQuery } from "@/backend/attempt/request-schemas";
+import { requireUser } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { withRoute } from "@/backend/http/route";
+import { parseQuery } from "@/backend/http/validation";
+import { listTests } from "@/backend/services/test-catalogue";
 
 /** GET /api/tests — published tests (api-contract §4). */
 export const GET = withRoute(async (request: Request) => {

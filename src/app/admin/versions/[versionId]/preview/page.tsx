@@ -1,4 +1,4 @@
-import { AdminPreviewPage } from "@/features/admin/preview-page";
+import { AdminPreviewPage } from "@/frontend/features/admin/pages/preview-page";
 
 export default async function Page({ params }: { params: Promise<{ versionId: string }> }) {
   const { versionId } = await params;

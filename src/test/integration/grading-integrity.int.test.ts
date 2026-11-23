@@ -6,14 +6,14 @@ import {
   createQuestionBody,
   createSectionBody,
   createTestBody,
-} from "@/features/admin/request-schemas";
-import { gradingSnapshotSchema } from "@/features/grading/snapshot";
-import { createGroup, createQuestion, createSection, putAnswerKey } from "@/server/services/admin-content";
-import { createAdminTest } from "@/server/services/admin-tests";
-import { publishVersion } from "@/server/services/admin-versions";
-import { saveAnswers } from "@/server/services/attempt-answers";
-import { beginAttempt, startAttempt } from "@/server/services/attempt-lifecycle";
-import { submitAttempt } from "@/server/services/attempt-submit";
+} from "@/backend/admin/request-schemas";
+import { gradingSnapshotSchema } from "@/shared/grading/snapshot";
+import { createGroup, createQuestion, createSection, putAnswerKey } from "@/backend/services/admin-content";
+import { createAdminTest } from "@/backend/services/admin-tests";
+import { publishVersion } from "@/backend/services/admin-versions";
+import { saveAnswers } from "@/backend/services/attempt-answers";
+import { beginAttempt, startAttempt } from "@/backend/services/attempt-lifecycle";
+import { submitAttempt } from "@/backend/services/attempt-submit";
 
 import { apiError, createUser, testSql } from "./helpers";
 

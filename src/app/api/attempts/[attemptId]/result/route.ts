@@ -1,9 +1,9 @@
-import { requireUser } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseUuidParam } from "@/server/http/validation";
-import { getResult } from "@/server/services/attempt-results";
+import { requireUser } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseUuidParam } from "@/backend/http/validation";
+import { getResult } from "@/backend/services/attempt-results";
 
 /** GET /api/attempts/:attemptId/result (api-contract §5, §12.4). */
 export const GET = withRoute(async (_request: Request, ctx: RouteContext<"/api/attempts/[attemptId]/result">) => {

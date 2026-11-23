@@ -1,4 +1,4 @@
-import { AdminWorkspacePage } from "@/features/admin/workspace-page";
+import { AdminWorkspacePage } from "@/frontend/features/admin/pages/workspace-page";
 
 export default async function Page({ params }: { params: Promise<{ versionId: string }> }) {
   const { versionId } = await params;

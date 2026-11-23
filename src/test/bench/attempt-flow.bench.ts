@@ -1,11 +1,11 @@
 import postgres from "postgres";
 import { afterAll, it } from "vitest";
 
-import { saveAnswers } from "@/server/services/attempt-answers";
-import { beginAttempt, getAttempt, startAttempt } from "@/server/services/attempt-lifecycle";
-import { getResult } from "@/server/services/attempt-results";
-import { submitAttempt } from "@/server/services/attempt-submit";
-import { getTestDetail, listTests } from "@/server/services/test-catalogue";
+import { saveAnswers } from "@/backend/services/attempt-answers";
+import { beginAttempt, getAttempt, startAttempt } from "@/backend/services/attempt-lifecycle";
+import { getResult } from "@/backend/services/attempt-results";
+import { submitAttempt } from "@/backend/services/attempt-submit";
+import { getTestDetail, listTests } from "@/backend/services/test-catalogue";
 
 import { createUser, perfectAnswers, READING_MOCK_1 } from "../integration/helpers";
 

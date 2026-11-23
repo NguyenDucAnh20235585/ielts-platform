@@ -12,9 +12,9 @@ import {
   updateQuestionBody,
   updateSectionBody,
   updateTestBody,
-} from "@/features/admin/request-schemas";
-import { settingsPatchSchema } from "@/features/admin/settings";
-import type { CurrentUser } from "@/server/auth/current-user";
+} from "@/backend/admin/request-schemas";
+import { settingsPatchSchema } from "@/shared/admin/settings";
+import type { CurrentUser } from "@/backend/auth/current-user";
 import {
   createGroup,
   createQuestion,
@@ -26,7 +26,7 @@ import {
   updateGroup,
   updateQuestion,
   updateSection,
-} from "@/server/services/admin-content";
+} from "@/backend/services/admin-content";
 import {
   archiveTest,
   createAdminTest,
@@ -34,15 +34,15 @@ import {
   listAdminTests,
   setTestHidden,
   updateAdminTest,
-} from "@/server/services/admin-tests";
+} from "@/backend/services/admin-tests";
 import {
   getVersionEditor,
   previewVersion,
   publishVersion,
   updateVersionSettings,
   validateVersion,
-} from "@/server/services/admin-versions";
-import { startAttempt } from "@/server/services/attempt-lifecycle";
+} from "@/backend/services/admin-versions";
+import { startAttempt } from "@/backend/services/attempt-lifecycle";
 
 import { allKeys, apiError, createUser, testSql } from "./helpers";
 

@@ -4,12 +4,12 @@ import { writeFileSync } from "node:fs";
 import postgres from "postgres";
 import { afterAll, expect, it } from "vitest";
 
-import type { CurrentUser } from "@/server/auth/current-user";
-import { ApiError } from "@/server/http/errors";
-import { saveAnswers } from "@/server/services/attempt-answers";
-import { beginAttempt, getAttempt, startAttempt } from "@/server/services/attempt-lifecycle";
-import { submitAttempt } from "@/server/services/attempt-submit";
-import { getTestDetail } from "@/server/services/test-catalogue";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import { ApiError } from "@/backend/http/errors";
+import { saveAnswers } from "@/backend/services/attempt-answers";
+import { beginAttempt, getAttempt, startAttempt } from "@/backend/services/attempt-lifecycle";
+import { submitAttempt } from "@/backend/services/attempt-submit";
+import { getTestDetail } from "@/backend/services/test-catalogue";
 
 import { createUser, READING_PRACTICE_1 } from "../integration/helpers";
 

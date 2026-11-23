@@ -1,9 +1,9 @@
-import { adminTestsQuery, createTestBody } from "@/features/admin/request-schemas";
-import { requireAdmin } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { withRoute } from "@/server/http/route";
-import { parseJsonBody, parseQuery } from "@/server/http/validation";
-import { createAdminTest, listAdminTests } from "@/server/services/admin-tests";
+import { adminTestsQuery, createTestBody } from "@/backend/admin/request-schemas";
+import { requireAdmin } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { withRoute } from "@/backend/http/route";
+import { parseJsonBody, parseQuery } from "@/backend/http/validation";
+import { createAdminTest, listAdminTests } from "@/backend/services/admin-tests";
 
 /** GET /api/admin/tests — all tests, any status (api-contract §6.1). */
 export const GET = withRoute(async (request: Request) => {
