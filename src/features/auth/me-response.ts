@@ -1,4 +1,4 @@
-import type { CurrentUser } from "@/server/auth/current-user";
+import type { CurrentUser } from "@/backend/auth/current-user";
 
 /** Response body of GET /api/me (api-contract §3). */
 export type MeResponse = {

@@ -10,9 +10,9 @@ import {
   toSettingsView,
 } from "@/features/admin/settings";
 import { type DbTestMode, type DbTestVisibility, TEST_STATUSES, TEST_TYPES } from "@/features/test/api-enums";
-import type { CurrentUser } from "@/server/auth/current-user";
-import type { Queryable, Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import type { Queryable, Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
 
 import { loadAdminTree, loadAnswerKeys, loadModeSettings, loadVersionInfo, writeModeSettings } from "./admin-shared";
 import { loadBandTable } from "./attempt-core";

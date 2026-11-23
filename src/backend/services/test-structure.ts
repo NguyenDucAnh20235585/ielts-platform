@@ -10,8 +10,8 @@ import {
   type StudentContent,
   type VersionRow,
 } from "@/features/test/student-content";
-import type { Queryable } from "@/server/db/types";
-import { resolveMediaUrl } from "@/server/media/urls";
+import type { Queryable } from "@/backend/db/types";
+import { resolveMediaUrl } from "@/backend/media/urls";
 
 export type VersionStructure = {
   version: VersionRow;

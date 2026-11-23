@@ -2,11 +2,11 @@ import { randomUUID } from "node:crypto";
 
 import { afterAll, describe, expect, it } from "vitest";
 
-import { saveAnswers, setFlag } from "@/server/services/attempt-answers";
-import { beginAttempt, getAttempt, getAttemptStatus, startAttempt } from "@/server/services/attempt-lifecycle";
-import { getResult, listHistory } from "@/server/services/attempt-results";
-import { submitAttempt } from "@/server/services/attempt-submit";
-import { getActiveAttemptForTest, getTestDetail, listTests } from "@/server/services/test-catalogue";
+import { saveAnswers, setFlag } from "@/backend/services/attempt-answers";
+import { beginAttempt, getAttempt, getAttemptStatus, startAttempt } from "@/backend/services/attempt-lifecycle";
+import { getResult, listHistory } from "@/backend/services/attempt-results";
+import { submitAttempt } from "@/backend/services/attempt-submit";
+import { getActiveAttemptForTest, getTestDetail, listTests } from "@/backend/services/test-catalogue";
 
 import {
   READING_MOCK_1,

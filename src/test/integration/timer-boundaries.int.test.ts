@@ -1,11 +1,11 @@
 import { afterAll, describe, expect, it } from "vitest";
 
 import { GRACE_SECONDS } from "@/features/attempt/timer";
-import { saveAnswers, setFlag } from "@/server/services/attempt-answers";
-import { beginAttempt, getAttemptStatus, startAttempt } from "@/server/services/attempt-lifecycle";
-import { getResult } from "@/server/services/attempt-results";
-import { submitAttempt } from "@/server/services/attempt-submit";
-import { getTestDetail, listTests } from "@/server/services/test-catalogue";
+import { saveAnswers, setFlag } from "@/backend/services/attempt-answers";
+import { beginAttempt, getAttemptStatus, startAttempt } from "@/backend/services/attempt-lifecycle";
+import { getResult } from "@/backend/services/attempt-results";
+import { submitAttempt } from "@/backend/services/attempt-submit";
+import { getTestDetail, listTests } from "@/backend/services/test-catalogue";
 
 import { apiError, createPublishedTest, createUser, secondsAfter, testSql } from "./helpers";
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { paginationQuery } from "@/server/http/pagination";
+import { paginationQuery } from "@/backend/http/pagination";
 
 import { ATTEMPT_STATUSES, TEST_MODES, TEST_TYPES } from "@/features/test/api-enums";
 import { apiEnum } from "@/features/test/api-enum-schema";

@@ -14,10 +14,10 @@ import {
   type DbTestVisibility,
   TEST_MODES,
 } from "@/features/test/api-enums";
-import type { CurrentUser } from "@/server/auth/current-user";
-import { isUniqueViolation } from "@/server/db/errors";
-import type { Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import { isUniqueViolation } from "@/backend/db/errors";
+import type { Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
 
 import { finalizeAttempt, finalizeIfExpired, loadOwnAttempt, timerOf } from "./attempt-core";
 import { type AudioRow, loadPreload, loadStudentContent, toPreload } from "./test-structure";

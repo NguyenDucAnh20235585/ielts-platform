@@ -1,10 +1,10 @@
 import { previewQuery } from "@/features/admin/request-schemas";
-import { requireAdmin } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseQuery, parseUuidParam } from "@/server/http/validation";
-import { previewVersion } from "@/server/services/admin-versions";
+import { requireAdmin } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseQuery, parseUuidParam } from "@/backend/http/validation";
+import { previewVersion } from "@/backend/services/admin-versions";
 
 /** GET /api/admin/test-versions/:versionId/preview?mode= — StudentContent, no answer keys (§6.8). */
 export const GET = withRoute(async (request: Request, ctx: RouteContext<"/api/admin/test-versions/[versionId]/preview">) => {

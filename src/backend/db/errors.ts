@@ -1,6 +1,6 @@
 import postgres from "postgres";
 
-import { ApiError } from "@/server/http/errors";
+import { ApiError } from "@/backend/http/errors";
 
 /**
  * Maps database errors raised on purpose by our migrations to API errors.

@@ -14,10 +14,10 @@ import {
   TEST_MODES,
   TEST_TYPES,
 } from "@/features/test/api-enums";
-import type { CurrentUser } from "@/server/auth/current-user";
-import type { Queryable, Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
-import { offsetOf, paginated } from "@/server/http/pagination";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import type { Queryable, Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
+import { offsetOf, paginated } from "@/backend/http/pagination";
 
 import { finalizeIfExpired, readAfterExpiry } from "./attempt-core";
 

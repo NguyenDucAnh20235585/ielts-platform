@@ -11,11 +11,11 @@ import {
 } from "@/features/test/api-enums";
 import { canOpenTest, studentAccessTypes } from "@/features/test/access";
 import { type ModeSettingsRow, sortModes, toModeOption } from "@/features/test/mode-settings";
-import type { CurrentUser } from "@/server/auth/current-user";
-import { likePattern } from "@/server/db/like";
-import type { Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
-import { offsetOf, paginated } from "@/server/http/pagination";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import { likePattern } from "@/backend/db/like";
+import type { Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
+import { offsetOf, paginated } from "@/backend/http/pagination";
 
 import { readAfterExpiry } from "./attempt-core";
 

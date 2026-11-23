@@ -1,10 +1,10 @@
 import { createGroupBody } from "@/features/admin/request-schemas";
-import { requireAdmin } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseJsonBody, parseUuidParam } from "@/server/http/validation";
-import { createGroup } from "@/server/services/admin-content";
+import { requireAdmin } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseJsonBody, parseUuidParam } from "@/backend/http/validation";
+import { createGroup } from "@/backend/services/admin-content";
 
 /** POST /api/admin/sections/:sectionId/question-groups (§7.2). */
 export const POST = withRoute(async (request: Request, ctx: RouteContext<"/api/admin/sections/[sectionId]/question-groups">) => {

@@ -1,7 +1,7 @@
 import "server-only";
 
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
 
 import { createSupabaseServerClient } from "./supabase-server";
 

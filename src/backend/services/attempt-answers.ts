@@ -4,10 +4,10 @@ import { type AnswerTarget, type StoredAnswer, validateAnswer } from "@/features
 import { GRACE_SECONDS, remainingSeconds } from "@/features/attempt/timer";
 import type { AnswerFormat } from "@/features/grading/schemas";
 import { effectiveOptions } from "@/features/test/question-options";
-import type { CurrentUser } from "@/server/auth/current-user";
-import { jsonValue } from "@/server/db/json";
-import type { Queryable, Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import { jsonValue } from "@/backend/db/json";
+import type { Queryable, Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
 
 import { assertAcceptsChanges, closeIfPastGrace, finalizeIfExpired, loadOwnAttempt, timerOf } from "./attempt-core";
 

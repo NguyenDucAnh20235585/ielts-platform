@@ -1,9 +1,9 @@
-import { requireUser } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseUuidParam } from "@/server/http/validation";
-import { getActiveAttemptForTest } from "@/server/services/test-catalogue";
+import { requireUser } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseUuidParam } from "@/backend/http/validation";
+import { getActiveAttemptForTest } from "@/backend/services/test-catalogue";
 
 /** GET /api/tests/:testId/active-attempt (api-contract §4, C-15). */
 export const GET = withRoute(async (_request: Request, ctx: RouteContext<"/api/tests/[testId]/active-attempt">) => {

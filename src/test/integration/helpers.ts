@@ -2,9 +2,9 @@ import { randomUUID } from "node:crypto";
 
 import postgres from "postgres";
 
-import type { AnswerInput } from "@/server/services/attempt-answers";
-import type { CurrentUser } from "@/server/auth/current-user";
-import type { Sql } from "@/server/db/types";
+import type { AnswerInput } from "@/backend/services/attempt-answers";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import type { Sql } from "@/backend/db/types";
 
 /** Seeded tests (supabase/seed.sql). */
 export const READING_MOCK_1 = "a0000000-0000-4000-8000-000000000001";

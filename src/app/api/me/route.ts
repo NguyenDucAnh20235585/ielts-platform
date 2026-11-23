@@ -1,6 +1,6 @@
 import { toMeResponse } from "@/features/auth/me-response";
-import { requireUser } from "@/server/auth/current-user";
-import { withRoute } from "@/server/http/route";
+import { requireUser } from "@/backend/auth/current-user";
+import { withRoute } from "@/backend/http/route";
 
 /** GET /api/me — the signed-in user (api-contract §3). */
 export const GET = withRoute(async () => {

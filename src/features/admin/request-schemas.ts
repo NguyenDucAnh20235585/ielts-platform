@@ -4,7 +4,7 @@ import { rulesInputSchema } from "@/features/grading/schemas";
 import { apiEnum } from "@/features/test/api-enum-schema";
 import { TEST_MODES, TEST_TYPES } from "@/features/test/api-enums";
 import { optionListSchema } from "@/features/test/question-options";
-import { paginationQuery } from "@/server/http/pagination";
+import { paginationQuery } from "@/backend/http/pagination";
 
 import { ADMIN_TEST_STATUSES } from "./admin-views";
 import { settingsPatchSchema } from "./settings";

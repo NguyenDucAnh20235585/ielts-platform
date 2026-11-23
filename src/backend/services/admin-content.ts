@@ -24,10 +24,10 @@ import { resolveRules } from "@/features/grading/rules";
 import { type AnswerFormat, rulesInputSchema } from "@/features/grading/schemas";
 import type { DbQuestionType, DbTestType } from "@/features/test/api-enums";
 import { effectiveOptions, parseOptions } from "@/features/test/question-options";
-import type { CurrentUser } from "@/server/auth/current-user";
-import { jsonValue } from "@/server/db/json";
-import type { Sql, TransactionSql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import { jsonValue } from "@/backend/db/json";
+import type { Sql, TransactionSql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
 
 import { type ContentKind, lockDraftOfNode, lockDraftVersion, loadAdminTree, NOT_FOUND } from "./admin-shared";
 import { writeAuditLog } from "./audit-log";

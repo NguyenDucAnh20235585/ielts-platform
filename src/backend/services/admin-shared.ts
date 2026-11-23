@@ -6,9 +6,9 @@ import type { AdminTestRow, VersionBriefRow } from "@/features/admin/admin-views
 import { settingsFromRows, type VersionSettings } from "@/features/admin/settings";
 import type { DbTestStatus, DbTestType, DbTestVisibility } from "@/features/test/api-enums";
 import { MODE_ORDER, type ModeSettingsRow } from "@/features/test/mode-settings";
-import type { Queryable, TransactionSql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
-import { resolveMediaUrl } from "@/server/media/urls";
+import type { Queryable, TransactionSql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
+import { resolveMediaUrl } from "@/backend/media/urls";
 
 import { loadVersionStructure } from "./test-structure";
 

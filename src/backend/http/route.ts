@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { mapDatabaseError } from "@/server/db/errors";
+import { mapDatabaseError } from "@/backend/db/errors";
 
 import { ApiError } from "./errors";
 import { zodIssues } from "./validation";

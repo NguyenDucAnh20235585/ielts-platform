@@ -10,11 +10,11 @@ import {
 import type { AdminTestsQuery, CreateTestBody, UpdateTestBody } from "@/features/admin/request-schemas";
 import { applySettingsPatch, defaultSettings, enabledModes, settingsProblem } from "@/features/admin/settings";
 import { TEST_MODES, TEST_TYPES, TEST_VISIBILITIES } from "@/features/test/api-enums";
-import type { CurrentUser } from "@/server/auth/current-user";
-import { likePattern } from "@/server/db/like";
-import type { Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
-import { offsetOf, paginated } from "@/server/http/pagination";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import { likePattern } from "@/backend/db/like";
+import type { Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
+import { offsetOf, paginated } from "@/backend/http/pagination";
 
 import { loadAdminTestRow, loadVersionBriefs, writeModeSettings } from "./admin-shared";
 import { writeAuditLog } from "./audit-log";

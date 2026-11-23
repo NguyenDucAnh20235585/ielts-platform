@@ -1,5 +1,5 @@
 import type { toAdminTest, toVersionBrief } from "./admin-views";
-import type { getVersionEditor } from "@/server/services/admin-versions";
+import type { getVersionEditor } from "@/backend/services/admin-versions";
 import type { MeResponse } from "@/features/auth/me-response";
 import type { Paginated } from "@/features/student/types";
 

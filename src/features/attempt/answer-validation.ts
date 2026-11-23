@@ -8,7 +8,7 @@ import {
   multiChoiceAnswerSchema,
   textAnswerSchema,
 } from "@/features/grading/schemas";
-import { ApiError } from "@/server/http/errors";
+import { ApiError } from "@/backend/http/errors";
 
 export type StoredAnswer = ChoiceAnswer | MultiChoiceAnswer | TextAnswer | null;
 

@@ -2,9 +2,9 @@ import "server-only";
 
 import { isFinalized } from "@/features/attempt/attempt-view";
 import { isPastGrace } from "@/features/attempt/timer";
-import type { CurrentUser } from "@/server/auth/current-user";
-import type { Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
+import type { CurrentUser } from "@/backend/auth/current-user";
+import type { Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
 
 import { type AnswerInput, writeAnswers } from "./attempt-answers";
 import { finalizeAttempt, loadOwnAttempt, timerOf } from "./attempt-core";

@@ -1,10 +1,10 @@
 import { answerKeyBody } from "@/features/admin/request-schemas";
-import { requireAdmin } from "@/server/auth/current-user";
-import { db } from "@/server/db/client";
-import { ApiError } from "@/server/http/errors";
-import { withRoute } from "@/server/http/route";
-import { parseJsonBody, parseUuidParam } from "@/server/http/validation";
-import { putAnswerKey } from "@/server/services/admin-content";
+import { requireAdmin } from "@/backend/auth/current-user";
+import { db } from "@/backend/db/client";
+import { ApiError } from "@/backend/http/errors";
+import { withRoute } from "@/backend/http/route";
+import { parseJsonBody, parseUuidParam } from "@/backend/http/validation";
+import { putAnswerKey } from "@/backend/services/admin-content";
 
 /** PUT /api/admin/questions/:questionId/answer-key — create or replace (§7.4). */
 export const PUT = withRoute(async (request: Request, ctx: RouteContext<"/api/admin/questions/[questionId]/answer-key">) => {

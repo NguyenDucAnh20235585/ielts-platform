@@ -10,9 +10,9 @@ import {
 } from "@/features/grading/grade-attempt";
 import { buildGradingSnapshot } from "@/features/grading/snapshot";
 import { orderQuestions } from "@/features/test/student-content";
-import { jsonValue } from "@/server/db/json";
-import type { Queryable, Sql } from "@/server/db/types";
-import { ApiError } from "@/server/http/errors";
+import { jsonValue } from "@/backend/db/json";
+import type { Queryable, Sql } from "@/backend/db/types";
+import { ApiError } from "@/backend/http/errors";
 
 import { type StructureColumns, structureColumns, toStructure } from "./test-structure";
 

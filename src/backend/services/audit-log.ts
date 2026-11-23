@@ -1,7 +1,7 @@
 import "server-only";
 
-import { jsonValue } from "@/server/db/json";
-import type { Queryable } from "@/server/db/types";
+import { jsonValue } from "@/backend/db/json";
+import type { Queryable } from "@/backend/db/types";
 
 /** Audited actions (api-contract §12.7). */
 export type AuditAction =
