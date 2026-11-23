@@ -1,8 +1,8 @@
 import "server-only";
 
-import type { AdminSection } from "@/features/admin/admin-tree";
-import { type AnswerKeyRow, toAnswerKeyView } from "@/features/admin/answer-key-row";
-import { checkAnswerKey, type KeyTarget } from "@/features/admin/answer-key-validation";
+import type { AdminSection } from "@/shared/admin/admin-tree";
+import { type AnswerKeyRow, toAnswerKeyView } from "@/shared/admin/answer-key-row";
+import { checkAnswerKey, type KeyTarget } from "@/shared/admin/answer-key-validation";
 import {
   isFormatAllowed,
   parseAnswerFormat,
@@ -10,7 +10,7 @@ import {
   resolveQuestionSpec,
   type QuestionSpec,
   TYPES_WITH_OWN_OPTIONS,
-} from "@/features/admin/question-rules";
+} from "@/shared/admin/question-rules";
 import type {
   AnswerKeyBody,
   CreateGroupBody,
@@ -19,7 +19,7 @@ import type {
   UpdateGroupBody,
   UpdateQuestionBody,
   UpdateSectionBody,
-} from "@/features/admin/request-schemas";
+} from "@/backend/admin/request-schemas";
 import { resolveRules } from "@/shared/grading/rules";
 import { type AnswerFormat, rulesInputSchema } from "@/shared/grading/schemas";
 import type { DbQuestionType, DbTestType } from "@/shared/test/api-enums";

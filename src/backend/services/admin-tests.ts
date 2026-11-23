@@ -6,9 +6,9 @@ import {
   toAdminTest,
   toVersionBrief,
   type VersionBriefRow,
-} from "@/features/admin/admin-views";
-import type { AdminTestsQuery, CreateTestBody, UpdateTestBody } from "@/features/admin/request-schemas";
-import { applySettingsPatch, defaultSettings, enabledModes, settingsProblem } from "@/features/admin/settings";
+} from "@/shared/admin/admin-views";
+import type { AdminTestsQuery, CreateTestBody, UpdateTestBody } from "@/backend/admin/request-schemas";
+import { applySettingsPatch, defaultSettings, enabledModes, settingsProblem } from "@/shared/admin/settings";
 import { TEST_MODES, TEST_TYPES, TEST_VISIBILITIES } from "@/shared/test/api-enums";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import { likePattern } from "@/backend/db/like";

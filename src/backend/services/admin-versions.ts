@@ -1,14 +1,14 @@
 import "server-only";
 
-import { ADMIN_TEST_STATUSES, adminStatusOf, toVersionBrief } from "@/features/admin/admin-views";
-import { validateVersionContent, type ValidationReport } from "@/features/admin/publish-validation";
+import { ADMIN_TEST_STATUSES, adminStatusOf, toVersionBrief } from "@/shared/admin/admin-views";
+import { validateVersionContent, type ValidationReport } from "@/shared/admin/publish-validation";
 import {
   applySettingsPatch,
   enabledModes,
   type SettingsPatch,
   settingsProblem,
   toSettingsView,
-} from "@/features/admin/settings";
+} from "@/shared/admin/settings";
 import { type DbTestMode, type DbTestVisibility, TEST_STATUSES, TEST_TYPES } from "@/shared/test/api-enums";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import type { Queryable, Sql } from "@/backend/db/types";

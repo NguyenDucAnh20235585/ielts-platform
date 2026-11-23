@@ -1,4 +1,4 @@
-import { createGroupBody } from "@/features/admin/request-schemas";
+import { createGroupBody } from "@/backend/admin/request-schemas";
 import { requireAdmin } from "@/backend/auth/current-user";
 import { db } from "@/backend/db/client";
 import { ApiError } from "@/backend/http/errors";

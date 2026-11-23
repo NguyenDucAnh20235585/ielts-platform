@@ -1,4 +1,4 @@
-import { adminTestsQuery, createTestBody } from "@/features/admin/request-schemas";
+import { adminTestsQuery, createTestBody } from "@/backend/admin/request-schemas";
 import { requireAdmin } from "@/backend/auth/current-user";
 import { db } from "@/backend/db/client";
 import { withRoute } from "@/backend/http/route";

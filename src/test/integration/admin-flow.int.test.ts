@@ -12,8 +12,8 @@ import {
   updateQuestionBody,
   updateSectionBody,
   updateTestBody,
-} from "@/features/admin/request-schemas";
-import { settingsPatchSchema } from "@/features/admin/settings";
+} from "@/backend/admin/request-schemas";
+import { settingsPatchSchema } from "@/shared/admin/settings";
 import type { CurrentUser } from "@/backend/auth/current-user";
 import {
   createGroup,

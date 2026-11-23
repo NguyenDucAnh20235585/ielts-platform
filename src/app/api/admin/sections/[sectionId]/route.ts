@@ -1,4 +1,4 @@
-import { updateSectionBody } from "@/features/admin/request-schemas";
+import { updateSectionBody } from "@/backend/admin/request-schemas";
 import { requireAdmin } from "@/backend/auth/current-user";
 import { db } from "@/backend/db/client";
 import { ApiError } from "@/backend/http/errors";

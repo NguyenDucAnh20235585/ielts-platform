@@ -6,8 +6,8 @@ import {
   createQuestionBody,
   createSectionBody,
   createTestBody,
-} from "@/features/admin/request-schemas";
-import { settingsPatchSchema } from "@/features/admin/settings";
+} from "@/backend/admin/request-schemas";
+import { settingsPatchSchema } from "@/shared/admin/settings";
 import { createGroup, createQuestion, createSection, putAnswerKey } from "@/backend/services/admin-content";
 import { createAdminTest } from "@/backend/services/admin-tests";
 import { publishVersion, updateVersionSettings, validateVersion } from "@/backend/services/admin-versions";

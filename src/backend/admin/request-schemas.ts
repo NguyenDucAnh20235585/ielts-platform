@@ -6,8 +6,8 @@ import { TEST_MODES, TEST_TYPES } from "@/shared/test/api-enums";
 import { optionListSchema } from "@/shared/test/question-options";
 import { paginationQuery } from "@/backend/http/pagination";
 
-import { ADMIN_TEST_STATUSES } from "./admin-views";
-import { settingsPatchSchema } from "./settings";
+import { ADMIN_TEST_STATUSES } from "@/shared/admin/admin-views";
+import { settingsPatchSchema } from "@/shared/admin/settings";
 
 /**
  * Request schemas for /api/admin/* (api-contract §6–7). Bodies are strict

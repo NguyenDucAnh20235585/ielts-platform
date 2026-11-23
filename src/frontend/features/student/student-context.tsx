@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { supabaseBrowser } from "@/features/auth/supabase-browser";
+import { supabaseBrowser } from "@/frontend/features/auth/supabase-browser";
 import { studentApi, errorText, StudentApiError } from "./api";
 import type { StudentUser } from "./types";
 import { Brand, StatusPanel } from "./ui";

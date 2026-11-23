@@ -1,7 +1,7 @@
 import "server-only";
 import postgres from "postgres";
 
-import { serverEnv } from "@/config/env";
+import { serverEnv } from "@/backend/config/env";
 
 import type { Sql } from "./types";
 

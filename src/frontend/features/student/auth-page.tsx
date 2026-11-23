@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseBrowser } from "@/features/auth/supabase-browser";
+import { supabaseBrowser } from "@/frontend/features/auth/supabase-browser";
 import { FoundationFooter } from "@/frontend/features/foundation/foundation-footer";
 import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
 import { FoundationHeader } from "@/frontend/features/foundation/foundation-interactions";

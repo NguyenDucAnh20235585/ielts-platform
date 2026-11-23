@@ -1,4 +1,4 @@
-import { settingsPatchSchema } from "@/features/admin/settings";
+import { settingsPatchSchema } from "@/shared/admin/settings";
 import { requireAdmin } from "@/backend/auth/current-user";
 import { db } from "@/backend/db/client";
 import { ApiError } from "@/backend/http/errors";

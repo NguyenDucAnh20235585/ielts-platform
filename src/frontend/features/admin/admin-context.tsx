@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseBrowser } from "@/features/auth/supabase-browser";
+import { supabaseBrowser } from "@/frontend/features/auth/supabase-browser";
 import { Brand } from "@/frontend/features/student/ui";
 import { adminApi, adminError } from "./client-api";
 import type { AdminUser } from "./client-types";

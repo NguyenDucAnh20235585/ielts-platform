@@ -1,4 +1,4 @@
-import { toMeResponse } from "@/features/auth/me-response";
+import { toMeResponse } from "@/shared/auth/me-response";
 import { requireUser } from "@/backend/auth/current-user";
 import { withRoute } from "@/backend/http/route";
 

@@ -1,4 +1,4 @@
-import type { MeResponse } from "@/features/auth/me-response";
+import type { MeResponse } from "@/shared/auth/me-response";
 import type { AttemptView, ActiveAttemptView } from "@/shared/attempt/attempt-view";
 import type { ResultPayload } from "@/shared/attempt/result-view";
 import type { ModeOption } from "@/shared/test/mode-settings";

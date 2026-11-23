@@ -1,6 +1,6 @@
-import type { toAdminTest, toVersionBrief } from "./admin-views";
+import type { toAdminTest, toVersionBrief } from "@/shared/admin/admin-views";
 import type { getVersionEditor } from "@/backend/services/admin-versions";
-import type { MeResponse } from "@/features/auth/me-response";
+import type { MeResponse } from "@/shared/auth/me-response";
 import type { Paginated } from "@/frontend/features/student/types";
 
 export type AdminTest = ReturnType<typeof toAdminTest>;
@@ -11,8 +11,8 @@ export type ModeSettingsMap = VersionEditor["settings"];
 export type TestList = Paginated<AdminTest>;
 export type TestDetail = { test: AdminTest; versions: VersionBrief[] };
 export type AdminUser = MeResponse;
-export type { AdminSection, AdminGroup, AdminQuestion } from "./admin-tree";
-export type { ValidationReport, ValidationIssue } from "./publish-validation";
+export type { AdminSection, AdminGroup, AdminQuestion } from "@/shared/admin/admin-tree";
+export type { ValidationReport, ValidationIssue } from "@/shared/admin/publish-validation";
 export type { StudentContent } from "@/shared/test/student-content";
 
 export const versionUrl = (id: string) => "/admin/versions/" + encodeURIComponent(id);

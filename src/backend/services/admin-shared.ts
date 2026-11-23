@@ -1,9 +1,9 @@
 import "server-only";
 
-import { buildAdminSections } from "@/features/admin/admin-tree";
-import type { AnswerKeyRow } from "@/features/admin/answer-key-row";
-import type { AdminTestRow, VersionBriefRow } from "@/features/admin/admin-views";
-import { settingsFromRows, type VersionSettings } from "@/features/admin/settings";
+import { buildAdminSections } from "@/shared/admin/admin-tree";
+import type { AnswerKeyRow } from "@/shared/admin/answer-key-row";
+import type { AdminTestRow, VersionBriefRow } from "@/shared/admin/admin-views";
+import { settingsFromRows, type VersionSettings } from "@/shared/admin/settings";
 import type { DbTestStatus, DbTestType, DbTestVisibility } from "@/shared/test/api-enums";
 import { MODE_ORDER, type ModeSettingsRow } from "@/shared/test/mode-settings";
 import type { Queryable, TransactionSql } from "@/backend/db/types";

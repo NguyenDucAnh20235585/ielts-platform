@@ -6,7 +6,7 @@ import {
   createQuestionBody,
   createSectionBody,
   createTestBody,
-} from "@/features/admin/request-schemas";
+} from "@/backend/admin/request-schemas";
 import { gradingSnapshotSchema } from "@/shared/grading/snapshot";
 import { createGroup, createQuestion, createSection, putAnswerKey } from "@/backend/services/admin-content";
 import { createAdminTest } from "@/backend/services/admin-tests";

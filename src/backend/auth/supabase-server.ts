@@ -2,7 +2,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-import { serverEnv } from "@/config/env";
+import { serverEnv } from "@/backend/config/env";
 
 /**
  * Supabase client bound to the current request's cookies. Used only for
