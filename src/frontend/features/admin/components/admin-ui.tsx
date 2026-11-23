@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AdminIcon } from "./admin-icons";
-import s from "./admin.module.css";
+import s from "../admin.module.css";
 
 export function StatusBadge({ status }: { status: string }) {
   const labels: Record<string, string> = { DRAFT: "Bản nháp", PUBLISHED: "Đã xuất bản", HIDDEN: "Đang ẩn", ARCHIVED: "Đã lưu trữ" };

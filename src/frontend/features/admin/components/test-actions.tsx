@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { AdminTest } from "./client-types";
-import { adminApi } from "./client-api";
+import type { AdminTest } from "../client-types";
+import { adminApi } from "../client-api";
 import { ConfirmModal } from "./admin-ui";
 import { AdminIcon } from "./admin-icons";
-import { useAdmin } from "./admin-context";
-import s from "./admin.module.css";
+import { useAdmin } from "../state/admin-context";
+import s from "../admin.module.css";
 
 export function TestActions({ test, onComplete, compact = false }: { test: AdminTest; onComplete: () => Promise<unknown>; compact?: boolean }) {
   const [action, setAction] = useState<"hide" | "unhide" | "archive" | null>(null);

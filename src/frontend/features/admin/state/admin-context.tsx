@@ -5,10 +5,10 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/frontend/features/auth/supabase-browser";
 import { Brand } from "@/frontend/features/student/components/ui";
-import { adminApi, adminError } from "./client-api";
-import type { AdminUser } from "./client-types";
-import { Alert, Empty, Modal } from "./admin-ui";
-import s from "./admin.module.css";
+import { adminApi, adminError } from "../client-api";
+import type { AdminUser } from "../client-types";
+import { Alert, Empty, Modal } from "../components/admin-ui";
+import s from "../admin.module.css";
 
 type AdminContextValue = {
   user: AdminUser;

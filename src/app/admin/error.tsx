@@ -1,6 +1,6 @@
 "use client";
 
-import { Empty } from "@/frontend/features/admin/admin-ui";
+import { Empty } from "@/frontend/features/admin/components/admin-ui";
 import s from "@/frontend/features/admin/admin.module.css";
 
 export default function AdminError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {

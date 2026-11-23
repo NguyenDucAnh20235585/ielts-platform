@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useAdmin, useDraftGuard } from "./admin-context";
+import { useAdmin, useDraftGuard } from "../state/admin-context";
 import { AdminIcon } from "./admin-icons";
 import { Alert } from "./admin-ui";
-import { adminError } from "./client-api";
-import type { ModeSettings, ModeSettingsMap, VersionEditor } from "./client-types";
+import { adminError } from "../client-api";
+import type { ModeSettings, ModeSettingsMap, VersionEditor } from "../client-types";
 import type { SaveNode } from "./content-forms";
-import s from "./admin.module.css";
+import s from "../admin.module.css";
 
 export function SettingsForm({ version, readOnly, onSave }: { version: VersionEditor; readOnly: boolean; onSave: SaveNode }) {
   const { setDirty } = useAdmin();

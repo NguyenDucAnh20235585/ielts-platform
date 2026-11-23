@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { SkillBadge } from "@/frontend/features/student/components/ui";
-import { AdminShell } from "./admin-shell";
-import { AdminIcon } from "./admin-icons";
-import { Alert, Empty, ModeBadges, StatusBadge } from "./admin-ui";
-import { TestActions } from "./test-actions";
-import { adminApi, adminError, body, useAdminResource } from "./client-api";
-import { useAdmin, useDraftGuard } from "./admin-context";
-import { dateLabel, versionUrl, type TestDetail, type VersionEditor, type AdminTest } from "./client-types";
-import s from "./admin.module.css";
+import { AdminShell } from "../components/admin-shell";
+import { AdminIcon } from "../components/admin-icons";
+import { Alert, Empty, ModeBadges, StatusBadge } from "../components/admin-ui";
+import { TestActions } from "../components/test-actions";
+import { adminApi, adminError, body, useAdminResource } from "../client-api";
+import { useAdmin, useDraftGuard } from "../state/admin-context";
+import { dateLabel, versionUrl, type TestDetail, type VersionEditor, type AdminTest } from "../client-types";
+import s from "../admin.module.css";
 
 export function AdminTestDetailPage({ testId }: { testId: string }) {
   const resource = useAdminResource<TestDetail>("/api/admin/tests/" + encodeURIComponent(testId));

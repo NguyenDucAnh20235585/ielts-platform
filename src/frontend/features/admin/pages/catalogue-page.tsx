@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {useState, type FormEvent } from "react";
 import { SkillBadge, Pagination } from "@/frontend/features/student/components/ui";
-import { AdminShell } from "./admin-shell";
-import { AdminIcon } from "./admin-icons";
-import { Alert, Empty, Modal, ModeBadges, StatusBadge } from "./admin-ui";
-import { TestActions } from "./test-actions";
-import { adminApi, adminError, body, useAdminResource } from "./client-api";
-import { useAdmin, useDraftGuard } from "./admin-context";
-import { dateLabel, testUrl, versionUrl, type TestList, type AdminTest, type VersionBrief } from "./client-types";
-import s from "./admin.module.css";
+import { AdminShell } from "../components/admin-shell";
+import { AdminIcon } from "../components/admin-icons";
+import { Alert, Empty, Modal, ModeBadges, StatusBadge } from "../components/admin-ui";
+import { TestActions } from "../components/test-actions";
+import { adminApi, adminError, body, useAdminResource } from "../client-api";
+import { useAdmin, useDraftGuard } from "../state/admin-context";
+import { dateLabel, testUrl, versionUrl, type TestList, type AdminTest, type VersionBrief } from "../client-types";
+import s from "../admin.module.css";
 
 export function AdminCataloguePage() {
   const router = useRouter();

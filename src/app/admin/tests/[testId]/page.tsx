@@ -1,4 +1,4 @@
-import { AdminTestDetailPage } from "@/frontend/features/admin/test-detail-page";
+import { AdminTestDetailPage } from "@/frontend/features/admin/pages/test-detail-page";
 
 export default async function Page({ params }: { params: Promise<{ testId: string }> }) {
   const { testId } = await params;

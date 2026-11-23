@@ -2,8 +2,8 @@
 
 import { AdminIcon } from "./admin-icons";
 import { Alert, Empty } from "./admin-ui";
-import { numberLabel, type ValidationReport, type ValidationIssue, type VersionEditor } from "./client-types";
-import s from "./admin.module.css";
+import { numberLabel, type ValidationReport, type ValidationIssue, type VersionEditor } from "../client-types";
+import s from "../admin.module.css";
 
 const titles: Record<string, string> = {
   NO_SECTIONS: "Chưa có section",

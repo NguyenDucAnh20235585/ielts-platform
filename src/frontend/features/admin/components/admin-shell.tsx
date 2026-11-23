@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Brand } from "@/frontend/features/student/components/ui";
-import { useAdmin } from "./admin-context";
+import { useAdmin } from "../state/admin-context";
 import { AdminIcon } from "./admin-icons";
-import s from "./admin.module.css";
+import s from "../admin.module.css";
 
 export function AdminShell({ children, skill = "", title = "Quản lý đề" }: { children: ReactNode; skill?: string; title?: string }) {
   const { user, logout } = useAdmin();

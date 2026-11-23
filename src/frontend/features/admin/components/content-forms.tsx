@@ -6,12 +6,12 @@ import { ALLOWED_FORMATS, defaultAnswerFormat } from "@/shared/admin/question-ru
 import { dbValueOf, QUESTION_TYPES, ANSWER_FORMATS_API, type DbQuestionType } from "@/shared/test/api-enums";
 import type { RulesInput } from "@/shared/grading/schemas";
 import { Markdown } from "@/frontend/features/student/components/markdown";
-import { useAdmin, useDraftGuard } from "./admin-context";
+import { useAdmin, useDraftGuard } from "../state/admin-context";
 import { AdminIcon } from "./admin-icons";
 import { Alert } from "./admin-ui";
-import { adminError } from "./client-api";
-import { numberLabel, questionLabels, type AdminSection, type AdminGroup, type AdminQuestion } from "./client-types";
-import s from "./admin.module.css";
+import { adminError } from "../client-api";
+import { numberLabel, questionLabels, type AdminSection, type AdminGroup, type AdminQuestion } from "../client-types";
+import s from "../admin.module.css";
 
 export type SaveNode = (payload: Record<string, unknown>) => Promise<void>;
 type Props = { readOnly: boolean; onSave: SaveNode; siblingCount: number };
