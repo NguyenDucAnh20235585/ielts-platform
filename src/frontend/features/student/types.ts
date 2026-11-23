@@ -1,21 +1,33 @@
 import type { MeResponse } from "@/shared/auth/me-response";
-import type { AttemptView, ActiveAttemptView } from "@/shared/attempt/attempt-view";
+import type {
+  AttemptView,
+  ActiveAttemptView,
+} from "@/shared/attempt/attempt-view";
 import type { ResultPayload } from "@/shared/attempt/result-view";
 import type { ModeOption } from "@/shared/test/mode-settings";
-import type { StudentSection, StudentTestVersion } from "@/shared/test/student-content";
+import type {
+  StudentSection,
+  StudentTestVersion,
+} from "@/shared/test/student-content";
 
-export type { StudentSection, StudentQuestion, StudentGroup, StudentTestVersion } from "@/shared/test/student-content";
+export type {
+  StudentSection,
+  StudentQuestion,
+  StudentGroup,
+  StudentTestVersion,
+} from "@/shared/test/student-content";
 export type { ModeOption, ResultPayload };
 export type StudentUser = MeResponse;
 export type Mode = "PRACTICE" | "MOCK";
 export type Skill = "READING" | "LISTENING";
-export type AnswerValue = { choice: string } | { choices: string[] } | { text: string } | null;
+export type AnswerValue =
+  | { choice: string }
+  | { choices: string[] }
+  | { text: string }
+  | null;
 export type Answers = Record<string, AnswerValue>;
 
-export type Paginated<T> = {
-  items: T[];
-  pagination: { page: number; limit: number; total: number; total_pages: number };
-};
+export type { Paginated } from "@/shared/types/pagination";
 export type TestSummary = {
   id: string;
   title: string;
@@ -28,10 +40,16 @@ export type TestSummary = {
 };
 export type TestDetail = TestSummary & {
   section_count: number;
-  latest_version: { id: string; version_number: number; published_at: string | null };
+  latest_version: {
+    id: string;
+    version_number: number;
+    published_at: string | null;
+  };
   active_attempt: ActiveAttemptView | null;
 };
-export type Preload = { audio: { section_id: string; url: string; expires_at: string | null }[] };
+export type Preload = {
+  audio: { section_id: string; url: string; expires_at: string | null }[];
+};
 export type AttemptPayload = {
   attempt: AttemptView;
   test_version: StudentTestVersion;
@@ -41,7 +59,10 @@ export type AttemptPayload = {
   preload: Preload | null;
 };
 export type StartPayload = { attempt: AttemptView; preload: Preload };
-export type TimerStatus = Pick<AttemptView, "status" | "server_time" | "started_at" | "expires_at" | "remaining_seconds">;
+export type TimerStatus = Pick<
+  AttemptView,
+  "status" | "server_time" | "started_at" | "expires_at" | "remaining_seconds"
+>;
 export type SavePayload = {
   saved_at: string;
   answers: { question_id: string; answer: AnswerValue; saved_at: string }[];
