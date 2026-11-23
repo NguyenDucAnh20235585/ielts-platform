@@ -5,7 +5,7 @@ import type { Option } from "@/features/test/question-options";
 import { ALLOWED_FORMATS, defaultAnswerFormat } from "./question-rules";
 import { dbValueOf, QUESTION_TYPES, ANSWER_FORMATS_API, type DbQuestionType } from "@/features/test/api-enums";
 import type { RulesInput } from "@/features/grading/schemas";
-import { Markdown } from "@/features/student/markdown";
+import { Markdown } from "@/frontend/features/student/markdown";
 import { useAdmin, useDraftGuard } from "./admin-context";
 import { AdminIcon } from "./admin-icons";
 import { Alert } from "./admin-ui";

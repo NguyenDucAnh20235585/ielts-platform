@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import FoundationIcon from "@/features/foundation/foundation-icons";
+import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
 import { studentApi, jsonBody, errorText } from "./api";
 import { useResource } from "./use-resource";
 import { useStudent } from "./student-context";

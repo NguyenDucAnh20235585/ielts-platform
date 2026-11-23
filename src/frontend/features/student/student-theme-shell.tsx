@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { FoundationFooter } from "@/features/foundation/foundation-footer";
-import { FoundationTheme, FoundationThemeToggle } from "@/features/foundation/foundation-theme";
-import foundation from "@/features/foundation/foundation.module.css";
+import { FoundationFooter } from "@/frontend/features/foundation/foundation-footer";
+import { FoundationTheme, FoundationThemeToggle } from "@/frontend/features/foundation/foundation-theme";
+import foundation from "@/frontend/features/foundation/foundation.module.css";
 import { StudentIcon, type IconName } from "./student-icons";
 import type { StudentUser } from "./types";
 import s from "./student-theme-shell.module.css";

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { FoundationTheme, FoundationThemeToggle } from "@/features/foundation/foundation-theme";
-import foundation from "@/features/foundation/foundation.module.css";
+import { FoundationTheme, FoundationThemeToggle } from "@/frontend/features/foundation/foundation-theme";
+import foundation from "@/frontend/features/foundation/foundation.module.css";
 import { useAttempt } from "./use-attempt";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";

@@ -1,7 +1,7 @@
 import type { toAdminTest, toVersionBrief } from "./admin-views";
 import type { getVersionEditor } from "@/backend/services/admin-versions";
 import type { MeResponse } from "@/features/auth/me-response";
-import type { Paginated } from "@/features/student/types";
+import type { Paginated } from "@/frontend/features/student/types";
 
 export type AdminTest = ReturnType<typeof toAdminTest>;
 export type VersionBrief = ReturnType<typeof toVersionBrief>;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import FoundationIcon from "@/features/foundation/foundation-icons";
+import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";
 import { useResource } from "./use-resource";

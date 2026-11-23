@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import Script from "next/script";
-import { foundationThemeInitScript } from "@/features/foundation/foundation-theme-config";
+import { foundationThemeInitScript } from "@/frontend/features/foundation/foundation-theme-config";
 import "./globals.css";
 
 const beVietnamPro = Be_Vietnam_Pro({

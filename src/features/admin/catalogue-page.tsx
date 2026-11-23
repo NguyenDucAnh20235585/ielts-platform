@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {useState, type FormEvent } from "react";
-import { SkillBadge, Pagination } from "@/features/student/ui";
+import { SkillBadge, Pagination } from "@/frontend/features/student/ui";
 import { AdminShell } from "./admin-shell";
 import { AdminIcon } from "./admin-icons";
 import { Alert, Empty, Modal, ModeBadges, StatusBadge } from "./admin-ui";

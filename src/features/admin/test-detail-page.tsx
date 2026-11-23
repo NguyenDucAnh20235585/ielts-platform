@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { SkillBadge } from "@/features/student/ui";
+import { SkillBadge } from "@/frontend/features/student/ui";
 import { AdminShell } from "./admin-shell";
 import { AdminIcon } from "./admin-icons";
 import { Alert, Empty, ModeBadges, StatusBadge } from "./admin-ui";

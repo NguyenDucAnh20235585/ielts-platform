@@ -1,5 +1,5 @@
 import type { ReactNode, SVGProps } from "react";
-import { StudentIcon, type IconName } from "@/features/student/student-icons";
+import { StudentIcon, type IconName } from "@/frontend/features/student/student-icons";
 
 type ExtraIcon = "plus" | "save" | "edit" | "trash" | "eye" | "hide" | "archive" | "settings" | "publish" | "chevron";
 const paths: Record<ExtraIcon, ReactNode> = {

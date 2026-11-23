@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import FoundationIcon from "@/features/foundation/foundation-icons";
+import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
 import { useResource } from "./use-resource";
 import { useStudent } from "./student-context";
 import { StudentThemeShell, StudentThemeStatus } from "./student-theme-shell";

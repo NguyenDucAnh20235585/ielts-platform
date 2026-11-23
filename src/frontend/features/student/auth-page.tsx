@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/features/auth/supabase-browser";
-import { FoundationFooter } from "@/features/foundation/foundation-footer";
-import FoundationIcon from "@/features/foundation/foundation-icons";
-import { FoundationHeader } from "@/features/foundation/foundation-interactions";
-import { FoundationTheme } from "@/features/foundation/foundation-theme";
-import foundation from "@/features/foundation/foundation.module.css";
+import { FoundationFooter } from "@/frontend/features/foundation/foundation-footer";
+import FoundationIcon from "@/frontend/features/foundation/foundation-icons";
+import { FoundationHeader } from "@/frontend/features/foundation/foundation-interactions";
+import { FoundationTheme } from "@/frontend/features/foundation/foundation-theme";
+import foundation from "@/frontend/features/foundation/foundation.module.css";
 import { errorText } from "./api";
 import s from "./auth.module.css";
 

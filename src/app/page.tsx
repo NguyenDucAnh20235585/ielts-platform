@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import FoundationPage from "@/features/foundation/foundation-page";
+import FoundationPage from "@/frontend/features/foundation/foundation-page";
 
 export const metadata: Metadata = {
   title: "Ms Chau’s IELTS | Reading & Listening Practice",

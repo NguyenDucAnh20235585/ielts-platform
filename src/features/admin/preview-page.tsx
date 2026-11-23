@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { QuestionCard } from "@/features/student/question-card";
-import { Markdown } from "@/features/student/markdown";
-import { Brand, SkillBadge } from "@/features/student/ui";
-import type { AnswerValue, Answers, StudentQuestion } from "@/features/student/types";
+import { QuestionCard } from "@/frontend/features/student/question-card";
+import { Markdown } from "@/frontend/features/student/markdown";
+import { Brand, SkillBadge } from "@/frontend/features/student/ui";
+import type { AnswerValue, Answers, StudentQuestion } from "@/frontend/features/student/types";
 import { AdminIcon } from "./admin-icons";
 import { Alert, Empty } from "./admin-ui";
 import { useAdminResource } from "./client-api";
 import { MediaImage } from "./content-forms";
 import { versionUrl, type VersionEditor, type StudentContent } from "./client-types";
 import s from "./admin.module.css";
-import student from "@/features/student/student.module.css";
+import student from "@/frontend/features/student/student.module.css";
 
 export function AdminPreviewPage({ versionId }: { versionId: string }) {
   const version = useAdminResource<VersionEditor>("/api/admin/test-versions/" + encodeURIComponent(versionId));
